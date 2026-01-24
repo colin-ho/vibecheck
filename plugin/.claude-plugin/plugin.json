@@ -1,0 +1,14 @@
+{
+  "name": "claude-wrapped",
+  "version": "1.0.0",
+  "description": "Your year in code with Claude - A Spotify Wrapped-like experience for Claude Code users",
+  "author": "Claude Wrapped Team",
+  "repository": "https://github.com/claude-wrapped/claude-code-plugin",
+  "commands": [
+    {
+      "name": "wrapped",
+      "description": "Generate your Claude Code Wrapped - see your coding stats and discover your developer persona",
+      "file": "commands/wrapped.md"
+    }
+  ]
+}
