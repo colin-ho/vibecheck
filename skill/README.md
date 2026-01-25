@@ -7,7 +7,7 @@ An interactive journey through your Claude Code usage statistics.
 ### Quick Install (Recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
 ```
 
 This single command:
@@ -27,8 +27,8 @@ This single command:
 2. Clone this repository and copy the skill files:
    ```bash
    git clone https://github.com/colin-ho/vibecheck /tmp/vibecheck
-   cp /tmp/vibecheck/plugin/SKILL.md ~/.claude/skills/vibes/
-   cp -r /tmp/vibecheck/plugin/scripts ~/.claude/skills/vibes/
+   cp /tmp/vibecheck/skill/SKILL.md ~/.claude/skills/vibes/
+   cp -r /tmp/vibecheck/skill/scripts ~/.claude/skills/vibes/
    rm -rf /tmp/vibecheck
    ```
 

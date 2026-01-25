@@ -19,7 +19,7 @@ npm run lint         # ESLint check
 
 ### Data Flow
 
-1. **Plugin** (`plugin/`): User runs `/vibes` in Claude Code → shell scripts extract stats from `~/.claude/stats-cache.json` and session JSONL files → compiled into `AnonymousBundle`
+1. **Skill** (`skill/`): User runs `/vibes` in Claude Code → Python script extracts stats from `~/.claude/stats-cache.json` and session JSONL files → compiled into `AnonymousBundle`
 
 2. **Encoding**: Bundle → pako.deflate → base64url → URL param `?d=<encoded>`
 
@@ -32,7 +32,7 @@ npm run lint         # ESLint check
 - `src/stories/slides/` - 15 individual animated story slides, each implements `StorySlideProps`
 - `src/personas/definitions.ts` - 16 persona definitions with metadata
 - `src/data/` - Types, URL encoding/decoding, bundle enrichment, mock data
-- `plugin/scripts/` - Shell scripts for local stats extraction
+- `skill/scripts/` - Python script for local stats extraction
 - `api/` - Vercel serverless endpoints
 
 ### Slide Component Pattern

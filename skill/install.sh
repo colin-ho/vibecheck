@@ -1,6 +1,6 @@
 #!/bin/bash
 # VibeChecked Skill Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
 
 set -e
 
@@ -32,9 +32,16 @@ fi
 # Create skills directory if it doesn't exist
 mkdir -p "$HOME/.claude/skills"
 
-# Remove existing installation
+# Remove old plugin installation (migrating to skill)
+OLD_PLUGIN_DIR="$HOME/.claude/plugins/vibechecked"
+if [ -d "$OLD_PLUGIN_DIR" ]; then
+    echo "Removing old plugin installation..."
+    rm -rf "$OLD_PLUGIN_DIR"
+fi
+
+# Remove existing skill installation
 if [ -d "$SKILL_DIR" ]; then
-    echo "Removing existing installation..."
+    echo "Updating existing installation..."
     rm -rf "$SKILL_DIR"
 fi
 
@@ -46,8 +53,8 @@ if command -v git &> /dev/null; then
     echo "Cloning from repository..."
     if git clone --depth 1 "$REPO_URL" "$TEMP_DIR/repo" 2>/dev/null; then
         mkdir -p "$SKILL_DIR"
-        cp "$TEMP_DIR/repo/plugin/SKILL.md" "$SKILL_DIR/"
-        cp -r "$TEMP_DIR/repo/plugin/scripts" "$SKILL_DIR/"
+        cp "$TEMP_DIR/repo/skill/SKILL.md" "$SKILL_DIR/"
+        cp -r "$TEMP_DIR/repo/skill/scripts" "$SKILL_DIR/"
     else
         echo "Failed to clone repository."
         echo "   Please check your internet connection or install manually:"
@@ -59,8 +66,8 @@ else
     if command -v curl &> /dev/null; then
         curl -sL "https://github.com/colin-ho/vibecheck/archive/main.tar.gz" | tar -xz -C "$TEMP_DIR"
         mkdir -p "$SKILL_DIR"
-        cp "$TEMP_DIR/vibecheck-main/plugin/SKILL.md" "$SKILL_DIR/"
-        cp -r "$TEMP_DIR/vibecheck-main/plugin/scripts" "$SKILL_DIR/"
+        cp "$TEMP_DIR/vibecheck-main/skill/SKILL.md" "$SKILL_DIR/"
+        cp -r "$TEMP_DIR/vibecheck-main/skill/scripts" "$SKILL_DIR/"
     else
         echo "Neither git nor curl found. Please install one and try again."
         exit 1
@@ -98,5 +105,5 @@ elif ! command -v claude &> /dev/null; then
 else
     echo "Generating your vibe check..."
     echo ""
-    claude --print "/vibes"
+    claude --print --model sonnet "/vibes"
 fi

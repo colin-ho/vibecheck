@@ -2,6 +2,7 @@
 name: vibes
 description: Generate your VibeChecked - an interactive journey through your Claude Code usage statistics. Use when the user wants to see their coding stats, developer persona, or usage patterns.
 allowed-tools: Bash(python3:*), Read
+model: sonnet
 ---
 
 # VibeChecked - Your Claude Code Journey
