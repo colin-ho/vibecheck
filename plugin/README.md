@@ -1,32 +1,47 @@
-# VibeChecked Plugin
+# VibeChecked Skill
 
 An interactive journey through your Claude Code usage statistics.
 
 ## Installation
 
-### Quick Install
+### Quick Install (Recommended)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
 ```
 
+This single command:
+1. Installs the VibeChecked skill to `~/.claude/skills/vibes/`
+2. Automatically analyzes your Claude Code usage
+3. Displays your personalized URL to visit
+
+**Requirements:** Claude Code CLI must be installed and you need existing usage stats.
+
 ### Manual Install
 
-1. Clone this repository and copy the plugin directory:
+1. Create the skill directory:
+   ```bash
+   mkdir -p ~/.claude/skills/vibes
+   ```
+
+2. Clone this repository and copy the skill files:
    ```bash
    git clone https://github.com/colin-ho/vibecheck /tmp/vibecheck
-   mv /tmp/vibecheck/plugin ~/.claude/plugins/vibechecked
+   cp /tmp/vibecheck/plugin/SKILL.md ~/.claude/skills/vibes/
+   cp -r /tmp/vibecheck/plugin/scripts ~/.claude/skills/vibes/
    rm -rf /tmp/vibecheck
    ```
 
-2. Make scripts executable:
+3. Make scripts executable:
    ```bash
-   chmod +x ~/.claude/plugins/vibechecked/scripts/*.sh
+   chmod +x ~/.claude/skills/vibes/scripts/*.py
    ```
 
-## Usage
+4. Run `/vibes` in Claude Code to generate your vibe check.
 
-Simply run the `/vibes` command in Claude Code:
+## Regenerating Your Vibe Check
+
+To regenerate your stats later (after more Claude Code usage), run the `/vibes` command in Claude Code:
 
 ```
 /vibes
@@ -35,7 +50,7 @@ Simply run the `/vibes` command in Claude Code:
 Claude will:
 1. Analyze your usage statistics
 2. Determine your developer persona
-3. Open an interactive web experience with your personalized results
+3. Display a URL with your personalized results
 
 ## What You'll See
 

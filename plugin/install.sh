@@ -1,19 +1,19 @@
 #!/bin/bash
-# VibeChecked Plugin Installer
+# VibeChecked Skill Installer
 # Usage: curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
 
 set -e
 
-PLUGIN_NAME="vibechecked"
-PLUGIN_DIR="$HOME/.claude/plugins/$PLUGIN_NAME"
+SKILL_NAME="vibes"
+SKILL_DIR="$HOME/.claude/skills/$SKILL_NAME"
 REPO_URL="https://github.com/colin-ho/vibecheck"
 
-echo "🎁 Installing VibeChecked Plugin..."
+echo "Installing VibeChecked..."
 
 # Check for Python 3
 if ! command -v python3 &> /dev/null; then
     echo ""
-    echo "⚠️  Warning: 'python3' is not found."
+    echo "Warning: 'python3' is not found."
     echo "   Python 3.8+ is required for VibeChecked."
     echo "   Install it with:"
     echo "     macOS:  brew install python3"
@@ -24,30 +24,32 @@ fi
 # Check if stats file exists
 if [ ! -f "$HOME/.claude/stats-cache.json" ]; then
     echo ""
-    echo "⚠️  Warning: No Claude Code stats found at ~/.claude/stats-cache.json"
+    echo "Warning: No Claude Code stats found at ~/.claude/stats-cache.json"
     echo "   You need to use Claude Code for a while before running /vibes."
     echo ""
 fi
 
-# Create plugins directory if it doesn't exist
-mkdir -p "$HOME/.claude/plugins"
+# Create skills directory if it doesn't exist
+mkdir -p "$HOME/.claude/skills"
 
 # Remove existing installation
-if [ -d "$PLUGIN_DIR" ]; then
+if [ -d "$SKILL_DIR" ]; then
     echo "Removing existing installation..."
-    rm -rf "$PLUGIN_DIR"
+    rm -rf "$SKILL_DIR"
 fi
 
-# Clone or download the plugin
+# Clone or download the skill
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
 
 if command -v git &> /dev/null; then
     echo "Cloning from repository..."
     if git clone --depth 1 "$REPO_URL" "$TEMP_DIR/repo" 2>/dev/null; then
-        mv "$TEMP_DIR/repo/plugin" "$PLUGIN_DIR"
+        mkdir -p "$SKILL_DIR"
+        cp "$TEMP_DIR/repo/plugin/SKILL.md" "$SKILL_DIR/"
+        cp -r "$TEMP_DIR/repo/plugin/scripts" "$SKILL_DIR/"
     else
-        echo "❌ Failed to clone repository."
+        echo "Failed to clone repository."
         echo "   Please check your internet connection or install manually:"
         echo "   https://github.com/colin-ho/vibecheck#installation"
         exit 1
@@ -56,26 +58,45 @@ else
     echo "Git not found, downloading via curl..."
     if command -v curl &> /dev/null; then
         curl -sL "https://github.com/colin-ho/vibecheck/archive/main.tar.gz" | tar -xz -C "$TEMP_DIR"
-        mv "$TEMP_DIR/vibecheck-main/plugin" "$PLUGIN_DIR"
+        mkdir -p "$SKILL_DIR"
+        cp "$TEMP_DIR/vibecheck-main/plugin/SKILL.md" "$SKILL_DIR/"
+        cp -r "$TEMP_DIR/vibecheck-main/plugin/scripts" "$SKILL_DIR/"
     else
-        echo "❌ Neither git nor curl found. Please install one and try again."
+        echo "Neither git nor curl found. Please install one and try again."
         exit 1
     fi
 fi
 
 # Verify installation
-if [ ! -f "$PLUGIN_DIR/scripts/vibes.py" ]; then
-    echo "❌ Installation failed: scripts not found."
+if [ ! -f "$SKILL_DIR/SKILL.md" ]; then
+    echo "Installation failed: SKILL.md not found."
+    exit 1
+fi
+
+if [ ! -f "$SKILL_DIR/scripts/vibes.py" ]; then
+    echo "Installation failed: scripts not found."
     exit 1
 fi
 
 # Make scripts executable
-chmod +x "$PLUGIN_DIR/scripts/vibes.py"
+chmod +x "$SKILL_DIR/scripts/vibes.py"
 
 echo ""
-echo "✅ VibeChecked installed successfully!"
+echo "VibeChecked installed successfully!"
 echo ""
-echo "To generate your vibe check, run:"
-echo "  /vibes"
-echo ""
-echo "Enjoy exploring your coding journey! 🎉"
+
+# Auto-run /vibes if prerequisites are met
+if [ ! -f "$HOME/.claude/stats-cache.json" ]; then
+    echo "No Claude Code stats found yet."
+    echo "   Use Claude Code for a while, then run /vibes to generate your vibe check."
+    echo ""
+elif ! command -v claude &> /dev/null; then
+    echo "Claude Code CLI not found in PATH."
+    echo "   Install Claude Code, then run /vibes to generate your vibe check."
+    echo "   https://claude.ai/code"
+    echo ""
+else
+    echo "Generating your vibe check..."
+    echo ""
+    claude --print "/vibes"
+fi

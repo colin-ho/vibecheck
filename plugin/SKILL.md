@@ -1,24 +1,28 @@
-# /vibes - Generate Your VibeChecked
+---
+name: vibes
+description: Generate your VibeChecked - an interactive journey through your Claude Code usage statistics. Use when the user wants to see their coding stats, developer persona, or usage patterns.
+allowed-tools: Bash(python3:*), Read
+---
 
-Generate a personalized interactive journey through your Claude Code usage with VibeChecked.
+# VibeChecked - Your Claude Code Journey
 
-## What This Command Does
+Generate a personalized interactive journey through your Claude Code usage.
+
+## What This Does
 
 1. Extracts your usage statistics from `~/.claude/stats-cache.json`
 2. Analyzes your tool usage patterns from session files
 3. Determines your developer persona based on your coding patterns
 4. Opens an interactive web experience with animated visualizations
 
-## Instructions for Claude
-
-When the user runs `/vibes`, follow these steps:
+## Instructions
 
 ### Step 1: Generate Your VibeChecked URL
 
 Run the vibes script to generate your personalized URL:
 
 ```bash
-python3 ~/.claude/plugins/vibechecked/scripts/vibes.py
+python3 ~/.claude/skills/vibes/scripts/vibes.py
 ```
 
 This outputs a URL. You can also use `--json` to see the raw data or `-v` for verbose output.
@@ -84,7 +88,7 @@ Add these to the `funFacts` array in the bundle.
 The `vibes.py` script outputs the full URL with encoded data. Open it in the browser:
 
 ```bash
-python3 ~/.claude/plugins/vibechecked/scripts/vibes.py
+python3 ~/.claude/skills/vibes/scripts/vibes.py
 ```
 
 Then tell the user you're opening their VibeChecked experience and provide the URL.
@@ -98,7 +102,7 @@ Then tell the user you're opening their VibeChecked experience and provide the U
 
 ## Example Output
 
-After running the command, Claude should say something like:
+After running the command, say something like:
 
 "I've analyzed your Claude Code usage! Here's what I found:
 
