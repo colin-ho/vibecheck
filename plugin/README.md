@@ -1,33 +1,35 @@
-# Claude Code Wrapped Plugin
+# VibeChecked Plugin
 
-Your year in code with Claude - A Spotify Wrapped-like experience for Claude Code users.
+An interactive journey through your Claude Code usage statistics.
 
 ## Installation
 
 ### Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/claude-wrapped/plugin/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
 ```
 
 ### Manual Install
 
-1. Clone this repository to your Claude plugins directory:
+1. Clone this repository and copy the plugin directory:
    ```bash
-   git clone https://github.com/claude-wrapped/claude-code-plugin ~/.claude/plugins/claude-wrapped
+   git clone https://github.com/colin-ho/vibecheck /tmp/vibecheck
+   mv /tmp/vibecheck/plugin ~/.claude/plugins/vibechecked
+   rm -rf /tmp/vibecheck
    ```
 
 2. Make scripts executable:
    ```bash
-   chmod +x ~/.claude/plugins/claude-wrapped/scripts/*.sh
+   chmod +x ~/.claude/plugins/vibechecked/scripts/*.sh
    ```
 
 ## Usage
 
-Simply run the `/wrapped` command in Claude Code:
+Simply run the `/vibes` command in Claude Code:
 
 ```
-/wrapped
+/vibes
 ```
 
 Claude will:
@@ -53,7 +55,7 @@ Claude will:
 
 ## Personas
 
-You might be assigned one of these fun personas:
+You might be assigned one of these developer personas:
 
 ### Legendary
 - **TOKEN TITAN** - Massive token usage
@@ -83,8 +85,9 @@ You might be assigned one of these fun personas:
 ## Requirements
 
 - Claude Code CLI
-- `jq` for JSON processing (recommended)
-- `gzip` and `base64` for data encoding
+- Python 3.8+ (**required**)
+  - macOS: `brew install python3`
+  - Ubuntu/Debian: `sudo apt install python3`
 
 ## Contributing
 

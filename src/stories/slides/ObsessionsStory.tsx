@@ -1,15 +1,25 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps, Topics } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
 import { getTopicRoast } from '../../personas/definitions';
+import { SlideLayout } from '../../components/SlideLayout';
 
 interface TopicData {
   name: string;
   count: number;
   percentage: number;
   color: string;
-  icon: string;
 }
+
+// Warm color palette for topics
+const topicConfig: Record<keyof Topics, { color: string; label: string }> = {
+  debugging: { color: '#da1c1c', label: 'Debugging' },
+  frontend: { color: '#bdb7fc', label: 'Frontend' },
+  backend: { color: '#dd5013', label: 'Backend' },
+  devops: { color: '#a05f1a', label: 'DevOps' },
+  ai: { color: '#8b372b', label: 'AI/ML' },
+  testing: { color: '#5d3d3a', label: 'Testing' },
+  refactoring: { color: '#3b110c', label: 'Refactoring' },
+};
 
 export function ObsessionsStory({ data, isActive }: StorySlideProps) {
   const topics = data.topics || {
@@ -22,27 +32,14 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
     refactoring: 0,
   };
 
-  // Calculate total and percentages
   const total = Object.values(topics).reduce((a, b) => a + b, 0) || 1;
 
-  const topicConfig: Record<keyof Topics, { color: string; icon: string; label: string }> = {
-    debugging: { color: '#ef4444', icon: '🐛', label: 'Debugging' },
-    frontend: { color: '#3b82f6', icon: '🎨', label: 'Frontend' },
-    backend: { color: '#22c55e', icon: '🔧', label: 'Backend' },
-    devops: { color: '#f97316', icon: '🚀', label: 'DevOps' },
-    ai: { color: '#a855f7', icon: '🤖', label: 'AI/ML' },
-    testing: { color: '#06b6d4', icon: '🧪', label: 'Testing' },
-    refactoring: { color: '#ec4899', icon: '✨', label: 'Refactoring' },
-  };
-
-  // Convert to array and sort by count
   const topicData: TopicData[] = Object.entries(topics)
     .map(([key, count]) => ({
       name: key,
       count,
       percentage: Math.round((count / total) * 100),
-      color: topicConfig[key as keyof Topics]?.color || '#888',
-      icon: topicConfig[key as keyof Topics]?.icon || '📁',
+      color: topicConfig[key as keyof Topics]?.color || '#8b372b',
     }))
     .sort((a, b) => b.count - a.count)
     .filter(t => t.count > 0);
@@ -50,140 +47,115 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
   const topTopic = topicData[0];
   const topTopicLabel = topicConfig[topTopic?.name as keyof Topics]?.label || topTopic?.name;
 
-  // Generate roast based on top topic
-  const getObsessionRoast = () => {
-    if (!topTopic) return "Your focus is... everywhere.";
-
-    const roasts: Record<string, string> = {
-      debugging: "Your code: broken. Your spirit: also broken. At least you're consistent.",
-      frontend: "CSS is hard. Everyone knows. But 47 prompts to center a div?",
-      backend: "REST in peace to your sanity. And your API endpoints.",
-      devops: "Infrastructure as code. Bugs as features. Pipeline as chaos.",
-      ai: "Prompt engineering your way through life. Token by token.",
-      testing: "The tests pass. The code works. These are two different statements.",
-      refactoring: "Perfection is a journey, not a destination. You're still journeying.",
-    };
-
-    return roasts[topTopic.name] || `Your top obsession: ${topTopicLabel}. Might want to diversify.`;
-  };
+  // Bubble/radar-style visualization
+  const maxPercentage = Math.max(...topicData.map(t => t.percentage), 1);
 
   return (
-    <GradientBackground variant="green">
-      <div className="flex flex-col items-center justify-center h-full px-8">
+    <SlideLayout>
         {/* Header */}
         <motion.div
-          className="text-gray-400 text-lg mb-8 tracking-widest uppercase text-center"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          What kept you up at night
+          WHAT KEPT YOU UP AT NIGHT
         </motion.div>
 
-        {/* Topic bars */}
+        {/* Bubble cluster visualization */}
         <motion.div
-          className="w-full max-w-md space-y-4 mb-8"
+          className="relative w-72 h-72 mb-6"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={isActive ? { opacity: 1, scale: 1 } : {}}
+          transition={{ delay: 0.3, duration: 0.8 }}
+        >
+          {topicData.slice(0, 6).map((topic, index) => {
+            // Position bubbles in a cluster
+            const angle = (index / Math.min(topicData.length, 6)) * Math.PI * 2 - Math.PI / 2;
+            const distanceFromCenter = index === 0 ? 0 : 80 + (index % 2) * 20;
+            const size = 40 + (topic.percentage / maxPercentage) * 60;
+
+            const x = 144 + (index === 0 ? 0 : Math.cos(angle) * distanceFromCenter);
+            const y = 144 + (index === 0 ? 0 : Math.sin(angle) * distanceFromCenter);
+
+            return (
+              <motion.div
+                key={topic.name}
+                className="absolute flex flex-col items-center justify-center rounded-full"
+                style={{
+                  left: x - size / 2,
+                  top: y - size / 2,
+                  width: size,
+                  height: size,
+                  background: `radial-gradient(circle, ${topic.color}50, ${topic.color}30)`,
+                  border: `2px solid ${topic.color}70`,
+                }}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={isActive ? { opacity: 1, scale: 1 } : {}}
+                transition={{
+                  delay: 0.6 + index * 0.15,
+                  type: 'spring',
+                  stiffness: 200,
+                }}
+              >
+                {index === 0 && (
+                  <>
+                    <span className="text-dark text-xs font-bold">{topTopicLabel}</span>
+                    <span className="text-dark/60 text-xs">{topic.percentage}%</span>
+                  </>
+                )}
+              </motion.div>
+            );
+          })}
+        </motion.div>
+
+        {/* Topic legend with bars */}
+        <motion.div
+          className="w-full max-w-sm space-y-2"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 1.7 }}
         >
           {topicData.slice(0, 5).map((topic, index) => (
             <motion.div
               key={topic.name}
-              className="relative"
-              initial={{ opacity: 0, x: -50 }}
+              className="flex items-center gap-3"
+              initial={{ opacity: 0, x: -20 }}
               animate={isActive ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 0.5 + index * 0.15 }}
+              transition={{ delay: 1.7 + index * 0.1 }}
             >
-              {/* Topic label */}
-              <div className="flex justify-between items-center mb-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{topic.icon}</span>
-                  <span className="text-white font-medium">
-                    {topicConfig[topic.name as keyof Topics]?.label || topic.name}
-                  </span>
-                </div>
-                <span className="text-gray-400 text-sm">{topic.percentage}%</span>
-              </div>
-
-              {/* Progress bar */}
-              <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: topic.color }}
+              />
+              <span className="text-dark/60 text-xs w-20">
+                {topicConfig[topic.name as keyof Topics]?.label || topic.name}
+              </span>
+              <div className="flex-1 h-1.5 bg-cream/40 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ backgroundColor: topic.color }}
                   initial={{ width: 0 }}
                   animate={isActive ? { width: `${topic.percentage}%` } : {}}
-                  transition={{ delay: 0.7 + index * 0.15, duration: 0.8, ease: 'easeOut' }}
+                  transition={{ delay: 1.9 + index * 0.1, duration: 0.8 }}
                 />
               </div>
-
-              {/* Roast line for top topic */}
-              {index === 0 && (
-                <motion.div
-                  className="text-terminal-orange text-sm mt-1 italic"
-                  initial={{ opacity: 0 }}
-                  animate={isActive ? { opacity: 1 } : {}}
-                  transition={{ delay: 1.5 }}
-                >
-                  {getTopicRoast(topic.name, topic.percentage)}
-                </motion.div>
-              )}
+              <span className="text-dark/80 text-xs w-8 text-right">{topic.percentage}%</span>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Main callout */}
-        <motion.div
-          className="glass p-6 rounded-2xl text-center max-w-md mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.8 }}
-        >
-          <div className="text-gray-400 text-sm mb-2">Your top obsession</div>
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <span className="text-4xl">{topTopic?.icon}</span>
-            <span className="text-4xl font-black text-white">{topTopicLabel}</span>
-          </div>
-          <div className="text-2xl font-bold" style={{ color: topTopic?.color }}>
-            {topTopic?.percentage}% of your prompts
-          </div>
-        </motion.div>
-
-        {/* Final roast */}
-        <motion.div
-          className="text-terminal-orange text-lg text-center italic max-w-md"
-          initial={{ opacity: 0 }}
-          animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 2.2 }}
-        >
-          {getObsessionRoast()}
-        </motion.div>
-
-        {/* Floating topic icons */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {topicData.map((topic, i) => (
-            <motion.div
-              key={`float-${topic.name}`}
-              className="absolute text-2xl opacity-20"
-              style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-              }}
-              animate={{
-                y: [0, -15, 0],
-                rotate: [0, 10, 0],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            >
-              {topic.icon}
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </GradientBackground>
+        {/* Roast for top topic */}
+        {topTopic && (
+          <motion.div
+            className="leading-[1.65] mt-8 text-sunset-accent text-sm italic text-center max-w-sm"
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ delay: 2.4 }}
+          >
+            {getTopicRoast(topTopic.name, topTopic.percentage)}
+          </motion.div>
+        )}
+    </SlideLayout>
   );
 }

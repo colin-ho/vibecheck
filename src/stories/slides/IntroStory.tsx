@@ -1,94 +1,113 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
+import { SlideLayout } from '../../components/SlideLayout';
 
 export function IntroStory({ isActive }: StorySlideProps) {
   return (
-    <GradientBackground variant="default">
-      <div className="flex flex-col items-center justify-center h-full px-8 text-center">
-        {/* Terminal frame */}
+    <SlideLayout>
+        {/* Terminal frame - warm refined style */}
         <motion.div
-          className="relative max-w-2xl w-full"
-          initial={{ opacity: 0, scale: 0.9 }}
+          className="relative max-w-xl w-full"
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 1 }}
         >
-          {/* Terminal header */}
-          <div className="bg-gray-800 rounded-t-lg px-4 py-2 flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="ml-4 text-gray-400 text-sm font-mono">claude-wrapped</span>
+          {/* Terminal header - warm colors */}
+          <div className="bg-sunset-afternoon border border-dark/10 rounded-t-lg px-4 py-2.5 flex items-center gap-3">
+            {/* Single lavender pulse indicator */}
+            <motion.div
+              className="w-2.5 h-2.5 rounded-full bg-lavender"
+              animate={{
+                boxShadow: [
+                  '0 0 4px rgba(189, 183, 252, 0.5)',
+                  '0 0 12px rgba(189, 183, 252, 0.8)',
+                  '0 0 4px rgba(189, 183, 252, 0.5)',
+                ],
+              }}
+              transition={{ duration: 2.5, repeat: Infinity }}
+            />
+            <span className="text-dark/80 text-xs font-mono tracking-wider">vibechecked</span>
           </div>
 
           {/* Terminal content */}
-          <div className="bg-gray-900/80 backdrop-blur rounded-b-lg p-8 border border-gray-800">
+          <div className="bg-sunset-morning border-x border-b border-dark/10 rounded-b-lg p-6 md:p-8">
             <motion.div
               className="font-mono text-left"
               initial={{ opacity: 0 }}
               animate={isActive ? { opacity: 1 } : {}}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.5 }}
             >
-              <div className="text-gray-500 mb-2">$ claude --wrapped</div>
+              <div className="text-dark/60 text-sm mb-3">$ claude --vibes</div>
 
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={isActive ? { opacity: 1 } : {}}
-                transition={{ delay: 0.8 }}
-                className="text-terminal-green"
+                transition={{ delay: 1 }}
+                className="text-sunset-accent text-sm"
               >
-                <span className="text-gray-500">[</span>
-                <span>████████████████████</span>
-                <span className="text-gray-500">]</span>
+                <span className="text-dark/50">[</span>
+                <motion.span
+                  initial={{ width: 0 }}
+                  animate={isActive ? { width: '100%' } : {}}
+                  transition={{ delay: 1, duration: 1, ease: 'linear' }}
+                  className="inline-block overflow-hidden"
+                >
+                  ████████████████████
+                </motion.span>
+                <span className="text-dark/50">]</span>
                 <span className="ml-2">100%</span>
               </motion.div>
 
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={isActive ? { opacity: 1 } : {}}
-                transition={{ delay: 1.3 }}
-                className="mt-4 text-gray-400"
+                transition={{ delay: 2.1 }}
+                className="mt-4 text-dark/70 text-sm"
               >
-                Analyzing your coding journey...
+                Analysis complete. Generating your journey...
               </motion.div>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Main title */}
+        {/* Main title - larger with gradient */}
         <motion.div
-          className="mt-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.8, duration: 0.6 }}
+          className="mt-14"
+          initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+          animate={isActive ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+          transition={{ delay: 2.5, duration: 1 }}
         >
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight">
-            <span className="gradient-text">YOUR YEAR</span>
+          <h1 className="leading-[1.05] text-6xl md:text-8xl font-black tracking-tightest">
+            <span className="bg-gradient-to-br from-lavender via-sunset-accent to-brand-red bg-clip-text text-transparent">YOUR JOURNEY</span>
           </h1>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight mt-2">
-            <span className="text-white">IN CODE</span>
+          <h1 className="leading-[1.05] text-6xl md:text-8xl font-black tracking-tightest mt-1">
+            <span className="text-dark">IN CODE</span>
           </h1>
         </motion.div>
 
         <motion.p
-          className="text-gray-400 mt-6 text-lg"
+          className="leading-[1.65] text-dark/70 mt-8 text-base tracking-wide"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 2.3 }}
+          transition={{ delay: 3.2 }}
         >
           A journey through your Claude Code sessions
         </motion.p>
 
         {/* Animated cursor */}
         <motion.div
-          className="mt-8 text-terminal-green font-mono"
+          className="mt-10 text-sunset-accent font-mono text-xl"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 2.8 }}
+          transition={{ delay: 3.6 }}
         >
-          <span className="cursor-blink">▌</span>
+          <motion.span
+            animate={{ opacity: [1, 0, 1] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+          >
+            _
+          </motion.span>
         </motion.div>
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

@@ -118,7 +118,7 @@ export interface Percentiles {
 }
 
 // Full data for rendering (bundle + server enrichment)
-export interface WrappedData extends AnonymousBundle {
+export interface UsageData extends AnonymousBundle {
   percentiles: Percentiles;
   persona: PersonaDefinition;
 }
@@ -144,7 +144,7 @@ export interface StorySlide {
 }
 
 export interface StorySlideProps {
-  data: WrappedData;
+  data: UsageData;
   onNext: () => void;
   isActive: boolean;
 }

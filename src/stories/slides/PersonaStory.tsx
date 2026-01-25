@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
+import { PulseRings } from '../../components/viz/RadialBurst';
 
 export function PersonaStory({ data, isActive }: StorySlideProps) {
   const { persona, roastEvidence, wordAnalysis, quirks } = data;
@@ -10,7 +11,6 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 
   useEffect(() => {
     if (isActive) {
-      // Start reveal sequence
       const revealTimer = setTimeout(() => setRevealed(true), 1500);
       const cardTimer = setTimeout(() => setShowCard(true), 2000);
       const evidenceTimer = setTimeout(() => setShowEvidence(true), 3500);
@@ -26,16 +26,14 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
     }
   }, [isActive]);
 
-  // Build dynamic evidence based on actual data
+  // Build dynamic evidence
   const buildEvidence = (): string[] => {
     const evidence: string[] = [];
 
-    // Use persona's built-in evidence if available
     if (persona.evidence && persona.evidence.length > 0) {
       return persona.evidence;
     }
 
-    // Build evidence from data
     if (roastEvidence?.topWord && roastEvidence.topWordCount > 50) {
       evidence.push(`You said "${roastEvidence.topWord}" ${roastEvidence.topWordCount} times`);
     }
@@ -61,7 +59,6 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
       evidence.push(`Epic ${hours}+ hour coding session`);
     }
 
-    // Fallback evidence
     if (evidence.length === 0) {
       evidence.push('Your coding patterns don\'t lie');
       evidence.push('The data speaks for itself');
@@ -72,84 +69,75 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 
   const evidenceLines = buildEvidence();
 
-  // Sample prompt for the evidence section
-  const samplePrompt = roastEvidence?.samplePrompt
-    ? `"${roastEvidence.samplePrompt.slice(0, 100)}${roastEvidence.samplePrompt.length > 100 ? '...' : ''}"`
-    : null;
-
   return (
-    <div
-      className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"
-      style={{ background: revealed ? persona.gradient : '#0a0a0a' }}
-    >
-      {/* Background transition */}
+    <div className="w-full h-full relative overflow-hidden">
+      {/* Background transition with persona gradient */}
       <motion.div
         className="absolute inset-0"
         style={{ background: persona.gradient }}
         initial={{ opacity: 0 }}
         animate={{ opacity: revealed ? 1 : 0 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 1.4 }}
       />
 
-      {/* Pre-reveal state */}
+      {/* Screen flash on reveal - warm cream */}
       <AnimatePresence>
-        {!revealed && (
+        {revealed && !showCard && (
           <motion.div
-            className="flex flex-col items-center justify-center z-10"
-            exit={{ opacity: 0, scale: 0.8 }}
-          >
-            <motion.div
-              className="text-gray-400 text-lg tracking-widest uppercase mb-8"
-              initial={{ opacity: 0, y: -20 }}
-              animate={isActive ? { opacity: 1, y: 0 } : {}}
-            >
-              And your persona is...
-            </motion.div>
-
-            {/* Loading animation */}
-            <motion.div
-              className="flex gap-2"
-              initial={{ opacity: 0 }}
-              animate={isActive ? { opacity: 1 } : {}}
-              transition={{ delay: 0.5 }}
-            >
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-4 h-4 rounded-full bg-terminal-green"
-                  animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.5, 1, 0.5],
-                  }}
-                  transition={{
-                    duration: 0.8,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                  }}
-                />
-              ))}
-            </motion.div>
-          </motion.div>
+            className="absolute inset-0 bg-cream"
+            initial={{ opacity: 0.7 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          />
         )}
       </AnimatePresence>
 
-      {/* Revealed persona card */}
-      <AnimatePresence>
-        {showCard && (
-          <motion.div
-            className="z-10 flex flex-col items-center px-4"
-            initial={{ opacity: 0, scale: 0.5, rotateY: -180 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-            transition={{
-              type: 'spring',
-              stiffness: 200,
-              damping: 20,
-              duration: 0.8,
-            }}
-          >
+      <div className="min-h-dvh h-dvh w-full p-[clamp(2rem,5vw,4rem)] pb-[clamp(3rem,7vw,5.5rem)] pt-[clamp(3rem,7vw,5.5rem)] flex flex-col items-center justify-center text-center gap-[clamp(0.75rem,2.5vw,1.75rem)] max-w-6xl mx-auto overflow-y-auto relative z-10">
+        {/* Pre-reveal state */}
+        <AnimatePresence>
+          {!revealed && (
+            <motion.div
+              className="flex flex-col items-center justify-center"
+              exit={{ opacity: 0, scale: 0.8 }}
+            >
+              <motion.div
+                className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-8"
+                initial={{ opacity: 0, y: -20 }}
+                animate={isActive ? { opacity: 1, y: 0 } : {}}
+              >
+                AND YOUR PERSONA IS...
+              </motion.div>
+
+              {/* Loading pulse rings - lavender */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={isActive ? { opacity: 1 } : {}}
+                transition={{ delay: 0.5 }}
+              >
+                <PulseRings color="#bdb7fc" size={120} rings={3} />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Revealed persona card */}
+        <AnimatePresence>
+          {showCard && (
+            <motion.div
+              className="flex flex-col items-center"
+              initial={{ opacity: 0, scale: 0.5, rotateY: -180 }}
+              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+              transition={{
+                type: 'spring',
+                stiffness: 200,
+                damping: 20,
+                duration: 1,
+              }}
+            >
             {/* Icon */}
             <motion.div
-              className="text-8xl mb-4"
+              className="text-7xl mb-4"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.3, type: 'spring' }}
@@ -157,17 +145,33 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
               {persona.icon}
             </motion.div>
 
-            {/* Persona card */}
+            {/* Persona card - warm styling */}
             <motion.div
-              className="bg-black/30 backdrop-blur-xl rounded-3xl p-6 md:p-8 max-w-md text-center border border-white/10"
+              className="relative bg-cream/80 backdrop-blur-xl rounded-2xl p-6 max-w-sm text-center"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
+              {/* Animated gradient border */}
+              <motion.div
+                className="absolute inset-0 rounded-2xl -z-10"
+                style={{
+                  background: `linear-gradient(135deg, ${persona.color}, transparent, ${persona.color})`,
+                  padding: '1px',
+                }}
+                animate={{
+                  backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+              />
+
               {/* Category badge */}
               <motion.div
-                className="inline-block px-4 py-1 rounded-full text-xs uppercase tracking-widest mb-4"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                className="inline-block px-3 py-1 rounded-full text-xs uppercase tracking-widest mb-3 bg-dark/10 text-dark"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
@@ -177,7 +181,7 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 
               {/* Persona name */}
               <motion.h1
-                className="text-4xl md:text-5xl font-black text-white tracking-tight"
+                className="text-3xl md:text-4xl font-black text-dark tracking-tight"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
@@ -187,7 +191,7 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 
               {/* Tagline */}
               <motion.p
-                className="text-lg md:text-xl text-white/80 mt-3"
+                className="leading-[1.65] text-base text-dark/80 mt-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
@@ -197,7 +201,7 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 
               {/* Description */}
               <motion.p
-                className="text-white/60 mt-4 text-base md:text-lg leading-relaxed"
+                className="leading-[1.65] text-dark/60 mt-3 text-sm"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.9 }}
@@ -206,54 +210,37 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
               </motion.p>
             </motion.div>
 
-            {/* Evidence section - only show for roast personas */}
+            {/* Evidence section - timeline style */}
             {showEvidence && persona.category === 'roast' && (
               <motion.div
-                className="mt-6 w-full max-w-md"
+                className="mt-5 w-full max-w-sm"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
-                  <div className="text-white/60 text-sm mb-3 uppercase tracking-wider">
-                    Why you got this:
-                  </div>
-                  <ul className="space-y-2">
-                    {evidenceLines.map((line, index) => (
-                      <motion.li
-                        key={index}
-                        className="text-white/80 text-sm flex items-start gap-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + index * 0.15 }}
-                      >
-                        <span className="text-terminal-orange">•</span>
-                        {line}
-                      </motion.li>
-                    ))}
-                  </ul>
-
-                  {/* Sample prompt */}
-                  {samplePrompt && (
+                <div className="text-dark/80 text-xs uppercase tracking-wider mb-3 text-center">
+                  Why you got this:
+                </div>
+                <div className="space-y-2">
+                  {evidenceLines.map((line, index) => (
                     <motion.div
-                      className="mt-4 pt-4 border-t border-white/10"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.8 }}
+                      key={index}
+                      className="flex items-center gap-3 text-sm"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 + index * 0.15 }}
                     >
-                      <div className="text-white/40 text-xs mb-2">Sample prompt:</div>
-                      <div className="text-white/60 text-sm italic font-mono">
-                        {samplePrompt}
-                      </div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-sunset-accent" />
+                      <span className="text-dark/70">{line}</span>
                     </motion.div>
-                  )}
+                  ))}
                 </div>
               </motion.div>
             )}
 
-            {/* Traits */}
+            {/* Traits - horizontal scrolling pills */}
             <motion.div
-              className="flex gap-2 mt-6 flex-wrap justify-center"
+              className="flex gap-2 mt-5 flex-wrap justify-center max-w-sm"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1 }}
@@ -261,42 +248,43 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
               {data.traits.map((trait, index) => (
                 <motion.span
                   key={trait}
-                  className="px-3 py-1.5 rounded-full text-sm bg-white/10 text-white/80"
+                  className="px-3 py-1 rounded-full text-xs bg-dark/10 text-dark/70"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.2 + index * 0.1 }}
+                  transition={{ delay: 1.2 + index * 0.08 }}
                 >
                   {trait}
                 </motion.span>
               ))}
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-      {/* Particle effects */}
+      {/* Warm particle burst on reveal */}
       {revealed && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(30)].map((_, i) => (
+          {[...Array(40)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-2 h-2 rounded-full"
+              className="absolute w-1.5 h-1.5 rounded-full"
               style={{
                 backgroundColor: persona.color,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: '50%',
+                top: '50%',
               }}
-              initial={{ opacity: 0, scale: 0 }}
+              initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
               animate={{
-                opacity: [0, 0.6, 0],
-                scale: [0, 1, 0],
-                y: [0, -100],
+                opacity: [0, 0.8, 0],
+                scale: [0, 1, 0.5],
+                x: (Math.random() - 0.5) * 400,
+                y: (Math.random() - 0.5) * 400,
               }}
               transition={{
-                duration: 2,
-                delay: 0.5 + Math.random() * 1,
-                repeat: Infinity,
-                repeatDelay: Math.random() * 2,
+                duration: 1.8,
+                delay: Math.random() * 0.5,
+                ease: 'easeOut',
               }}
             />
           ))}

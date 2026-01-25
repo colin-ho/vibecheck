@@ -1,13 +1,13 @@
 {
-  "name": "claude-wrapped",
+  "name": "vibechecked",
   "version": "1.0.0",
-  "description": "Your year in code with Claude - A Spotify Wrapped-like experience for Claude Code users",
-  "author": "Claude Wrapped Team",
-  "repository": "https://github.com/claude-wrapped/claude-code-plugin",
+  "description": "VibeChecked - A Spotify Wrapped-like experience for Claude Code users",
+  "author": "VibeChecked Team",
+  "repository": "https://github.com/colin-ho/vibecheck",
   "commands": [
     {
       "name": "wrapped",
-      "description": "Generate your Claude Code Wrapped - see your coding stats and discover your developer persona",
+      "description": "Generate your VibeChecked - see your coding stats and discover your developer persona",
       "file": "commands/wrapped.md"
     }
   ]

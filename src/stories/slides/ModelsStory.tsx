@@ -1,56 +1,17 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
+import { SlideLayout } from '../../components/SlideLayout';
 
-const modelInfo: Record<string, { name: string; color: string; description: string; emoji: string }> = {
-  opus: {
-    name: 'Claude Opus',
-    color: '#c084fc',
-    description: 'The powerhouse',
-    emoji: '👑',
-  },
-  'claude-opus-4-20250514': {
-    name: 'Claude Opus 4',
-    color: '#c084fc',
-    description: 'Latest powerhouse',
-    emoji: '👑',
-  },
-  sonnet: {
-    name: 'Claude Sonnet',
-    color: '#60a5fa',
-    description: 'The sweet spot',
-    emoji: '⚡',
-  },
-  'claude-sonnet-4-20250514': {
-    name: 'Claude Sonnet 4',
-    color: '#60a5fa',
-    description: 'Latest balance',
-    emoji: '⚡',
-  },
-  haiku: {
-    name: 'Claude Haiku',
-    color: '#34d399',
-    description: 'Speed demon',
-    emoji: '🚀',
-  },
-  'claude-3-opus-20240229': {
-    name: 'Claude 3 Opus',
-    color: '#c084fc',
-    description: 'The powerhouse',
-    emoji: '👑',
-  },
-  'claude-3-5-sonnet-20241022': {
-    name: 'Claude 3.5 Sonnet',
-    color: '#60a5fa',
-    description: 'The sweet spot',
-    emoji: '⚡',
-  },
-  'claude-3-haiku-20240307': {
-    name: 'Claude 3 Haiku',
-    color: '#34d399',
-    description: 'Speed demon',
-    emoji: '🚀',
-  },
+// Warm color palette for models
+const modelInfo: Record<string, { name: string; color: string; description: string }> = {
+  opus: { name: 'Claude Opus', color: '#da1c1c', description: 'The powerhouse' },
+  'claude-opus-4-20250514': { name: 'Claude Opus 4', color: '#da1c1c', description: 'Latest powerhouse' },
+  sonnet: { name: 'Claude Sonnet', color: '#bdb7fc', description: 'The sweet spot' },
+  'claude-sonnet-4-20250514': { name: 'Claude Sonnet 4', color: '#bdb7fc', description: 'Latest balance' },
+  haiku: { name: 'Claude Haiku', color: '#dd5013', description: 'Speed demon' },
+  'claude-3-opus-20240229': { name: 'Claude 3 Opus', color: '#da1c1c', description: 'The powerhouse' },
+  'claude-3-5-sonnet-20241022': { name: 'Claude 3.5 Sonnet', color: '#bdb7fc', description: 'The sweet spot' },
+  'claude-3-haiku-20240307': { name: 'Claude 3 Haiku', color: '#dd5013', description: 'Speed demon' },
 };
 
 export function ModelsStory({ data, isActive }: StorySlideProps) {
@@ -61,17 +22,11 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
-  // Calculate percentages for pie chart
   const modelData = sortedModels.map(([model, tokens]) => ({
     model,
     tokens,
     percentage: (tokens / total) * 100,
-    ...modelInfo[model] || {
-      name: model,
-      color: '#888',
-      description: 'Model',
-      emoji: '🤖',
-    },
+    ...modelInfo[model] || { name: model, color: '#8b372b', description: 'Model' },
   }));
 
   const topModel = modelData[0];
@@ -79,7 +34,7 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
   const getModelComment = (model: string, percentage: number): string => {
     const modelKey = model.toLowerCase();
     if (modelKey.includes('opus')) {
-      if (percentage > 80) return "Only the best for you 👑";
+      if (percentage > 80) return "Only the best for you";
       if (percentage > 50) return "Quality over quantity";
       return "Opus for the important stuff";
     }
@@ -89,100 +44,122 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
       return "Sonnet knows the way";
     }
     if (modelKey.includes('haiku')) {
-      if (percentage > 50) return "Speed is your priority 🚀";
+      if (percentage > 50) return "Speed is your priority";
       return "Quick and nimble";
     }
     return "A diverse model diet";
   };
 
-  // Calculate pie chart segments
-  let cumulativePercentage = 0;
-  const pieSegments = modelData.map((model) => {
-    const startAngle = cumulativePercentage * 3.6; // 360 / 100
-    cumulativePercentage += model.percentage;
-    return {
-      ...model,
-      startAngle,
-      endAngle: cumulativePercentage * 3.6,
-    };
-  });
+  // Concentric rings visualization
+  const ringData = modelData.map((model, index) => ({
+    ...model,
+    radius: 80 - index * 20,
+    strokeWidth: Math.max(8, 16 - index * 4),
+  }));
 
   return (
-    <GradientBackground variant="purple">
-      <div className="flex flex-col items-center justify-center h-full px-8">
+    <SlideLayout>
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase text-center"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          Your model mix
+          YOUR MODEL MIX
         </motion.div>
 
-        {/* Pie chart visualization */}
+        {/* Concentric rings visualization */}
         <motion.div
-          className="relative w-56 h-56 my-8"
-          initial={{ opacity: 0, scale: 0 }}
+          className="relative my-6"
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
           transition={{ delay: 0.3, type: 'spring' }}
         >
-          <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-            {pieSegments.map((segment, index) => {
-              const largeArc = segment.percentage > 50 ? 1 : 0;
-              const startX = 50 + 40 * Math.cos((segment.startAngle * Math.PI) / 180);
-              const startY = 50 + 40 * Math.sin((segment.startAngle * Math.PI) / 180);
-              const endX = 50 + 40 * Math.cos((segment.endAngle * Math.PI) / 180);
-              const endY = 50 + 40 * Math.sin((segment.endAngle * Math.PI) / 180);
+          <svg viewBox="0 0 200 200" className="w-56 h-56">
+            {ringData.map((model, index) => {
+              const circumference = 2 * Math.PI * model.radius;
+              const dashLength = (model.percentage / 100) * circumference;
 
               return (
-                <motion.path
-                  key={segment.model}
-                  d={`M 50 50 L ${startX} ${startY} A 40 40 0 ${largeArc} 1 ${endX} ${endY} Z`}
-                  fill={segment.color}
-                  initial={{ opacity: 0 }}
-                  animate={isActive ? { opacity: 1 } : {}}
-                  transition={{ delay: 0.5 + index * 0.2 }}
+                <motion.circle
+                  key={model.model}
+                  cx="100"
+                  cy="100"
+                  r={model.radius}
+                  fill="none"
+                  stroke={model.color}
+                  strokeWidth={model.strokeWidth}
+                  strokeLinecap="round"
+                  strokeDasharray={`${dashLength} ${circumference}`}
+                  transform="rotate(-90 100 100)"
+                  initial={{ strokeDashoffset: circumference }}
+                  animate={isActive ? { strokeDashoffset: 0 } : {}}
+                  transition={{
+                    delay: 0.6 + index * 0.2,
+                    duration: 1.2,
+                    ease: 'easeOut',
+                  }}
+                  style={{
+                    filter: index === 0 ? `drop-shadow(0 0 10px ${model.color}60)` : undefined,
+                  }}
                 />
               );
             })}
-            {/* Inner circle for donut effect */}
-            <circle cx="50" cy="50" r="25" fill="#0a0a0a" />
+
+            {/* Background rings */}
+            {ringData.map((model) => (
+              <circle
+                key={`bg-${model.model}`}
+                cx="100"
+                cy="100"
+                r={model.radius}
+                fill="none"
+                stroke="rgba(59, 17, 12, 0.08)"
+                strokeWidth={model.strokeWidth}
+              />
+            ))}
           </svg>
 
-          {/* Center content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl">{topModel?.emoji}</span>
-          </div>
+          {/* Center - top model name */}
+          <motion.div
+            className="absolute inset-0 flex flex-col items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ delay: 1.4 }}
+          >
+            <div className="text-xl font-bold text-dark">{topModel?.name.split(' ').pop()}</div>
+            <div className="text-2xl font-black" style={{ color: topModel?.color }}>
+              {topModel?.percentage.toFixed(0)}%
+            </div>
+          </motion.div>
         </motion.div>
 
-        {/* Model breakdown */}
+        {/* Model legend */}
         <motion.div
-          className="flex flex-col gap-3 w-full max-w-sm"
+          className="flex flex-col gap-3 w-full max-w-xs"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 1 }}
+          transition={{ delay: 1.7 }}
         >
           {modelData.map((model, index) => (
             <motion.div
               key={model.model}
-              className="flex items-center gap-3 glass px-4 py-3 rounded-xl"
+              className="flex items-center gap-3"
               initial={{ opacity: 0, x: -20 }}
               animate={isActive ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 1.2 + index * 0.15 }}
+              transition={{ delay: 1.7 + index * 0.15 }}
             >
               <div
-                className="w-4 h-4 rounded-full"
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: model.color }}
               />
-              <span className="text-2xl">{model.emoji}</span>
               <div className="flex-1">
-                <div className="text-white font-medium">{model.name}</div>
-                <div className="text-gray-500 text-xs">{model.description}</div>
+                <div className="text-dark text-sm font-medium">{model.name}</div>
               </div>
               <div className="text-right">
-                <div className="text-white font-bold">{model.percentage.toFixed(1)}%</div>
-                <div className="text-gray-500 text-xs">
-                  {(model.tokens / 1000000).toFixed(1)}M tokens
+                <div className="text-dark text-sm font-bold">{model.percentage.toFixed(1)}%</div>
+                <div className="text-dark/70 text-xs">
+                  {(model.tokens / 1000000).toFixed(1)}M
                 </div>
               </div>
             </motion.div>
@@ -192,15 +169,14 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
         {/* Comment */}
         {topModel && (
           <motion.div
-            className="mt-8 text-lg text-gray-400 text-center"
+            className="leading-[1.65] mt-8 text-dark/80 text-sm text-center"
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
-            transition={{ delay: 2 }}
+            transition={{ delay: 2.4 }}
           >
             {getModelComment(topModel.model, topModel.percentage)}
           </motion.div>
         )}
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

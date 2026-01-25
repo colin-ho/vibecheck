@@ -1,147 +1,200 @@
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
-import { CountUp } from '../../components/AnimatedNumber';
+import { HeroStat } from '../../components/HeroStat';
+import { SlideLayout } from '../../components/SlideLayout';
 
 export function ProjectsStory({ data, isActive }: StorySlideProps) {
   const { stats } = data;
 
-  const getProjectComment = (count: number): { emoji: string; text: string } => {
-    if (count > 30) return { emoji: '🌍', text: "A true polyglot developer" };
-    if (count > 20) return { emoji: '🗺️', text: "Project nomad energy" };
-    if (count > 10) return { emoji: '🎯', text: "Diversified portfolio" };
-    if (count > 5) return { emoji: '🏠', text: "A few favorite codebases" };
-    return { emoji: '💎', text: "Deep focus on what matters" };
+  const getProjectComment = (count: number): string => {
+    if (count > 30) return "A true polyglot developer";
+    if (count > 20) return "Project nomad energy";
+    if (count > 10) return "Diversified portfolio";
+    if (count > 5) return "A few favorite codebases";
+    return "Deep focus on what matters";
   };
 
-  const projectComment = getProjectComment(stats.projectCount);
+  // Generate orbital constellation positions
+  const orbits = useMemo(() => {
+    const projectCount = Math.min(stats.projectCount, 30);
+    const points: Array<{ x: number; y: number; size: number; delay: number; orbitIndex: number }> = [];
 
-  // Visual: project dots arranged in a pattern
-  const projectDots = Array.from({ length: Math.min(stats.projectCount, 50) });
+    // Create 3 orbital rings
+    const orbitRadii = [60, 100, 140];
+
+    let pointIndex = 0;
+    orbitRadii.forEach((radius, orbitIndex) => {
+      const dotsInOrbit = Math.min(Math.ceil(projectCount / 3), 4 + orbitIndex * 2);
+      for (let i = 0; i < dotsInOrbit && pointIndex < projectCount; i++) {
+        const angle = (i / dotsInOrbit) * Math.PI * 2 + orbitIndex * 0.5;
+        points.push({
+          x: 150 + Math.cos(angle) * radius,
+          y: 150 + Math.sin(angle) * radius,
+          size: 8 - orbitIndex * 2,
+          delay: pointIndex * 0.08,
+          orbitIndex,
+        });
+        pointIndex++;
+      }
+    });
+
+    return points;
+  }, [stats.projectCount]);
 
   return (
-    <GradientBackground variant="green">
-      <div className="flex flex-col items-center justify-center h-full px-8">
+    <SlideLayout>
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase text-center"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          You worked across
+          YOU WORKED ACROSS
         </motion.div>
 
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.3, type: 'spring' }}
-        >
-          <div className="text-8xl md:text-9xl font-black text-white">
-            {isActive && <CountUp end={stats.projectCount} duration={1.5} />}
-          </div>
-          <div className="text-2xl text-gray-300 mt-2">
-            {stats.projectCount === 1 ? 'project' : 'projects'}
-          </div>
-        </motion.div>
+        {/* Hero stat */}
+        {isActive && (
+          <HeroStat
+            value={stats.projectCount}
+            label={stats.projectCount === 1 ? 'PROJECT' : 'PROJECTS'}
+            color="cream"
+            size="lg"
+            delay={0.3}
+          />
+        )}
 
-        {/* Project visualization - constellation pattern */}
+        {/* Orbital constellation visualization */}
         <motion.div
-          className="mt-12 relative w-80 h-40"
+          className="relative mt-8"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
           transition={{ delay: 1 }}
         >
-          {projectDots.map((_, i) => {
-            // Create a constellation-like pattern
-            const angle = (i / projectDots.length) * Math.PI * 2;
-            const radius = 40 + (i % 3) * 30;
-            const x = 160 + Math.cos(angle + i * 0.1) * radius;
-            const y = 80 + Math.sin(angle + i * 0.1) * (radius * 0.5);
-
-            return (
-              <motion.div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  left: x,
-                  top: y,
-                  width: 6 + (i % 4) * 2,
-                  height: 6 + (i % 4) * 2,
-                  background: `linear-gradient(135deg, #00ff41, #00d4ff)`,
-                }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={isActive ? { opacity: 0.6 + (i % 3) * 0.2, scale: 1 } : {}}
-                transition={{
-                  delay: 1.2 + i * 0.05,
-                  duration: 0.3,
-                }}
+          <svg width={300} height={300} className="overflow-visible">
+            {/* Orbital rings (faint) */}
+            {[60, 100, 140].map((radius, i) => (
+              <motion.circle
+                key={radius}
+                cx={150}
+                cy={150}
+                r={radius}
+                fill="none"
+                stroke="rgba(59, 17, 12, 0.08)"
+                strokeWidth={1}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={isActive ? { opacity: 1, scale: 1 } : {}}
+                transition={{ delay: 0.8 + i * 0.1 }}
               />
-            );
-          })}
+            ))}
 
-          {/* Connection lines */}
-          <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
-            {projectDots.slice(0, 10).map((_, i) => {
-              const angle = (i / 10) * Math.PI * 2;
-              const nextAngle = ((i + 1) / 10) * Math.PI * 2;
-              const radius = 40 + (i % 3) * 30;
-              const nextRadius = 40 + ((i + 1) % 3) * 30;
-
-              const x1 = 160 + Math.cos(angle + i * 0.1) * radius;
-              const y1 = 80 + Math.sin(angle + i * 0.1) * (radius * 0.5);
-              const x2 = 160 + Math.cos(nextAngle + (i + 1) * 0.1) * nextRadius;
-              const y2 = 80 + Math.sin(nextAngle + (i + 1) * 0.1) * (nextRadius * 0.5);
-
+            {/* Connection lines (subtle) */}
+            {orbits.slice(0, 10).map((point, i) => {
+              const nextPoint = orbits[(i + 1) % Math.min(orbits.length, 10)];
+              if (!nextPoint) return null;
               return (
                 <motion.line
-                  key={i}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke="rgba(0, 255, 65, 0.2)"
-                  strokeWidth="1"
+                  key={`line-${i}`}
+                  x1={point.x}
+                  y1={point.y}
+                  x2={nextPoint.x}
+                  y2={nextPoint.y}
+                  stroke="rgba(189, 183, 252, 0.2)"
+                  strokeWidth={1}
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={isActive ? { pathLength: 1, opacity: 1 } : {}}
-                  transition={{ delay: 1.5 + i * 0.1, duration: 0.5 }}
+                  transition={{ delay: 1.7 + i * 0.05, duration: 0.3 }}
                 />
               );
             })}
+
+            {/* Project dots - warm colors */}
+            {orbits.map((point, i) => (
+              <motion.circle
+                key={i}
+                cx={point.x}
+                cy={point.y}
+                r={point.size}
+                fill={point.orbitIndex === 0 ? '#bdb7fc' : point.orbitIndex === 1 ? '#dd5013' : '#da1c1c'}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={isActive ? { opacity: 0.8, scale: 1 } : {}}
+                transition={{
+                  delay: 1.2 + point.delay,
+                  duration: 0.5,
+                  type: 'spring',
+                }}
+                style={{
+                  filter: point.orbitIndex === 0 ? 'drop-shadow(0 0 6px rgba(189, 183, 252, 0.5))' : undefined,
+                }}
+              />
+            ))}
+
+            {/* Center glow */}
+            <motion.circle
+              cx={150}
+              cy={150}
+              r={20}
+              fill="url(#centerGlowWarm)"
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+
+            <defs>
+              <radialGradient id="centerGlowWarm">
+                <stop offset="0%" stopColor="rgba(189, 183, 252, 0.4)" />
+                <stop offset="100%" stopColor="transparent" />
+              </radialGradient>
+            </defs>
           </svg>
+
+          {/* Overflow indicator */}
+          {stats.projectCount > 30 && (
+            <motion.div
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs text-dark/80"
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ delay: 2.2 }}
+            >
+              +{stats.projectCount - 30} more
+            </motion.div>
+          )}
         </motion.div>
 
-        {/* Days active */}
+        {/* Stats row */}
         <motion.div
-          className="mt-8 flex gap-6"
+          className="mt-6 flex gap-8"
           initial={{ opacity: 0, y: 20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 2 }}
+          transition={{ delay: 2.4 }}
         >
-          <div className="glass px-6 py-4 rounded-xl text-center">
-            <div className="text-3xl font-bold text-terminal-green">
-              {stats.daysActive}
-            </div>
-            <div className="text-gray-400 text-sm">active days</div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-lavender">{stats.daysActive}</div>
+            <div className="text-[0.65rem] font-semibold tracking-[0.15em] uppercase text-dark/70 mt-1">active days</div>
           </div>
-          <div className="glass px-6 py-4 rounded-xl text-center">
-            <div className="text-3xl font-bold text-terminal-blue">
+          <div className="text-center">
+            <div className="text-xl font-bold text-sunset-accent">
               {(stats.totalSessions / Math.max(stats.daysActive, 1)).toFixed(1)}
             </div>
-            <div className="text-gray-400 text-sm">sessions/day avg</div>
+            <div className="text-[0.65rem] font-semibold tracking-[0.15em] uppercase text-dark/70 mt-1">sessions/day</div>
           </div>
         </motion.div>
 
+        {/* Comment */}
         <motion.div
-          className="mt-8 text-center"
+          className="leading-[1.65] mt-6 text-dark/80 text-sm"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 2.3 }}
+          transition={{ delay: 2.7 }}
         >
-          <span className="text-4xl">{projectComment.emoji}</span>
-          <div className="text-lg text-gray-400 mt-2">{projectComment.text}</div>
+          {getProjectComment(stats.projectCount)}
         </motion.div>
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

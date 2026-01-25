@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toPng } from 'html-to-image';
 import { StorySlideProps } from '../../data/types';
@@ -9,6 +9,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
   const { persona, stats } = data;
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   const totalTokens = stats.totalTokens.input + stats.totalTokens.output;
@@ -17,6 +18,16 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
     if (n >= 1000) return `${(n / 1000).toFixed(0)}K`;
     return n.toString();
   };
+
+  // Trigger confetti on load
+  useEffect(() => {
+    if (isActive) {
+      const timer = setTimeout(() => setShowConfetti(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowConfetti(false);
+    }
+  }, [isActive]);
 
   const handleDownloadImage = async () => {
     if (!shareCardRef.current) return;
@@ -29,7 +40,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
       });
 
       const link = document.createElement('a');
-      link.download = `claude-wrapped-${persona.id}.png`;
+      link.download = `vibechecked-${persona.id}.png`;
       link.href = dataUrl;
       link.click();
     } catch (error) {
@@ -40,125 +51,158 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
   };
 
   const handleShareTwitter = () => {
-    const text = `I'm a ${persona.name}! ${persona.tagline}\n\n${formatNumber(totalTokens)} tokens • ${stats.totalSessions} sessions • ${stats.projectCount} projects\n\nGet your Claude Code Wrapped:`;
-    const url = `https://claude-wrapped.dev/?d=${encodeDataForUrl(data)}`;
+    const text = `I'm a ${persona.name}! ${persona.tagline}\n\n${formatNumber(totalTokens)} tokens \u2022 ${stats.totalSessions} sessions \u2022 ${stats.projectCount} projects\n\nGet your VibeChecked:`;
+    const url = `https://howsyourvibecoding.vercel.app/?d=${encodeDataForUrl(data)}`;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, '_blank');
   };
 
   const handleCopyLink = async () => {
-    const url = `https://claude-wrapped.dev/?d=${encodeDataForUrl(data)}`;
+    const url = `https://howsyourvibecoding.vercel.app/?d=${encodeDataForUrl(data)}`;
     await navigator.clipboard.writeText(url);
-    // Could add a toast notification here
   };
 
   return (
-    <div
-      className="w-full h-full flex flex-col items-center justify-center px-8 relative overflow-hidden"
-      style={{ background: persona.gradient }}
-    >
-      {/* Title */}
-      <motion.div
-        className="text-center mb-8"
-        initial={{ opacity: 0, y: -20 }}
-        animate={isActive ? { opacity: 1, y: 0 } : {}}
-      >
-        <h2 className="text-3xl font-bold text-white mb-2">Share Your Wrapped</h2>
-        <p className="text-white/60">Let the world know your coding personality</p>
-      </motion.div>
-
-      {/* Mini preview card */}
-      <motion.div
-        className="bg-black/30 backdrop-blur rounded-2xl p-6 max-w-sm w-full mb-8"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={isActive ? { opacity: 1, scale: 1 } : {}}
-        transition={{ delay: 0.2 }}
-        onClick={() => setShowPreview(true)}
-      >
-        <div className="flex items-center gap-4 mb-4">
-          <span className="text-4xl">{persona.icon}</span>
-          <div>
-            <div className="text-white font-bold text-xl">{persona.name}</div>
-            <div className="text-white/60 text-sm">{persona.tagline}</div>
-          </div>
+    <div className="w-full h-full relative overflow-hidden">
+      {/* Confetti/celebration particles - warm colors */}
+      {showConfetti && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 rounded-full"
+              style={{
+                backgroundColor: ['#bdb7fc', '#dd5013', '#da1c1c', '#a05f1a', '#FFF8F0'][i % 5],
+                left: `${Math.random() * 100}%`,
+                top: '-5%',
+              }}
+              animate={{
+                y: ['0vh', '110vh'],
+                x: [(Math.random() - 0.5) * 100, (Math.random() - 0.5) * 200],
+                rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
+                opacity: [1, 1, 0],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                delay: Math.random() * 1,
+                ease: 'linear',
+              }}
+            />
+          ))}
         </div>
+      )}
 
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-white font-bold text-lg">{formatNumber(totalTokens)}</div>
-            <div className="text-white/40 text-xs">tokens</div>
-          </div>
-          <div>
-            <div className="text-white font-bold text-lg">{stats.totalSessions}</div>
-            <div className="text-white/40 text-xs">sessions</div>
-          </div>
-          <div>
-            <div className="text-white font-bold text-lg">{stats.projectCount}</div>
-            <div className="text-white/40 text-xs">projects</div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Share buttons */}
-      <motion.div
-        className="flex flex-col gap-3 w-full max-w-sm"
-        initial={{ opacity: 0, y: 20 }}
-        animate={isActive ? { opacity: 1, y: 0 } : {}}
-        transition={{ delay: 0.4 }}
-      >
-        <button
-          onClick={handleDownloadImage}
-          disabled={isGenerating}
-          className="flex items-center justify-center gap-3 bg-white text-black font-semibold py-4 px-6 rounded-xl hover:bg-white/90 transition-colors disabled:opacity-50"
+      <div className="min-h-dvh h-dvh w-full p-[clamp(2rem,5vw,4rem)] pb-[clamp(3rem,7vw,5.5rem)] pt-[clamp(3rem,7vw,5.5rem)] flex flex-col items-center justify-center text-center gap-[clamp(0.75rem,2.5vw,1.75rem)] max-w-6xl mx-auto overflow-y-auto relative z-10">
+        {/* Title */}
+        <motion.div
+          className="text-center mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={isActive ? { opacity: 1, y: 0 } : {}}
         >
-          {isGenerating ? (
-            <>
-              <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <span>Generating...</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span>Download Image</span>
-            </>
-          )}
-        </button>
+          <h2 className="text-2xl font-bold text-dark mb-1">Share Your VibeChecked</h2>
+          <p className="leading-[1.65] text-dark/80 text-sm">Let the world know your coding personality</p>
+        </motion.div>
 
-        <button
-          onClick={handleShareTwitter}
-          className="flex items-center justify-center gap-3 bg-[#1DA1F2] text-white font-semibold py-4 px-6 rounded-xl hover:bg-[#1a8cd8] transition-colors"
+        {/* Larger card preview - warm styling */}
+        <motion.div
+          className="bg-cream/80 backdrop-blur-xl rounded-2xl p-5 w-full max-w-sm mb-6 cursor-pointer"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={isActive ? { opacity: 1, scale: 1 } : {}}
+          transition={{ delay: 0.2 }}
+          onClick={() => setShowPreview(true)}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-          </svg>
-          <span>Share on X</span>
-        </button>
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-5xl">{persona.icon}</span>
+            <div>
+              <div className="text-dark font-bold text-xl">{persona.name}</div>
+              <div className="text-dark/60 text-sm">{persona.tagline}</div>
+            </div>
+          </div>
 
-        <button
-          onClick={handleCopyLink}
-          className="flex items-center justify-center gap-3 bg-white/10 text-white font-semibold py-4 px-6 rounded-xl hover:bg-white/20 transition-colors"
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-dark font-bold text-xl">{formatNumber(totalTokens)}</div>
+              <div className="text-dark/70 text-xs">tokens</div>
+            </div>
+            <div>
+              <div className="text-dark font-bold text-xl">{stats.totalSessions}</div>
+              <div className="text-dark/70 text-xs">sessions</div>
+            </div>
+            <div>
+              <div className="text-dark font-bold text-xl">{stats.projectCount}</div>
+              <div className="text-dark/70 text-xs">projects</div>
+            </div>
+          </div>
+
+          {/* Customize hint */}
+          <div className="mt-4 text-center">
+            <span className="text-dark/60 text-xs">Tap to preview full card</span>
+          </div>
+        </motion.div>
+
+        {/* Share buttons - warm styling */}
+        <motion.div
+          className="flex flex-col gap-3 w-full max-w-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isActive ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.4 }}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          <span>Copy Link</span>
-        </button>
-      </motion.div>
+          <button
+            onClick={handleDownloadImage}
+            disabled={isGenerating}
+            className="flex items-center justify-center gap-3 bg-dark text-cream font-semibold py-3.5 px-6 rounded-full hover:bg-dark/90 transition-all disabled:opacity-50 shadow-lg shadow-dark/10"
+          >
+            {isGenerating ? (
+              <>
+                <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Download Image</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={handleShareTwitter}
+            className="flex items-center justify-center gap-3 bg-dark/20 text-dark font-semibold py-3.5 px-6 rounded-full hover:bg-dark/30 transition-all border border-dark/10"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            <span>Share on X</span>
+          </button>
+
+          <button
+            onClick={handleCopyLink}
+            className="flex items-center justify-center gap-3 bg-dark/10 text-dark/80 font-medium py-3 px-6 rounded-full hover:bg-dark/20 transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span>Copy Link</span>
+          </button>
+        </motion.div>
+      </div>
 
       {/* Footer */}
       <motion.div
-        className="absolute bottom-8 text-white/40 text-sm text-center"
+        className="absolute bottom-6 left-0 right-0 text-dark/60 text-xs text-center"
         initial={{ opacity: 0 }}
         animate={isActive ? { opacity: 1 } : {}}
         transition={{ delay: 0.8 }}
       >
-        <p>Made with ♥ and Claude</p>
-        <p className="text-xs mt-1">claude-wrapped.dev</p>
+        <p>Made with Claude</p>
+        <p className="mt-0.5">howsyourvibecoding.vercel.app</p>
       </motion.div>
 
       {/* Hidden share card for export */}
@@ -169,21 +213,21 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
       {/* Preview modal */}
       {showPreview && (
         <motion.div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-dark/90 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           onClick={() => setShowPreview(false)}
         >
           <motion.div
             className="max-w-4xl w-full"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
             <ShareCard data={data} />
             <button
               onClick={() => setShowPreview(false)}
-              className="mt-4 text-white/60 hover:text-white text-center w-full"
+              className="mt-4 text-cream/80 hover:text-cream text-sm text-center w-full transition-colors"
             >
               Click anywhere to close
             </button>

@@ -1,23 +1,14 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
-import { CountUp } from '../../components/AnimatedNumber';
+import { HeroStat } from '../../components/HeroStat';
+import { ArcPair } from '../../components/viz/ArcPair';
+import { SlideLayout } from '../../components/SlideLayout';
 
 export function TokensStory({ data, isActive }: StorySlideProps) {
   const { stats, percentiles } = data;
   const { totalTokens } = stats;
 
   const total = totalTokens.input + totalTokens.output;
-
-  const formatTokens = (n: number): string => {
-    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-    if (n >= 1000) return `${(n / 1000).toFixed(0)}K`;
-    return n.toString();
-  };
-
-  // Calculate percentages for visualization
-  const inputPercent = (totalTokens.input / total) * 100;
-  const outputPercent = (totalTokens.output / total) * 100;
 
   const getTokenComment = (tokens: number): string => {
     if (tokens > 10000000) return "You've fed Claude a small library";
@@ -28,92 +19,73 @@ export function TokensStory({ data, isActive }: StorySlideProps) {
   };
 
   return (
-    <GradientBackground variant="green">
-      <div className="flex flex-col items-center justify-center h-full px-8 text-center">
+    <SlideLayout>
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          You exchanged
+          YOU EXCHANGED
         </motion.div>
 
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.3, duration: 0.6, type: 'spring' }}
-        >
-          <div className="text-7xl md:text-8xl font-black text-white">
-            {isActive && <CountUp end={total / 1000000} decimals={1} suffix="M" duration={1.5} />}
-          </div>
-          <div className="text-2xl text-gray-300 mt-2">tokens with Claude</div>
-        </motion.div>
+        {/* Hero stat */}
+        {isActive && (
+          <HeroStat
+            value={total / 1000000}
+            suffix="M"
+            label="TOKENS WITH CLAUDE"
+            color="cream"
+            glow={false}
+            size="lg"
+            decimals={1}
+            delay={0.3}
+          />
+        )}
 
-        {/* Token flow visualization */}
+        {/* Dual arc visualization - input vs output */}
         <motion.div
-          className="mt-12 w-full max-w-md"
+          className="mt-10"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
           transition={{ delay: 1 }}
         >
-          <div className="flex justify-between text-sm text-gray-400 mb-2">
-            <span>Input</span>
-            <span>Output</span>
-          </div>
-          <div className="h-4 rounded-full overflow-hidden bg-gray-800 flex">
-            <motion.div
-              className="h-full bg-gradient-to-r from-terminal-green to-terminal-blue"
-              initial={{ width: 0 }}
-              animate={isActive ? { width: `${inputPercent}%` } : {}}
-              transition={{ delay: 1.2, duration: 0.8 }}
-            />
-            <motion.div
-              className="h-full bg-gradient-to-r from-terminal-purple to-terminal-pink"
-              initial={{ width: 0 }}
-              animate={isActive ? { width: `${outputPercent}%` } : {}}
-              transition={{ delay: 1.5, duration: 0.8 }}
-            />
-          </div>
-          <div className="flex justify-between text-lg font-semibold mt-2">
-            <span className="text-terminal-green">{formatTokens(totalTokens.input)}</span>
-            <span className="text-terminal-purple">{formatTokens(totalTokens.output)}</span>
-          </div>
+          <ArcPair
+            leftValue={totalTokens.input}
+            rightValue={totalTokens.output}
+            leftColor="#bdb7fc"
+            rightColor="#da1c1c"
+            leftLabel="INPUT"
+            rightLabel="OUTPUT"
+            leftGradient={['#bdb7fc', '#dd5013']}
+            rightGradient={['#da1c1c', '#dd5013']}
+            size={260}
+            strokeWidth={14}
+            delay={1.2}
+          />
         </motion.div>
 
-        {/* Token breakdown */}
-        <motion.div
-          className="mt-8 flex gap-6 flex-wrap justify-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1.8 }}
-        >
-          <div className="glass px-5 py-3 rounded-xl text-center">
-            <div className="text-2xl font-bold text-terminal-green">
-              {formatTokens(totalTokens.input)}
-            </div>
-            <div className="text-gray-400 text-xs">sent to Claude</div>
-          </div>
-          <div className="glass px-5 py-3 rounded-xl text-center">
-            <div className="text-2xl font-bold text-terminal-purple">
-              {formatTokens(totalTokens.output)}
-            </div>
-            <div className="text-gray-400 text-xs">received back</div>
-          </div>
-          <div className="glass px-5 py-3 rounded-xl text-center">
-            <div className="text-2xl font-bold text-terminal-blue">
-              {formatTokens(totalTokens.cached)}
-            </div>
-            <div className="text-gray-400 text-xs">from cache</div>
-          </div>
-        </motion.div>
+        {/* Cached tokens inline stat */}
+        {totalTokens.cached > 0 && (
+          <motion.div
+            className="mt-8 text-sm"
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ delay: 2.2 }}
+          >
+            <span className="text-sunset-accent font-semibold">
+              {(totalTokens.cached / 1000000).toFixed(1)}M
+            </span>
+            <span className="text-dark/80 ml-2">from cache</span>
+          </motion.div>
+        )}
 
+        {/* Comment */}
         <motion.div
-          className="mt-10 text-lg text-gray-400"
+          className="leading-[1.65] mt-6 text-dark/80 text-sm"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 2.2 }}
+          transition={{ delay: 2.5 }}
         >
           {getTokenComment(total)}
         </motion.div>
@@ -121,18 +93,17 @@ export function TokensStory({ data, isActive }: StorySlideProps) {
         {/* Percentile badge */}
         {percentiles.tokenUsage <= 20 && (
           <motion.div
-            className="mt-6 glass px-6 py-3 rounded-full"
-            initial={{ opacity: 0, y: 20 }}
+            className="mt-4 text-sm"
+            initial={{ opacity: 0, y: 10 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 2.5 }}
+            transition={{ delay: 2.8 }}
           >
-            <span className="text-terminal-green font-semibold">
+            <span className="text-lavender font-semibold">
               Top {Math.round(percentiles.tokenUsage)}%
             </span>
-            <span className="text-gray-400 ml-2">token user</span>
+            <span className="text-dark/80 ml-2">token user</span>
           </motion.div>
         )}
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

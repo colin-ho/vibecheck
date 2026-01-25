@@ -1,30 +1,20 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
-import { CountUp } from '../../components/AnimatedNumber';
+import { HeroStat } from '../../components/HeroStat';
+import { RadialBarChart } from '../../components/viz/RadialChart';
+import { SlideLayout } from '../../components/SlideLayout';
 
+// Updated to warm color palette
 const toolColors: Record<string, string> = {
-  Read: '#00ff41',
-  Bash: '#f97316',
-  Edit: '#00d4ff',
-  Write: '#a855f7',
-  Grep: '#ec4899',
-  Glob: '#facc15',
-  Task: '#22c55e',
-  WebFetch: '#3b82f6',
-  WebSearch: '#8b5cf6',
-};
-
-const toolEmojis: Record<string, string> = {
-  Read: '📖',
-  Bash: '💻',
-  Edit: '✏️',
-  Write: '📝',
-  Grep: '🔍',
-  Glob: '🗂️',
-  Task: '🤖',
-  WebFetch: '🌐',
-  WebSearch: '🔎',
+  Read: '#bdb7fc',    // lavender
+  Bash: '#dd5013',    // sunset-orange
+  Edit: '#da1c1c',    // gander-red
+  Write: '#a05f1a',   // coffee
+  Grep: '#8b372b',    // cinnamon
+  Glob: '#5d3d3a',    // cocoa
+  Task: '#bdb7fc',    // lavender
+  WebFetch: '#dd5013', // sunset-orange
+  WebSearch: '#da1c1c', // gander-red
 };
 
 export function ToolsStory({ data, isActive }: StorySlideProps) {
@@ -53,96 +43,125 @@ export function ToolsStory({ data, isActive }: StorySlideProps) {
     }
   };
 
+  // Prepare data for radial bar chart
+  const chartSegments = sortedTools.map(([tool, count]) => ({
+    value: count,
+    maxValue: maxUsage,
+    color: toolColors[tool] || '#8b372b',
+    label: tool,
+  }));
+
   return (
-    <GradientBackground variant="orange">
-      <div className="flex flex-col items-center justify-center h-full px-8">
+    <SlideLayout>
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase text-center"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          Your tool arsenal
+          YOUR TOOL ARSENAL
         </motion.div>
 
         {/* Total tool calls */}
         <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, scale: 0.5 }}
+          className="text-center mb-6"
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
           transition={{ delay: 0.3 }}
         >
-          <div className="text-6xl font-black text-white">
-            {isActive && <CountUp end={totalTools} duration={1.5} />}
-          </div>
-          <div className="text-gray-300 text-lg">total tool calls</div>
+          {isActive && (
+            <HeroStat
+              value={totalTools}
+              label="TOTAL TOOL CALLS"
+              color="cream"
+              size="md"
+              delay={0.3}
+            />
+          )}
         </motion.div>
 
-        {/* Tool bars */}
+        {/* Radial bar chart */}
         <motion.div
-          className="w-full max-w-lg space-y-3"
+          className="relative"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={isActive ? { opacity: 1, scale: 1 } : {}}
+          transition={{ delay: 0.7 }}
+        >
+          <RadialBarChart
+            segments={chartSegments}
+            size={260}
+            innerRadius={50}
+            outerRadius={110}
+            animate={true}
+            delay={1}
+            highlightIndex={0}
+          />
+
+          {/* Center content - top tool */}
+          {topTool && (
+            <motion.div
+              className="absolute inset-0 flex flex-col items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ delay: 1.8 }}
+            >
+              <div className="text-2xl font-bold text-dark">{topTool[0]}</div>
+              <div className="text-xs text-dark/80 mt-1">{topTool[1].toLocaleString()}</div>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Tool legend */}
+        <motion.div
+          className="mt-6 flex flex-wrap justify-center gap-3 max-w-md"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 2 }}
         >
           {sortedTools.map(([tool, count], index) => (
             <motion.div
               key={tool}
-              className="flex items-center gap-3"
-              initial={{ opacity: 0, x: -50 }}
-              animate={isActive ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 1 + index * 0.1 }}
+              className="flex items-center gap-2 text-xs"
+              initial={{ opacity: 0, y: 10 }}
+              animate={isActive ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 2 + index * 0.1 }}
             >
-              <span className="text-2xl w-8">{toolEmojis[tool] || '🔧'}</span>
-              <span className="text-white font-medium w-20 text-sm">{tool}</span>
-              <div className="flex-1 h-8 bg-gray-800 rounded-lg overflow-hidden relative">
-                <motion.div
-                  className="h-full rounded-lg"
-                  style={{ backgroundColor: toolColors[tool] || '#888' }}
-                  initial={{ width: 0 }}
-                  animate={isActive ? { width: `${(count / maxUsage) * 100}%` } : {}}
-                  transition={{ delay: 1.2 + index * 0.1, duration: 0.8 }}
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white font-bold text-sm">
-                  {count.toLocaleString()}
-                </span>
-              </div>
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: toolColors[tool] || '#8b372b' }}
+              />
+              <span className="text-dark/60">{tool}</span>
+              <span className="text-dark/80">{count.toLocaleString()}</span>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* Top tool highlight */}
+        {/* Tool comment */}
         {topTool && (
           <motion.div
-            className="mt-8 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 2 }}
+            className="leading-[1.65] mt-6 text-dark/80 text-sm"
+            initial={{ opacity: 0 }}
+            animate={isActive ? { opacity: 1 } : {}}
+            transition={{ delay: 2.5 }}
           >
-            <div className="text-lg text-gray-400">
-              Your favorite tool is <span className="text-white font-bold">{topTool[0]}</span>
-            </div>
-            <div className="text-gray-500 text-sm mt-1">
-              {getToolComment(topTool[0])}
-            </div>
+            {getToolComment(topTool[0])}
           </motion.div>
         )}
 
         {/* Tool diversity badge */}
         {percentiles.toolDiversity <= 20 && (
           <motion.div
-            className="mt-6 glass px-6 py-3 rounded-full"
-            initial={{ opacity: 0, y: 20 }}
+            className="mt-4 text-sm"
+            initial={{ opacity: 0, y: 10 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 2.3 }}
+            transition={{ delay: 2.8 }}
           >
-            <span className="text-terminal-orange font-semibold">
+            <span className="text-sunset-accent font-semibold">
               Top {Math.round(percentiles.toolDiversity)}%
             </span>
-            <span className="text-gray-400 ml-2">in tool diversity ({toolCount} tools used)</span>
+            <span className="text-dark/80 ml-2">in tool diversity ({toolCount} tools)</span>
           </motion.div>
         )}
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

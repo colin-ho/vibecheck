@@ -84,9 +84,17 @@ export function CountUp({
   className = '',
   duration = 2,
 }: CountUpProps) {
+  // Ensure end is a valid number
+  const targetValue = typeof end === 'number' && !isNaN(end) ? end : 0;
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    // Skip animation if target is 0
+    if (targetValue === 0) {
+      setCount(0);
+      return;
+    }
+
     let startTime: number;
     let animationFrame: number;
 
@@ -96,7 +104,7 @@ export function CountUp({
 
       // Easing function (ease-out cubic)
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(eased * end);
+      setCount(eased * targetValue);
 
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
@@ -105,7 +113,7 @@ export function CountUp({
 
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
-  }, [end, duration]);
+  }, [targetValue, duration]);
 
   const formatted = decimals > 0 ? count.toFixed(decimals) : Math.round(count).toLocaleString();
 

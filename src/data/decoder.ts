@@ -1,5 +1,5 @@
 import pako from 'pako';
-import { AnonymousBundle, WrappedData, Percentiles } from './types';
+import { AnonymousBundle, UsageData, Percentiles } from './types';
 import { getPersona, determinePersona } from '../personas/definitions';
 import { mockData } from './mockData';
 
@@ -12,8 +12,8 @@ function base64UrlToBase64(str: string): string {
   return base64;
 }
 
-// Decode the URL parameter into WrappedData
-export async function decodeUrlData(): Promise<WrappedData> {
+// Decode the URL parameter into UsageData
+export async function decodeUrlData(): Promise<UsageData> {
   const params = new URLSearchParams(window.location.search);
   const encodedData = params.get('d');
 
@@ -54,7 +54,7 @@ export function encodeDataForUrl(bundle: AnonymousBundle): string {
 }
 
 // Enrich bundle with percentiles and persona details
-async function enrichBundle(bundle: AnonymousBundle): Promise<WrappedData> {
+async function enrichBundle(bundle: AnonymousBundle): Promise<UsageData> {
   // Try to get percentiles from server
   let percentiles: Percentiles;
   try {

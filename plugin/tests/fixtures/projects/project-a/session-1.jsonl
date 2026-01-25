@@ -1,0 +1,9 @@
+{"type":"user","message":{"role":"user","content":"Please help me fix this bug in the login function"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"I'll help you fix this bug."},{"type":"tool_use","id":"tool-1","name":"Read","input":{"file_path":"/src/login.ts"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"tool-1","content":"function login() { ... }"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"I see the issue."},{"type":"tool_use","id":"tool-2","name":"Edit","input":{"file_path":"/src/login.ts","old_string":"foo","new_string":"bar"}}]}}
+{"type":"user","message":{"role":"user","content":"Thanks! Can you also add some tests?"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Sure, let me create tests."},{"type":"tool_use","id":"tool-3","name":"Write","input":{"file_path":"/src/login.test.ts","content":"test code"}}]}}
+{"type":"user","message":{"role":"user","content":"debug the authentication flow"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-4","name":"Grep","input":{"pattern":"auth"}}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-5","name":"Read","input":{"file_path":"/src/auth.ts"}}]}}

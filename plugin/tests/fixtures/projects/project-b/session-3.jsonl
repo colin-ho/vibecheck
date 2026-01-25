@@ -1,0 +1,10 @@
+{"type":"user","message":{"role":"user","content":"help me write a function to parse JSON"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-1","name":"Read","input":{"file_path":"/src/parser.ts"}}]}}
+{"type":"user","message":{"role":"user","content":"add error handling please"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-2","name":"Edit","input":{"file_path":"/src/parser.ts","old_string":"x","new_string":"y"}}]}}
+{"type":"user","message":{"role":"user","content":"fix the bug where it crashes on empty input"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-3","name":"Read","input":{"file_path":"/src/parser.ts"}}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-4","name":"Edit","input":{"file_path":"/src/parser.ts","old_string":"z","new_string":"w"}}]}}
+{"type":"user","message":{"role":"user","content":"THIS IS STILL BROKEN WHAT THE HELL"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-5","name":"Bash","input":{"command":"npm run build"}}]}}
+{"type":"user","message":{"role":"user","content":"Sorry for yelling, thanks for your patience"}}

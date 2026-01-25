@@ -1,7 +1,7 @@
-import { WrappedData } from './types';
+import { UsageData } from './types';
 import { getPersona } from '../personas/definitions';
 
-export const mockData: WrappedData = {
+export const mockData: UsageData = {
   stats: {
     totalSessions: 847,
     totalMessages: 12453,
@@ -175,7 +175,7 @@ export const mockData: WrappedData = {
 };
 
 // Generate varied mock data for testing different personas
-export function generateMockData(personaId?: string): WrappedData {
+export function generateMockData(personaId?: string): UsageData {
   const id = personaId || 'vibe-coder';
   return {
     ...mockData,
@@ -185,7 +185,7 @@ export function generateMockData(personaId?: string): WrappedData {
 }
 
 // Generate mock data for a "polite" user
-export function generatePoliteMockData(): WrappedData {
+export function generatePoliteMockData(): UsageData {
   return {
     ...mockData,
     wordAnalysis: {
@@ -203,7 +203,7 @@ export function generatePoliteMockData(): WrappedData {
 }
 
 // Generate mock data for a "3AM demon"
-export function generateNightOwlMockData(): WrappedData {
+export function generateNightOwlMockData(): UsageData {
   return {
     ...mockData,
     quirks: {
@@ -229,7 +229,7 @@ export function generateNightOwlMockData(): WrappedData {
 }
 
 // Generate mock data for an "essay writer"
-export function generateEssayWriterMockData(): WrappedData {
+export function generateEssayWriterMockData(): UsageData {
   return {
     ...mockData,
     promptStats: {

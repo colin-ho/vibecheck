@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
-import { CountUp } from '../../components/AnimatedNumber';
+import { HeroStat } from '../../components/HeroStat';
+import { FillGauge } from '../../components/viz/CircularProgress';
+import { SlideLayout } from '../../components/SlideLayout';
 
 export function CacheStory({ data, isActive }: StorySlideProps) {
   const { stats, percentiles } = data;
@@ -27,93 +28,78 @@ export function CacheStory({ data, isActive }: StorySlideProps) {
   };
 
   return (
-    <GradientBackground variant="blue">
-      <div className="flex flex-col items-center justify-center h-full px-8 text-center">
+    <SlideLayout>
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          Your cache hit rate
+          YOUR CACHE HIT RATE
         </motion.div>
 
+        {/* Fill gauge visualization */}
         <motion.div
-          className="relative"
-          initial={{ opacity: 0, scale: 0.5 }}
+          className="flex items-center gap-12"
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.3, duration: 0.6, type: 'spring' }}
+          transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <div className="text-8xl md:text-9xl font-black text-white">
-            {isActive && <CountUp end={cacheRate} decimals={1} suffix="%" duration={1.5} />}
+          <FillGauge
+            value={cacheRate}
+            max={100}
+            width={50}
+            height={180}
+            color="#dd5013"
+            animate={true}
+            delay={0.6}
+          />
+
+          {/* Hero stat */}
+          <div className="text-left">
+            {isActive && (
+              <HeroStat
+                value={cacheRate}
+                suffix="%"
+                color="sunset"
+                glow={true}
+                size="lg"
+                decimals={1}
+                delay={0.6}
+              />
+            )}
+            <motion.div
+              className="text-[0.65rem] font-semibold tracking-[0.15em] uppercase text-dark/70 mt-2"
+              initial={{ opacity: 0 }}
+              animate={isActive ? { opacity: 1 } : {}}
+              transition={{ delay: 1.4 }}
+            >
+              CACHE EFFICIENCY
+            </motion.div>
           </div>
         </motion.div>
 
-        {/* Cache visualization - circular progress */}
-        <motion.div
-          className="mt-8 relative"
-          initial={{ opacity: 0 }}
-          animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 1 }}
-        >
-          <svg className="w-40 h-40" viewBox="0 0 100 100">
-            {/* Background circle */}
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="8"
-            />
-            {/* Progress circle */}
-            <motion.circle
-              cx="50"
-              cy="50"
-              r="40"
-              fill="none"
-              stroke="url(#cacheGradient)"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray="251"
-              strokeDashoffset="251"
-              transform="rotate(-90 50 50)"
-              animate={isActive ? { strokeDashoffset: 251 - (251 * cacheRate) / 100 } : {}}
-              transition={{ delay: 1.2, duration: 1.5, ease: 'easeOut' }}
-            />
-            <defs>
-              <linearGradient id="cacheGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#00d4ff" />
-                <stop offset="100%" stopColor="#00ff41" />
-              </linearGradient>
-            </defs>
-            {/* Center text */}
-            <text x="50" y="50" textAnchor="middle" dy="0.35em" className="text-2xl font-bold fill-white">
-              {Math.round(cacheRate)}%
-            </text>
-          </svg>
-        </motion.div>
-
-        {/* Savings estimate */}
+        {/* Savings badge */}
         {estimatedSavings > 1 && (
           <motion.div
-            className="mt-8 glass px-8 py-4 rounded-xl"
+            className="mt-10 bg-dark/10 border border-dark/20 px-6 py-3 rounded-full"
             initial={{ opacity: 0, y: 20 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 2 }}
           >
-            <div className="text-3xl font-bold text-terminal-green">
+            <span className="text-sunset-accent font-bold text-lg">
               ~{formatMoney(estimatedSavings)}
-            </div>
-            <div className="text-gray-400 text-sm">estimated savings from caching</div>
+            </span>
+            <span className="text-dark/60 text-sm ml-2">estimated savings</span>
           </motion.div>
         )}
 
+        {/* Comment */}
         <motion.div
-          className="mt-8 text-lg text-gray-400 max-w-md"
+          className="leading-[1.65] mt-8 text-dark/80 text-sm max-w-sm"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 2.3 }}
+          transition={{ delay: 2.4 }}
         >
           {getCacheComment(cacheRate)}
         </motion.div>
@@ -121,18 +107,17 @@ export function CacheStory({ data, isActive }: StorySlideProps) {
         {/* Percentile badge */}
         {percentiles.cacheEfficiency <= 25 && (
           <motion.div
-            className="mt-6 glass px-6 py-3 rounded-full"
-            initial={{ opacity: 0, y: 20 }}
+            className="mt-4 text-sm"
+            initial={{ opacity: 0, y: 10 }}
             animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 2.6 }}
+            transition={{ delay: 2.7 }}
           >
-            <span className="text-terminal-blue font-semibold">
+            <span className="text-sunset-accent font-semibold">
               Top {Math.round(percentiles.cacheEfficiency)}%
             </span>
-            <span className="text-gray-400 ml-2">in cache efficiency</span>
+            <span className="text-dark/80 ml-2">in cache efficiency</span>
           </motion.div>
         )}
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

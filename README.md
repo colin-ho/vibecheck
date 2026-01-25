@@ -1,10 +1,10 @@
-# Claude Code Wrapped
+# VibeChecked
 
-Your year in code with Claude - A Spotify Wrapped-like experience for Claude Code users.
+An interactive journey through your Claude Code usage statistics.
 
 ## Overview
 
-Claude Wrapped generates a personalized, animated story experience that showcases your Claude Code usage statistics, determines your developer persona, and creates shareable cards for social media.
+VibeChecked generates a personalized, animated story experience that showcases your Claude Code usage statistics, determines your developer persona, and creates shareable cards for social media.
 
 ## Features
 
@@ -25,7 +25,7 @@ Claude Wrapped generates a personalized, animated story experience that showcase
 ## Project Structure
 
 ```
-claude-wrapped/
+vibechecked/
 ├── api/                          # Vercel serverless functions
 │   ├── submit.ts                 # Receive bundles, compute percentiles
 │   └── stats.ts                  # Global aggregate stats
@@ -34,7 +34,7 @@ claude-wrapped/
 │   ├── .claude-plugin/
 │   │   └── plugin.json           # Plugin metadata
 │   ├── commands/
-│   │   └── wrapped.md            # /wrapped command definition
+│   │   └── vibes.md              # /vibes command definition
 │   ├── scripts/
 │   │   ├── extract-stats.sh      # Read stats-cache.json
 │   │   ├── extract-tools.sh      # Count tool usage from JSONL
@@ -129,25 +129,25 @@ http://localhost:5173/?d=<base64url-encoded-gzipped-json>
 
 ```bash
 # Install the plugin
-curl -fsSL https://raw.githubusercontent.com/claude-wrapped/plugin/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
 
-# Generate your wrapped
-/wrapped
+# Generate your journey
+/vibes
 ```
 
 ### For Development
 
 ```bash
 # Copy plugin to Claude plugins directory
-cp -r plugin ~/.claude/plugins/claude-wrapped
+cp -r plugin ~/.claude/plugins/vibechecked
 
 # Make scripts executable
-chmod +x ~/.claude/plugins/claude-wrapped/scripts/*.sh
+chmod +x ~/.claude/plugins/vibechecked/scripts/*.sh
 ```
 
 ## Story Screens
 
-1. **Intro** - Terminal-themed "YOUR YEAR IN CODE" opening
+1. **Intro** - Terminal-themed "YOUR JOURNEY IN CODE" opening
 2. **Sessions** - Total sessions with comparison
 3. **Time** - Hours spent pair programming
 4. **Tokens** - Input/output token flow visualization

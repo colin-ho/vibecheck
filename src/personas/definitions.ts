@@ -265,7 +265,7 @@ export const personas: Record<string, PersonaDefinition> = {
     id: 'debug-addict',
     name: 'DEBUG ADDICT',
     tagline: 'Your code: broken. Your spirit: also broken.',
-    description: 'You\'ve said "fix" more times than you\'ve said "I love you" this year. Debugging is your cardio. At this point, the bugs are a feature.',
+    description: 'You\'ve said "fix" more times than you\'ve said "I love you". Debugging is your cardio. At this point, the bugs are a feature.',
     color: '#e67e22',
     gradient: 'linear-gradient(135deg, #e67e22, #d35400, #c0392b)',
     category: 'roast',

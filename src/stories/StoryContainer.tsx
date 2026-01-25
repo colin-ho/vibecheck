@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { WrappedData, StorySlideProps } from '../data/types';
+import { UsageData, StorySlideProps } from '../data/types';
 
 import { IntroStory } from './slides/IntroStory';
 import { OpeningMemoryStory } from './slides/OpeningMemoryStory';
@@ -19,12 +19,12 @@ import { PersonaStory } from './slides/PersonaStory';
 import { ShareStory } from './slides/ShareStory';
 
 interface StoryContainerProps {
-  data: WrappedData;
+  data: UsageData;
 }
 
 const slides: React.ComponentType<StorySlideProps>[] = [
   IntroStory,
-  OpeningMemoryStory,    // NEW: Remember your first prompt
+  OpeningMemoryStory,
   SessionsStory,
   TimeStory,
   TokensStory,
@@ -33,10 +33,10 @@ const slides: React.ComponentType<StorySlideProps>[] = [
   TimingStory,
   ModelsStory,
   ProjectsStory,
-  WordCloudStory,        // NEW: Vocabulary roast
-  ObsessionsStory,       // NEW: Topic breakdown
-  QuirksStory,           // UPDATED: Behavioral crimes
-  PersonaStory,          // UPDATED: With evidence
+  WordCloudStory,
+  ObsessionsStory,
+  QuirksStory,
+  PersonaStory,
   ShareStory,
 ];
 
@@ -108,44 +108,65 @@ export function StoryContainer({ data }: StoryContainerProps) {
   const CurrentSlideComponent = slides[currentSlide];
   const progress = ((currentSlide + 1) / slides.length) * 100;
 
+  // Enhanced slide variants with blur transition
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
       opacity: 0,
+      filter: 'blur(8px)',
+      scale: 0.95,
     }),
     center: {
       x: 0,
       opacity: 1,
+      filter: 'blur(0px)',
+      scale: 1,
     },
     exit: (direction: number) => ({
-      x: direction > 0 ? '-100%' : '100%',
+      x: direction > 0 ? '-50%' : '50%',
       opacity: 0,
+      filter: 'blur(8px)',
+      scale: 0.9,
     }),
   };
 
   return (
-    <div className="relative w-full h-full bg-[#0a0a0a] overflow-hidden">
-      {/* Progress bar */}
-      <div className="absolute top-0 left-0 right-0 z-50 progress-bar">
+    <div 
+      className="relative w-full h-full overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #FFF8F0 0%, #FFCBA4 50%, #FFB08A 100%)'
+      }}
+    >
+      {/* Progress bar - refined */}
+      <div className="absolute top-0 left-0 right-0 z-50 h-1 bg-dark/5">
         <motion.div
-          className="progress-bar-fill"
+          className="h-full bg-gradient-to-r from-lavender via-sunset-accent to-brand-red"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
+          style={{
+            boxShadow: '0 0 10px rgba(221, 80, 19, 0.5)',
+          }}
         />
       </div>
 
       {/* Slide counter */}
-      <div className="absolute top-4 right-4 z-50 text-white/40 text-sm font-mono">
+      <div
+        className="absolute z-50 text-dark/60 text-xs font-mono bg-white/40 backdrop-blur-sm px-2 py-1 rounded-full"
+        style={{ top: 24, right: 24 }}
+      >
         {currentSlide + 1} / {slides.length}
       </div>
 
       {/* Navigation hints */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 text-white/30 text-xs">
+      <div
+        className="absolute left-1/2 -translate-x-1/2 z-50 text-dark/70 text-xs bg-white/40 backdrop-blur-sm px-3 py-1.5 rounded-full"
+        style={{ bottom: 24 }}
+      >
         {currentSlide < slides.length - 1 ? (
-          <span>Tap or press → to continue</span>
+          <span>Tap or press <span className="text-dark">→</span> to continue</span>
         ) : (
-          <span>Share your wrapped!</span>
+          <span>Share your journey!</span>
         )}
       </div>
 
@@ -153,10 +174,11 @@ export function StoryContainer({ data }: StoryContainerProps) {
       {currentSlide > 0 && (
         <button
           onClick={goToPrevious}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-50 p-2 text-white/30 hover:text-white/60 transition-colors"
+          className="absolute top-1/2 -translate-y-1/2 z-50 p-2 text-dark/50 hover:text-dark/80 transition-colors bg-white/40 backdrop-blur-sm rounded-full"
+          style={{ left: 16 }}
           aria-label="Previous slide"
         >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -165,16 +187,17 @@ export function StoryContainer({ data }: StoryContainerProps) {
       {currentSlide < slides.length - 1 && (
         <button
           onClick={goToNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-50 p-2 text-white/30 hover:text-white/60 transition-colors"
+          className="absolute top-1/2 -translate-y-1/2 z-50 p-2 text-dark/50 hover:text-dark/80 transition-colors bg-white/40 backdrop-blur-sm rounded-full"
+          style={{ right: 16 }}
           aria-label="Next slide"
         >
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       )}
 
-      {/* Slide content */}
+      {/* Slide content with enhanced transitions */}
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={currentSlide}
@@ -185,7 +208,9 @@ export function StoryContainer({ data }: StoryContainerProps) {
           exit="exit"
           transition={{
             x: { type: 'spring', stiffness: 300, damping: 30 },
-            opacity: { duration: 0.2 },
+            opacity: { duration: 0.25 },
+            filter: { duration: 0.25 },
+            scale: { duration: 0.25 },
           }}
           className="w-full h-full"
           onClick={goToNext}

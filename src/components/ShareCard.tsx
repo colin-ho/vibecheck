@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
-import { WrappedData } from '../data/types';
+import { UsageData } from '../data/types';
 
 interface ShareCardProps {
-  data: WrappedData;
+  data: UsageData;
 }
 
 export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ data }, ref) => {
@@ -24,17 +24,16 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ data }, r
   return (
     <div
       ref={ref}
-      className="share-card flex flex-col justify-between"
+      className="w-[1200px] h-[675px] p-12 flex flex-col justify-between font-sans"
       style={{
         background: persona.gradient,
-        fontFamily: "'Inter', system-ui, sans-serif",
       }}
     >
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
           <div className="text-white/60 text-sm font-medium tracking-widest uppercase">
-            Claude Code Wrapped 2024
+            VibeChecked 2024
           </div>
         </div>
         <div className="text-4xl">{persona.icon}</div>
@@ -95,12 +94,12 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ data }, r
 
       {/* Footer */}
       <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
-        <div className="text-white/40 text-xs">
-          claude-wrapped.dev
+        <div className="text-white/70 text-xs">
+          howsyourvibecoding.vercel.app
         </div>
         <div className="flex items-center gap-2 text-white/60 text-sm">
           <span>Made with</span>
-          <span className="text-red-400">♥</span>
+          <span className="text-brand-red">♥</span>
           <span>and Claude</span>
         </div>
       </div>

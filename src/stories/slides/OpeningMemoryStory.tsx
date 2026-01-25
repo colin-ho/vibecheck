@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
+import { SlideLayout } from '../../components/SlideLayout';
 
 export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
   const { promptSamples } = data;
   const firstPrompt = promptSamples?.first || 'help me with something';
 
-  // Extract a timestamp-like display (mock for now)
+  // Mock timestamp display
   const mockTimestamp = 'January 22, 2:47 AM';
 
   // Truncate if too long
-  const displayPrompt = firstPrompt.length > 200
-    ? firstPrompt.slice(0, 200) + '...'
+  const displayPrompt = firstPrompt.length > 180
+    ? firstPrompt.slice(0, 180) + '...'
     : firstPrompt;
 
   // Generate roast based on prompt characteristics
@@ -36,75 +36,87 @@ export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
   };
 
   return (
-    <GradientBackground variant="purple">
-      <div className="flex flex-col items-center justify-center h-full px-8">
+    <SlideLayout className="relative">
         {/* Header */}
         <motion.div
-          className="text-gray-400 text-lg mb-12 tracking-widest uppercase text-center"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-10"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          Remember this?
+          WHERE IT STARTED
         </motion.div>
 
-        {/* Memory card */}
+        {/* Memory card - warm refined style */}
         <motion.div
-          className="w-full max-w-lg"
-          initial={{ opacity: 0, scale: 0.9 }}
+          className="w-full max-w-md"
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.3, duration: 0.5 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
         >
-          {/* Terminal-style card */}
-          <div className="bg-black/60 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden">
-            {/* Terminal header */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-black/40 border-b border-white/10">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80" />
-              <span className="text-white/40 text-xs ml-2 font-mono">your-first-session</span>
+          <div className="bg-cream/90 border border-dark/10 rounded-xl overflow-hidden">
+            {/* Terminal header - warm minimal */}
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-sunset-afternoon border-b border-dark/10">
+              <motion.div
+                className="w-2 h-2 rounded-full bg-lavender"
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              />
+              <span className="text-dark/70 text-xs font-mono">your-journey</span>
             </div>
 
             {/* Content */}
-            <div className="p-6">
-              {/* Timestamp */}
+            <div className="p-5">
+              {/* Timestamp badge - photo metadata style */}
               <motion.div
-                className="text-gray-500 text-sm mb-4 font-mono"
+                className="inline-flex items-center gap-2 text-dark/70 text-xs font-mono mb-4 bg-dark/5 px-3 py-1.5 rounded-full"
                 initial={{ opacity: 0 }}
                 animate={isActive ? { opacity: 1 } : {}}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.7 }}
               >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 {mockTimestamp}
               </motion.div>
 
               {/* "You wrote:" label */}
               <motion.div
-                className="text-gray-400 text-sm mb-2"
+                className="text-dark/80 text-xs mb-2"
                 initial={{ opacity: 0 }}
                 animate={isActive ? { opacity: 1 } : {}}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 0.9 }}
               >
                 You wrote:
               </motion.div>
 
-              {/* The actual prompt */}
+              {/* The actual prompt with typing cursor */}
               <motion.div
-                className="bg-white/5 rounded-xl p-4 mb-4 border-l-4 border-terminal-green"
-                initial={{ opacity: 0, x: -20 }}
+                className="relative"
+                initial={{ opacity: 0, x: -10 }}
                 animate={isActive ? { opacity: 1, x: 0 } : {}}
-                transition={{ delay: 1.0, duration: 0.4 }}
+                transition={{ delay: 1.1, duration: 0.6 }}
               >
-                <p className="text-white/90 text-lg font-mono leading-relaxed">
-                  "{displayPrompt}"
-                </p>
+                <div className="border-l-2 border-lavender/60 pl-4 py-2">
+                  <p className="text-dark/90 text-base font-mono leading-relaxed">
+                    "{displayPrompt}"
+                    <motion.span
+                      className="inline-block w-2 h-4 bg-lavender/50 ml-1 align-middle"
+                      animate={{ opacity: [1, 0, 1] }}
+                      transition={{ duration: 1.2, repeat: Infinity }}
+                    />
+                  </p>
+                </div>
               </motion.div>
 
-              {/* Roast/comment */}
+              {/* Roast/comment - italic sunset orange */}
               <motion.p
-                className="text-terminal-orange text-sm italic mt-4"
+                className="leading-[1.65] text-sunset-accent text-sm italic mt-5"
                 initial={{ opacity: 0 }}
                 animate={isActive ? { opacity: 1 } : {}}
-                transition={{ delay: 1.4 }}
+                transition={{ delay: 1.8 }}
               >
                 {getRoast()}
               </motion.p>
@@ -112,29 +124,28 @@ export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
           </div>
         </motion.div>
 
-        {/* Floating memory particles */}
+        {/* Subtle floating particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-purple-400/30 rounded-full"
+              className="absolute w-1 h-1 bg-lavender/30 rounded-full"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: `${20 + Math.random() * 60}%`,
+                top: `${20 + Math.random() * 60}%`,
               }}
               animate={{
-                y: [0, -20, 0],
-                opacity: [0.2, 0.5, 0.2],
+                y: [0, -30, 0],
+                opacity: [0.2, 0.4, 0.2],
               }}
               transition={{
-                duration: 3 + Math.random() * 2,
+                duration: 5 + Math.random() * 2,
                 repeat: Infinity,
                 delay: Math.random() * 2,
               }}
             />
           ))}
         </div>
-      </div>
-    </GradientBackground>
+    </SlideLayout>
   );
 }

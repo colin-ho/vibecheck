@@ -1,6 +1,6 @@
-# /wrapped - Generate Your Claude Code Wrapped
+# /vibes - Generate Your VibeChecked
 
-Generate a personalized "Spotify Wrapped" style summary of your Claude Code usage.
+Generate a personalized interactive journey through your Claude Code usage with VibeChecked.
 
 ## What This Command Does
 
@@ -11,17 +11,17 @@ Generate a personalized "Spotify Wrapped" style summary of your Claude Code usag
 
 ## Instructions for Claude
 
-When the user runs `/wrapped`, follow these steps:
+When the user runs `/vibes`, follow these steps:
 
-### Step 1: Extract Statistics
+### Step 1: Generate Your VibeChecked URL
 
-Run the bundle script to gather anonymous statistics:
+Run the vibes script to generate your personalized URL:
 
 ```bash
-bash ~/.claude/plugins/claude-wrapped/scripts/bundle.sh
+python3 ~/.claude/plugins/vibechecked/scripts/vibes.py
 ```
 
-Store the JSON output for the next steps.
+This outputs a URL. You can also use `--json` to see the raw data or `-v` for verbose output.
 
 ### Step 2: Analyze Prompting Style (LOCAL ONLY)
 
@@ -79,21 +79,15 @@ Generate 3 fun facts based on the data. Examples:
 
 Add these to the `funFacts` array in the bundle.
 
-### Step 5: Encode and Open
+### Step 5: Open the URL
 
-1. Convert the final bundle to JSON
-2. Compress it with gzip/deflate
-3. Encode it as base64url
-4. Open the URL: `https://claude-wrapped.dev/?d=<encoded-bundle>`
-
-Use this approach:
+The `vibes.py` script outputs the full URL with encoded data. Open it in the browser:
 
 ```bash
-# The bundle JSON should be in a variable called $BUNDLE
-echo "$BUNDLE" | gzip -c | base64 | tr '+/' '-_' | tr -d '='
+python3 ~/.claude/plugins/vibechecked/scripts/vibes.py
 ```
 
-Then tell the user you're opening their wrapped experience and provide the URL.
+Then tell the user you're opening their VibeChecked experience and provide the URL.
 
 ## Privacy Notice
 
@@ -115,6 +109,6 @@ After running the command, Claude should say something like:
 
 Based on your patterns, you're a **MIDNIGHT ARCHITECT** - your best work happens after dark!
 
-Opening your personalized Wrapped experience..."
+Opening your VibeChecked experience..."
 
 Then open the URL with the encoded data.

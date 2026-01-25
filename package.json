@@ -1,8 +1,8 @@
 {
-  "name": "claude-wrapped",
+  "name": "vibechecked",
   "private": true,
   "version": "1.0.0",
-  "description": "Your year in code with Claude - A Spotify Wrapped-like experience for Claude Code users",
+  "description": "VibeChecked - An interactive journey through your Claude Code usage statistics",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,8 @@
     "html-to-image": "^1.11.13",
     "pako": "^2.1.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

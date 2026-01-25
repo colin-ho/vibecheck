@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Claude Code Wrapped is a Spotify Wrapped-style experience for Claude Code users. It generates personalized, animated story experiences showcasing coding stats, developer personas, and shareable cards. Privacy-first design with local-only analysis.
+VibeChecked is an interactive journey through your Claude Code usage statistics. It generates personalized, animated story experiences showcasing coding stats, developer personas, and shareable cards. Privacy-first design with local-only analysis.
 
 ## Commands
 
@@ -19,7 +19,7 @@ npm run lint         # ESLint check
 
 ### Data Flow
 
-1. **Plugin** (`plugin/`): User runs `/wrapped` in Claude Code → shell scripts extract stats from `~/.claude/stats-cache.json` and session JSONL files → compiled into `AnonymousBundle`
+1. **Plugin** (`plugin/`): User runs `/vibes` in Claude Code → shell scripts extract stats from `~/.claude/stats-cache.json` and session JSONL files → compiled into `AnonymousBundle`
 
 2. **Encoding**: Bundle → pako.deflate → base64url → URL param `?d=<encoded>`
 
@@ -38,7 +38,7 @@ npm run lint         # ESLint check
 ### Slide Component Pattern
 
 All story slides:
-- Accept `data: WrappedData`, `onNext: () => void`, `isActive: boolean`
+- Accept `data: UsageData`, `onNext: () => void`, `isActive: boolean`
 - Use Framer Motion for timing-based reveal sequences
 - Exit animations handled by `StoryContainer`
 
@@ -49,7 +49,7 @@ All story slides:
 ## Tech Stack
 
 - React 19 + TypeScript 5.9 + Vite 7
-- Tailwind CSS 4 with terminal theme (green #00ff41, blue #00d4ff, purple #a855f7)
+- Tailwind CSS 4 with sunset theme (dawn #FFF8F0 to twilight #FF8A5B, accents: lavender #bdb7fc, sunset #dd5013, red #da1c1c)
 - Framer Motion for animations
 - html-to-image for PNG/JPEG export
 - Vercel serverless with optional Upstash Redis

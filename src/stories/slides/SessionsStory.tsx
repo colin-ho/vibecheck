@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
-import { CountUp } from '../../components/AnimatedNumber';
+import { HeroStat } from '../../components/HeroStat';
+import { RadialBurst } from '../../components/viz/RadialBurst';
+import { SlideLayout } from '../../components/SlideLayout';
 
 export function SessionsStory({ data, isActive }: StorySlideProps) {
   const { stats, percentiles } = data;
@@ -16,74 +17,76 @@ export function SessionsStory({ data, isActive }: StorySlideProps) {
   };
 
   return (
-    <GradientBackground variant="purple">
-      <div className="flex flex-col items-center justify-center h-full px-8 text-center">
+    <SlideLayout>
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          This year, you started
+          YOU'VE STARTED
         </motion.div>
 
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={isActive ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.3, duration: 0.6, type: 'spring' }}
-        >
-          <div className="text-8xl md:text-9xl font-black text-white">
-            {isActive && <CountUp end={stats.totalSessions} duration={1.5} />}
-          </div>
-          <div className="text-2xl text-gray-300 mt-2">coding sessions</div>
-        </motion.div>
-
-        <motion.div
-          className="mt-12 text-xl text-gray-400 max-w-md"
-          initial={{ opacity: 0 }}
-          animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 1.5 }}
-        >
-          {getSessionsComment(stats.totalSessions)}
-        </motion.div>
-
-        {/* Percentile badge */}
-        {percentiles.totalSessions <= 20 && (
-          <motion.div
-            className="mt-8 glass px-6 py-3 rounded-full"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isActive ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 2 }}
-          >
-            <span className="text-terminal-green font-semibold">
-              Top {Math.round(percentiles.totalSessions)}%
-            </span>
-            <span className="text-gray-400 ml-2">of all Claude Code users</span>
-          </motion.div>
+        {/* Hero stat */}
+        {isActive && (
+          <HeroStat
+            value={stats.totalSessions}
+            color="cream"
+            glow={false}
+            size="xl"
+            delay={0.3}
+          />
         )}
 
-        {/* Session visualization */}
         <motion.div
-          className="mt-12 flex flex-wrap justify-center gap-1 max-w-lg"
+          className="text-dark text-xl mt-2"
+          initial={{ opacity: 0 }}
+          animate={isActive ? { opacity: 1 } : {}}
+          transition={{ delay: 1.2 }}
+        >
+          coding sessions
+        </motion.div>
+
+        {/* Radial burst visualization */}
+        <motion.div
+          className="mt-8"
           initial={{ opacity: 0 }}
           animate={isActive ? { opacity: 1 } : {}}
           transition={{ delay: 1 }}
         >
-          {Array.from({ length: Math.min(stats.totalSessions, 100) }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="w-2 h-2 rounded-sm bg-terminal-green/60"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={isActive ? { opacity: 1, scale: 1 } : {}}
-              transition={{ delay: 1 + i * 0.01 }}
-            />
-          ))}
-          {stats.totalSessions > 100 && (
-            <span className="text-gray-500 text-sm ml-2">+{stats.totalSessions - 100} more</span>
-          )}
+          <RadialBurst
+            count={stats.totalSessions}
+            color="#da1c1c"
+            secondaryColor="#dd5013"
+            size={220}
+            rings={4}
+            maxDots={80}
+            delay={1.2}
+          />
         </motion.div>
-      </div>
-    </GradientBackground>
+
+        {/* Comment */}
+        <motion.div
+          className="leading-[1.65] mt-8 text-dark/80 max-w-sm"
+          initial={{ opacity: 0 }}
+          animate={isActive ? { opacity: 1 } : {}}
+          transition={{ delay: 2.2 }}
+        >
+          {getSessionsComment(stats.totalSessions)}
+        </motion.div>
+
+        {/* Percentile - inline text */}
+        {percentiles.totalSessions <= 20 && (
+          <motion.div
+            className="mt-6 text-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={isActive ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 2.6 }}
+          >
+            <span className="text-lavender font-semibold">Top {Math.round(percentiles.totalSessions)}%</span>
+            <span className="text-dark/80 ml-2">of all Claude Code users</span>
+          </motion.div>
+        )}
+    </SlideLayout>
   );
 }

@@ -1,5 +1,5 @@
 import { toPng, toJpeg, toBlob } from 'html-to-image';
-import { WrappedData } from '../data/types';
+import { UsageData } from '../data/types';
 
 export interface ImageOptions {
   quality?: number;
@@ -97,7 +97,7 @@ export async function copyImageToClipboard(element: HTMLElement): Promise<boolea
 /**
  * Generate a share URL with encoded data
  */
-export function generateShareUrl(data: WrappedData, baseUrl = 'https://claude-wrapped.dev'): string {
+export function generateShareUrl(data: UsageData, baseUrl = 'https://howsyourvibecoding.vercel.app'): string {
   // Import the encoder from decoder module
   // This is a simplified version - the actual encoding happens in decoder.ts
   const params = new URLSearchParams();
@@ -111,7 +111,7 @@ export function generateShareUrl(data: WrappedData, baseUrl = 'https://claude-wr
 /**
  * Generate Twitter share URL
  */
-export function generateTwitterShareUrl(data: WrappedData): string {
+export function generateTwitterShareUrl(data: UsageData): string {
   const totalTokens = data.stats.totalTokens.input + data.stats.totalTokens.output;
   const formatNumber = (n: number): string => {
     if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -123,9 +123,9 @@ export function generateTwitterShareUrl(data: WrappedData): string {
 
 ${formatNumber(totalTokens)} tokens • ${data.stats.totalSessions} sessions • ${data.stats.projectCount} projects
 
-Get your Claude Code Wrapped:`;
+Get your VibeChecked:`;
 
-  const url = 'https://claude-wrapped.dev';
+  const url = 'https://howsyourvibecoding.vercel.app';
 
   return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
 }

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { StorySlideProps } from '../../data/types';
-import { GradientBackground } from '../../components/GradientBackground';
 
 export function TimingStory({ data, isActive }: StorySlideProps) {
   const { stats, percentiles } = data;
@@ -17,33 +16,17 @@ export function TimingStory({ data, isActive }: StorySlideProps) {
   const totalHourSessions = stats.hourCounts.reduce((a, b) => a + b, 0);
   const nightPercentage = (nightSessions / totalHourSessions) * 100;
 
-  const getTimePersonality = (): { emoji: string; title: string; description: string } => {
+  const getTimePersonality = (): { title: string; description: string } => {
     if (nightPercentage > 40) {
-      return {
-        emoji: '🦉',
-        title: 'Night Owl',
-        description: 'The quiet hours are your domain',
-      };
+      return { title: 'Night Owl', description: 'The quiet hours are your domain' };
     }
     if (morningSessions > nightSessions * 2) {
-      return {
-        emoji: '🌅',
-        title: 'Early Bird',
-        description: 'Shipping code before the world wakes up',
-      };
+      return { title: 'Early Bird', description: 'Shipping code before the world wakes up' };
     }
     if (peakHour >= 9 && peakHour <= 17) {
-      return {
-        emoji: '☀️',
-        title: 'Day Coder',
-        description: 'Traditional hours, consistent output',
-      };
+      return { title: 'Day Coder', description: 'Traditional hours, consistent output' };
     }
-    return {
-      emoji: '🌙',
-      title: 'Evening Warrior',
-      description: 'When the day job ends, the real work begins',
-    };
+    return { title: 'Evening Warrior', description: 'When the day job ends, the real work begins' };
   };
 
   const personality = getTimePersonality();
@@ -55,155 +38,148 @@ export function TimingStory({ data, isActive }: StorySlideProps) {
     return `${hour - 12}pm`;
   };
 
-  const getPeakHourRoast = (hour: number): string => {
-    if (hour >= 0 && hour <= 4) return "Your peak hour is when most people are asleep 😴";
-    if (hour >= 5 && hour <= 7) return "An early bird catching bugs 🐛";
-    if (hour >= 8 && hour <= 9) return "Starting the day strong ☕";
-    if (hour >= 10 && hour <= 11) return "Mid-morning momentum 🚀";
-    if (hour >= 12 && hour <= 13) return "Lunch coding is a lifestyle 🍕";
-    if (hour >= 14 && hour <= 16) return "Afternoon productivity peak 📈";
-    if (hour >= 17 && hour <= 18) return "The 5 o'clock commit rush 🏃";
-    if (hour >= 19 && hour <= 21) return "Evening hacking session 🌆";
-    return "Late night debugging sessions 🌙";
-  };
+  // Clock visualization - 24 segments in a circle
+  const clockRadius = 100;
+  const innerRadius = 45;
+  const segmentAngle = (2 * Math.PI) / 24;
 
   return (
-    <GradientBackground variant="purple">
-      <div className="flex flex-col items-center justify-center h-full px-8">
+    <div className="min-h-dvh h-dvh w-full p-[clamp(2rem,5vw,4rem)] pb-[clamp(3rem,7vw,5.5rem)] pt-[clamp(3rem,7vw,5.5rem)] flex flex-col items-center justify-center text-center max-w-6xl mx-auto overflow-y-auto">
         <motion.div
-          className="text-gray-400 text-lg mb-4 tracking-widest uppercase text-center"
+          className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-4 text-center"
           initial={{ opacity: 0, y: -20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
-          When you code
+          WHEN YOU CODE
         </motion.div>
 
         {/* Time personality */}
         <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, scale: 0.5 }}
+          className="text-center mb-4"
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={isActive ? { opacity: 1, scale: 1 } : {}}
           transition={{ delay: 0.3 }}
         >
-          <div className="text-6xl mb-2">{personality.emoji}</div>
-          <div className="text-4xl font-black text-white">{personality.title}</div>
-          <div className="text-gray-400 mt-2">{personality.description}</div>
+          <div className="text-4xl font-black text-dark tracking-tight">{personality.title}</div>
+          <div className="text-dark/80 text-sm mt-2">{personality.description}</div>
         </motion.div>
 
-        {/* 24-hour heatmap */}
+        {/* Circular 24-hour clock */}
         <motion.div
-          className="w-full max-w-2xl"
-          initial={{ opacity: 0 }}
-          animate={isActive ? { opacity: 1 } : {}}
-          transition={{ delay: 0.8 }}
+          className="relative flex-shrink-0"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={isActive ? { opacity: 1, scale: 1 } : {}}
+          transition={{ delay: 0.7 }}
         >
-          <div className="grid grid-cols-12 gap-1 mb-2">
-            {stats.hourCounts.slice(0, 12).map((count, hour) => (
-              <motion.div
-                key={hour}
-                className="aspect-square rounded-md relative group"
-                style={{
-                  backgroundColor: `rgba(0, 255, 65, ${Math.max(0.1, count / maxHour)})`,
-                }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={isActive ? { opacity: 1, scale: 1 } : {}}
-                transition={{ delay: 1 + hour * 0.05 }}
-              >
-                {hour === peakHour && (
-                  <motion.div
-                    className="absolute inset-0 rounded-md border-2 border-terminal-green"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
+          <svg width={clockRadius * 2 + 40} height={clockRadius * 2 + 40} className="overflow-visible">
+            <g transform={`translate(${clockRadius + 20}, ${clockRadius + 20})`}>
+              {/* Hour segments */}
+              {stats.hourCounts.map((count, hour) => {
+                const intensity = count / maxHour;
+                const startAngle = (hour - 6) * segmentAngle; // Start at 6am (top)
+                const endAngle = (hour - 5) * segmentAngle;
+
+                const isAM = hour < 12;
+                // Warm colors: lavender for AM, gander-red for PM
+                const baseColor = isAM ? '189, 183, 252' : '218, 28, 28';
+
+                const x1Inner = innerRadius * Math.cos(startAngle);
+                const y1Inner = innerRadius * Math.sin(startAngle);
+                const x2Inner = innerRadius * Math.cos(endAngle);
+                const y2Inner = innerRadius * Math.sin(endAngle);
+
+                const segmentOuter = innerRadius + (clockRadius - innerRadius) * Math.max(0.1, intensity);
+                const x1Outer = segmentOuter * Math.cos(startAngle);
+                const y1Outer = segmentOuter * Math.sin(startAngle);
+                const x2Outer = segmentOuter * Math.cos(endAngle);
+                const y2Outer = segmentOuter * Math.sin(endAngle);
+
+                const isPeak = hour === peakHour;
+
+                return (
+                  <motion.path
+                    key={hour}
+                    d={`M ${x1Inner} ${y1Inner} L ${x1Outer} ${y1Outer} A ${segmentOuter} ${segmentOuter} 0 0 1 ${x2Outer} ${y2Outer} L ${x2Inner} ${y2Inner} A ${innerRadius} ${innerRadius} 0 0 0 ${x1Inner} ${y1Inner}`}
+                    fill={`rgba(${baseColor}, ${0.3 + intensity * 0.7})`}
+                    stroke={isPeak ? (isAM ? '#bdb7fc' : '#da1c1c') : 'rgba(59,17,12,0.1)'}
+                    strokeWidth={isPeak ? 2 : 0.5}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={isActive ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ delay: 1 + hour * 0.03 }}
+                    style={{
+                      transformOrigin: 'center',
+                      filter: isPeak ? `drop-shadow(0 0 8px rgba(${baseColor}, 0.8))` : undefined,
+                    }}
                   />
-                )}
-                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500">
-                  {hour === 0 || hour === 6 ? formatHour(hour) : ''}
-                </span>
-              </motion.div>
-            ))}
-          </div>
-          <div className="grid grid-cols-12 gap-1 mt-6">
-            {stats.hourCounts.slice(12).map((count, i) => {
-              const hour = i + 12;
+                );
+              })}
+
+              {/* Center content */}
+              <motion.text
+                x={0}
+                y={0}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-lg font-bold fill-dark"
+                initial={{ opacity: 0 }}
+                animate={isActive ? { opacity: 1 } : {}}
+                transition={{ delay: 1.8 }}
+              >
+                {formatHour(peakHour)}
+              </motion.text>
+            </g>
+          </svg>
+
+          {/* Hour markers */}
+          <div className="absolute inset-0 pointer-events-none">
+            {[0, 6, 12, 18].map((hour) => {
+              const angle = (hour - 6) * segmentAngle;
+              const x = (clockRadius + 20) + (clockRadius + 15) * Math.cos(angle);
+              const y = (clockRadius + 20) + (clockRadius + 15) * Math.sin(angle);
               return (
-                <motion.div
+                <div
                   key={hour}
-                  className="aspect-square rounded-md relative"
+                  className="absolute text-xs text-dark/70 font-mono"
                   style={{
-                    backgroundColor: `rgba(168, 85, 247, ${Math.max(0.1, count / maxHour)})`,
+                    left: x,
+                    top: y,
+                    transform: 'translate(-50%, -50%)',
                   }}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={isActive ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ delay: 1.6 + i * 0.05 }}
                 >
-                  {hour === peakHour && (
-                    <motion.div
-                      className="absolute inset-0 rounded-md border-2 border-terminal-purple"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    />
-                  )}
-                  <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500">
-                    {hour === 12 || hour === 18 ? formatHour(hour) : ''}
-                  </span>
-                </motion.div>
+                  {formatHour(hour)}
+                </div>
               );
             })}
-          </div>
-
-          {/* Legend */}
-          <div className="flex justify-between items-center mt-8 text-xs text-gray-500">
-            <span>AM hours</span>
-            <div className="flex items-center gap-2">
-              <span>Less</span>
-              <div className="flex gap-1">
-                {[0.1, 0.3, 0.5, 0.7, 1].map((opacity, i) => (
-                  <div
-                    key={i}
-                    className="w-3 h-3 rounded-sm"
-                    style={{ backgroundColor: `rgba(0, 255, 65, ${opacity})` }}
-                  />
-                ))}
-              </div>
-              <span>More</span>
-            </div>
-            <span>PM hours</span>
           </div>
         </motion.div>
 
         {/* Peak hour highlight */}
         <motion.div
-          className="mt-8 text-center"
+          className="mt-4 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={isActive ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 2.2 }}
         >
-          <div className="glass px-6 py-4 rounded-xl">
-            <div className="text-2xl font-bold text-white">
-              Peak hour: <span className="text-terminal-green">{formatHour(peakHour)}</span>
-            </div>
-            <div className="text-gray-400 text-sm mt-1">
-              {getPeakHourRoast(peakHour)}
-            </div>
+          <div className="text-sm text-dark/80">
+            Peak hour: <span className="text-dark font-semibold">{formatHour(peakHour)}</span>
           </div>
         </motion.div>
 
         {/* Night coding percentile */}
         {percentiles.nightCoding <= 20 && (
           <motion.div
-            className="mt-4 glass px-6 py-3 rounded-full"
+            className="mt-3 text-sm"
             initial={{ opacity: 0 }}
             animate={isActive ? { opacity: 1 } : {}}
             transition={{ delay: 2.5 }}
           >
-            <span className="text-terminal-purple font-semibold">
+            <span className="text-brand-red font-semibold">
               Top {Math.round(percentiles.nightCoding)}%
             </span>
-            <span className="text-gray-400 ml-2">night coder</span>
+            <span className="text-dark/80 ml-2">night coder</span>
           </motion.div>
         )}
       </div>
-    </GradientBackground>
   );
 }
