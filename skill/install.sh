@@ -117,7 +117,7 @@ python3 "$SKILL_DIR/scripts/vibes.py" --json > "$STATS_FILE"
 
 # Step 2: Have Claude analyze and output enrichment JSON
 ENRICHMENT_FILE="/tmp/vibes-enrichment.json"
-claude --print --model haiku "/vibes" > "$ENRICHMENT_FILE" 2>/dev/null
+claude --print --model haiku "/vibes" < /dev/null > "$ENRICHMENT_FILE" 2>&1
 
 # Step 3: Parse enrichment JSON and generate final URL
 if [ -f "$ENRICHMENT_FILE" ] && grep -q '"persona"' "$ENRICHMENT_FILE"; then
