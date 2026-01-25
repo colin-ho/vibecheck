@@ -2,8 +2,9 @@
 """Generate VibeChecked URL from local stats.
 
 Usage:
-    python3 vibes.py              # Output URL
-    python3 vibes.py --json       # Output raw JSON bundle
+    python3 vibes.py              # Output URL with base stats only
+    python3 vibes.py --json       # Output raw JSON bundle for analysis
+    python3 vibes.py --persona TOKEN_TITAN --traits '["night-owl","methodical"]' --fun-facts '["You said fix 94 times"]'
     python3 vibes.py -v           # Verbose mode with warnings
 """
 
@@ -470,8 +471,14 @@ def main() -> None:
     global verbose
 
     parser = argparse.ArgumentParser(description="Generate VibeChecked URL")
-    parser.add_argument("--json", action="store_true", help="Output raw JSON bundle")
+    parser.add_argument("--json", action="store_true", help="Output raw JSON bundle for analysis")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode")
+    # Claude-provided enrichment fields
+    parser.add_argument("--persona", type=str, help="Persona ID (e.g., token-titan, midnight-architect)")
+    parser.add_argument("--traits", type=str, help="JSON array of trait strings")
+    parser.add_argument("--prompting-style", type=str, help="Description of prompting style")
+    parser.add_argument("--communication-tone", type=str, help="Description of communication tone")
+    parser.add_argument("--fun-facts", type=str, help="JSON array of fun fact strings")
     args = parser.parse_args()
     verbose = args.verbose
 
@@ -492,6 +499,24 @@ def main() -> None:
     bundle = build_bundle(
         base_stats, tool_usage, prompt_samples, prompt_stats, word_analysis, topics, quirks
     )
+
+    # Apply Claude-provided enrichments
+    if args.persona:
+        bundle["personaId"] = args.persona
+    if args.traits:
+        try:
+            bundle["traits"] = json.loads(args.traits)
+        except json.JSONDecodeError:
+            warn(f"Invalid JSON for --traits: {args.traits}")
+    if args.prompting_style:
+        bundle["promptingStyle"] = args.prompting_style
+    if args.communication_tone:
+        bundle["communicationTone"] = args.communication_tone
+    if args.fun_facts:
+        try:
+            bundle["funFacts"] = json.loads(args.fun_facts)
+        except json.JSONDecodeError:
+            warn(f"Invalid JSON for --fun-facts: {args.fun_facts}")
 
     if args.json:
         print(json.dumps(bundle, indent=2))

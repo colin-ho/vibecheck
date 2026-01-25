@@ -92,18 +92,93 @@ echo ""
 echo "VibeChecked installed successfully!"
 echo ""
 
-# Auto-run /vibes if prerequisites are met
+# Auto-run vibes if prerequisites are met
 if [ ! -f "$HOME/.claude/stats-cache.json" ]; then
     echo "No Claude Code stats found yet."
     echo "   Use Claude Code for a while, then run /vibes to generate your vibe check."
     echo ""
-elif ! command -v claude &> /dev/null; then
+    exit 0
+fi
+
+if ! command -v claude &> /dev/null; then
     echo "Claude Code CLI not found in PATH."
     echo "   Install Claude Code, then run /vibes to generate your vibe check."
     echo "   https://claude.ai/code"
     echo ""
-else
-    echo "Generating your vibe check..."
-    echo ""
-    claude --print --model sonnet "/vibes"
+    exit 0
 fi
+
+echo "Generating your vibe check..."
+echo ""
+
+# Step 1: Generate raw stats JSON
+STATS_FILE="/tmp/vibes-stats.json"
+python3 "$SKILL_DIR/scripts/vibes.py" --json > "$STATS_FILE"
+
+# Step 2: Have Claude analyze and output enrichment JSON
+ENRICHMENT_FILE="/tmp/vibes-enrichment.json"
+claude --print --model haiku "/vibes" > "$ENRICHMENT_FILE" 2>/dev/null
+
+# Step 3: Parse enrichment JSON and generate final URL
+if [ -f "$ENRICHMENT_FILE" ] && grep -q '"persona"' "$ENRICHMENT_FILE"; then
+    # Extract JSON from Claude's output (find the JSON block)
+    ENRICHMENT_JSON=$(grep -A 100 '^{' "$ENRICHMENT_FILE" | head -n 100)
+
+    # Parse fields using python
+    FINAL_URL=$(python3 - "$STATS_FILE" "$ENRICHMENT_FILE" "$SKILL_DIR/scripts/vibes.py" << 'PYTHON_SCRIPT'
+import json
+import subprocess
+import sys
+import re
+
+stats_file = sys.argv[1]
+enrichment_file = sys.argv[2]
+vibes_script = sys.argv[3]
+
+# Read enrichment output and extract JSON
+with open(enrichment_file) as f:
+    content = f.read()
+
+# Find JSON block in output
+json_match = re.search(r'\{[^{}]*"persona"[^{}]*\}', content, re.DOTALL)
+if not json_match:
+    # Try to find a larger JSON block
+    json_match = re.search(r'\{[\s\S]*?"persona"[\s\S]*?"funFacts"[\s\S]*?\][\s\S]*?\}', content)
+
+if json_match:
+    try:
+        enrichment = json.loads(json_match.group())
+    except json.JSONDecodeError:
+        # Fallback: try to parse the whole content
+        enrichment = {"persona": "token-titan", "traits": [], "promptingStyle": "", "communicationTone": "", "funFacts": []}
+else:
+    enrichment = {"persona": "token-titan", "traits": [], "promptingStyle": "", "communicationTone": "", "funFacts": []}
+
+# Build command
+cmd = [
+    "python3", vibes_script,
+    "--persona", enrichment.get("persona", "token-titan"),
+    "--traits", json.dumps(enrichment.get("traits", [])),
+    "--prompting-style", enrichment.get("promptingStyle", ""),
+    "--communication-tone", enrichment.get("communicationTone", ""),
+    "--fun-facts", json.dumps(enrichment.get("funFacts", []))
+]
+
+result = subprocess.run(cmd, capture_output=True, text=True)
+print(result.stdout.strip())
+PYTHON_SCRIPT
+)
+
+    echo ""
+    echo "Here's your VibeChecked URL:"
+    echo ""
+    echo "$FINAL_URL"
+    echo ""
+else
+    # Fallback: generate URL without enrichment
+    echo "Generating basic stats..."
+    python3 "$SKILL_DIR/scripts/vibes.py"
+fi
+
+# Cleanup
+rm -f "$STATS_FILE" "$ENRICHMENT_FILE"
