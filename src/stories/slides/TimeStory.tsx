@@ -83,7 +83,8 @@ const intensityColors = [
 export function TimeStory({ data, isActive }: StorySlideProps) {
 	const { stats } = data
 
-	const totalMinutes = (stats.totalSessions || 1) * 45
+	// Use real totalMinutes if available, fall back to estimate for old bundles
+	const totalMinutes = stats.totalMinutes ?? (stats.totalSessions || 1) * 45
 	const totalHours = Math.round(totalMinutes / 60) || 1
 
 	const { grid, weeks, days } = useMemo(
