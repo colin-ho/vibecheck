@@ -22,7 +22,7 @@ export function SpiralCloud({
 	rotate = false,
 	animate = true,
 	delay = 0,
-	maxWords = 15,
+	maxWords = 20,
 	colors = ['#bdb7fc', '#dd5013', '#da1c1c', '#a05f1a', '#8b372b'],
 }: SpiralCloudProps) {
 	const sortedWords = [...words].sort((a, b) => b.count - a.count).slice(0, maxWords)

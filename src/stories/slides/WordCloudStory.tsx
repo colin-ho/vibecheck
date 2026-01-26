@@ -60,7 +60,7 @@ export function WordCloudStory({ data, isActive }: StorySlideProps) {
 				transition={{ delay: 0.3 }}
 			>
 				<SpiralCloud
-					words={topWords.slice(0, 12)}
+					words={topWords.slice(0, 20)}
 					size={280}
 					rotate={false}
 					delay={0.6}

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion'
 
 export function LandingPage() {
@@ -13,34 +12,14 @@ export function LandingPage() {
 	const x = useSpring(mouseX, springConfig)
 	const y = useSpring(mouseY, springConfig)
 
-	// Use fewer colors - sunset theme
-	const primaryColor = 'rgba(221, 80, 19, 0.6)' // sunset-accent
-	const secondaryColor = 'rgba(189, 183, 252, 0.6)' // lavender
+	// Sunset theme color
+	const sunsetColor = '#dd5013'
 
-	// Create motion templates for reactive gradients
-	const outerGlowGradient = useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, ${primaryColor} 0%, ${secondaryColor} 50%, transparent 100%)`
-	const mainOrbGradient = useMotionTemplate`radial-gradient(ellipse ${x}% ${y}% at center, ${primaryColor} 0%, ${secondaryColor} 60%, transparent 100%)`
-	const innerCoreGradient = useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, ${secondaryColor} 0%, ${primaryColor} 50%, transparent 100%)`
-
-	// Reuse the same 2 colors for orbiting particles
-	const particleColors = [
-		primaryColor,
-		secondaryColor,
-		primaryColor,
-		secondaryColor,
-		primaryColor,
-		secondaryColor,
-	]
+	// Create motion template for reactive gradient
+	const outerGlowGradient = useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, rgba(221, 80, 19, 0.7) 0%, rgba(221, 80, 19, 0.3) 50%, transparent 100%)`
 
 	const installCommand =
 		'curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash'
-
-	const samples = [
-		{ path: '/sample_1', label: 'Vibe Coder', icon: '🎲' },
-		{ path: '/sample_2', label: '3AM Demon', icon: '👹' },
-		{ path: '/sample_3', label: 'Polite Menace', icon: '🎭' },
-		{ path: '/sample_4', label: 'Essay Writer', icon: '📚' },
-	]
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText(installCommand)
@@ -77,9 +56,9 @@ export function LandingPage() {
 					ref={containerRef}
 					className="w-2/3 flex items-center justify-center p-8 relative overflow-hidden"
 				>
-					{/* Dynamic Morphing Orb */}
+					{/* Claude Code Icon Animation */}
 					<motion.div
-						className="relative"
+						className="relative flex items-center justify-center"
 						style={{
 							width: 400,
 							height: 400,
@@ -87,144 +66,277 @@ export function LandingPage() {
 					>
 						{/* Outer glow layer */}
 						<motion.div
-							className="absolute inset-0 rounded-full blur-[100px]"
+							className="absolute blur-[100px]"
 							style={{
+								width: 350,
+								height: 250,
 								background: outerGlowGradient,
+								borderRadius: '30%',
 							}}
 							animate={{
-								scale: [1, 1.4, 0.9, 1.3, 1],
+								scale: [1, 1.3, 0.9, 1.2, 1],
 								opacity: [0.6, 0.85, 0.5, 0.75, 0.6],
 							}}
 							transition={{
-								duration: 8,
+								duration: 7,
 								repeat: Infinity,
 								ease: 'easeInOut',
 							}}
 						/>
 
-						{/* Main morphing orb */}
+						{/* 3D Chill Vibes Container */}
 						<motion.div
-							className="absolute inset-0 blur-2xl"
+							className="relative z-10 select-none blur-[12px]"
 							style={{
-								background: mainOrbGradient,
-								borderRadius: useTransform(
-									x,
-									[0, 100],
-									['30% 70% 70% 30% / 30% 30% 70% 70%', '70% 30% 30% 70% / 70% 70% 30% 30%']
-								),
-								x: useTransform(x, [0, 100], [-30, 30]),
-								y: useTransform(y, [0, 100], [-30, 30]),
+								perspective: 800,
+								transformStyle: 'preserve-3d',
+								x: useTransform(x, [0, 100], [-20, 20]),
+								y: useTransform(y, [0, 100], [-20, 20]),
 							}}
 							animate={{
-								scale: [1, 1.3, 0.95, 1.2, 1],
-								rotate: [0, 180, 360],
-								borderRadius: [
-									'30% 70% 70% 30% / 30% 30% 70% 70%',
-									'70% 30% 30% 70% / 70% 70% 30% 30%',
-									'50% 50% 50% 50% / 50% 50% 50% 50%',
-									'30% 70% 70% 30% / 30% 30% 70% 70%',
-									'60% 40% 40% 60% / 60% 60% 40% 40%',
-								],
+								rotateY: [0, 8, -8, 5, -5, 0],
+								rotateX: [0, -4, 3, -3, 4, 0],
+								y: [0, -8, 0, -6, 0, -10, 0],
+								scale: [1, 1.03, 0.98, 1.02, 0.99, 1.04, 1],
+								filter: ['blur(12px)', 'blur(10px)', 'blur(14px)', 'blur(11px)', 'blur(12px)'],
 							}}
 							transition={{
-								scale: {
-									duration: 6,
-									repeat: Infinity,
-									ease: 'easeInOut',
-								},
-								rotate: {
-									duration: 20,
-									repeat: Infinity,
-									ease: 'linear',
-								},
-								borderRadius: {
-									duration: 10,
-									repeat: Infinity,
-									ease: 'easeInOut',
-								},
-							}}
-						/>
-
-						{/* Inner core */}
-						<motion.div
-							className="absolute inset-[25%] rounded-full blur-3xl"
-							style={{
-								background: innerCoreGradient,
-								x: useTransform(x, [0, 100], [-25, 25]),
-								y: useTransform(y, [0, 100], [-25, 25]),
-							}}
-							animate={{
-								scale: [1, 1.4, 0.85, 1.25, 1],
-								opacity: [0.8, 0.95, 0.65, 0.9, 0.8],
-							}}
-							transition={{
-								duration: 5,
+								duration: 4,
 								repeat: Infinity,
 								ease: 'easeInOut',
 							}}
-						/>
+						>
+							{/* Main body - top portion (head) */}
+							<motion.div
+								className="relative"
+								style={{
+									width: 320,
+									height: 110,
+									background: sunsetColor,
+									borderRadius: '55px 60px 16px 20px',
+									marginLeft: 45,
+									transformOrigin: 'center bottom',
+								}}
+								animate={{
+									opacity: [0.85, 1, 0.9, 0.95, 0.85],
+									rotate: [-1, 2, -1, 2, -1],
+									scaleY: [1, 0.98, 1.02, 0.99, 1],
+								}}
+								transition={{
+									duration: 3,
+									repeat: Infinity,
+									ease: 'easeInOut',
+								}}
+							>
+								{/* Eye - left */}
+								<motion.div
+									className="absolute rounded-full"
+									style={{
+										width: 36,
+										height: 40,
+										background: '#FFF8F0',
+										top: 30,
+										left: 70,
+									}}
+									animate={{
+										opacity: [0.7, 0.9, 0.75, 0.85, 0.7],
+										scale: [1, 1.08, 0.95, 1.05, 1],
+									}}
+									transition={{
+										duration: 2,
+										repeat: Infinity,
+										ease: 'easeInOut',
+									}}
+								/>
+								{/* Eye - right */}
+								<motion.div
+									className="absolute rounded-full"
+									style={{
+										width: 34,
+										height: 37,
+										background: '#FFF8F0',
+										top: 33,
+										right: 75,
+									}}
+									animate={{
+										opacity: [0.75, 0.85, 0.7, 0.9, 0.75],
+										scale: [1, 0.95, 1.08, 0.97, 1],
+									}}
+									transition={{
+										duration: 2,
+										repeat: Infinity,
+										ease: 'easeInOut',
+										delay: 0.5,
+									}}
+								/>
+							</motion.div>
 
-						{/* Orbiting particles */}
+							{/* Main body - bottom portion (torso, wider) */}
+							<motion.div
+								className="relative"
+								style={{
+									width: 380,
+									height: 95,
+									background: sunsetColor,
+									borderRadius: '20px 14px 70px 60px',
+									marginTop: -14,
+									marginLeft: 10,
+									transformOrigin: 'center center',
+								}}
+								animate={{
+									opacity: [0.9, 0.95, 1, 0.95, 0.9],
+									scaleX: [1, 1.02, 0.98, 1.01, 1],
+									scaleY: [1, 0.98, 1.02, 0.99, 1],
+								}}
+								transition={{
+									duration: 2,
+									repeat: Infinity,
+									ease: 'easeInOut',
+								}}
+							/>
+
+							{/* Arm - left - gentle sway */}
+							<motion.div
+								className="absolute"
+								style={{
+									width: 55,
+									height: 75,
+									background: sunsetColor,
+									borderRadius: '28px 18px 30px 38px',
+									top: 72,
+									left: -30,
+									transformOrigin: 'right top',
+								}}
+								animate={{
+									rotate: [-8, 15, -5, 20, -10, 12, -8],
+									x: [0, 5, -3, 8, -2, 4, 0],
+									y: [0, -8, 2, -12, 0, -6, 0],
+									opacity: [0.8, 0.95, 0.85, 1, 0.9, 0.95, 0.8],
+								}}
+								transition={{
+									duration: 3,
+									repeat: Infinity,
+									ease: 'easeInOut',
+								}}
+							/>
+
+							{/* Arm - right - gentle sway */}
+							<motion.div
+								className="absolute"
+								style={{
+									width: 50,
+									height: 68,
+									background: sunsetColor,
+									borderRadius: '16px 30px 32px 24px',
+									top: 78,
+									right: -22,
+									transformOrigin: 'left top',
+								}}
+								animate={{
+									rotate: [8, -18, 5, -22, 10, -15, 8],
+									x: [0, -6, 3, -10, 2, -5, 0],
+									y: [0, -10, 3, -15, 0, -8, 0],
+									opacity: [0.85, 1, 0.9, 0.95, 0.85, 1, 0.85],
+								}}
+								transition={{
+									duration: 3.5,
+									repeat: Infinity,
+									ease: 'easeInOut',
+									delay: 0.3,
+								}}
+							/>
+
+							{/* Foot - left - gentle tap */}
+							<motion.div
+								className="absolute"
+								style={{
+									width: 65,
+									height: 45,
+									background: sunsetColor,
+									borderRadius: '12px 16px 28px 32px',
+									bottom: -40,
+									left: 55,
+									transformOrigin: 'center top',
+								}}
+								animate={{
+									rotate: [-2, 4, -1, 5, -3, 3, -2],
+									y: [0, 3, -1, 4, 0, 2, 0],
+									opacity: [0.75, 0.9, 0.8, 0.95, 0.85, 0.9, 0.75],
+								}}
+								transition={{
+									duration: 2.5,
+									repeat: Infinity,
+									ease: 'easeInOut',
+								}}
+							/>
+
+							{/* Foot - right - gentle tap */}
+							<motion.div
+								className="absolute"
+								style={{
+									width: 70,
+									height: 42,
+									background: sunsetColor,
+									borderRadius: '18px 12px 34px 26px',
+									bottom: -38,
+									right: 50,
+									transformOrigin: 'center top',
+								}}
+								animate={{
+									rotate: [2, -5, 1, -4, 3, -2, 2],
+									y: [0, 4, -1, 5, 0, 3, 0],
+									opacity: [0.8, 0.95, 0.85, 0.9, 0.8, 0.95, 0.8],
+								}}
+								transition={{
+									duration: 2.5,
+									repeat: Infinity,
+									ease: 'easeInOut',
+									delay: 0.4,
+								}}
+							/>
+						</motion.div>
+
+						{/* Floating particles around the icon */}
 						{[...Array(6)].map((_, i) => {
-							const initialAngle = (i * 360) / 6 // Distribute evenly around circle
-							const baseOrbitRadius = 140 // Smaller base radius
-							const particleSize = 80 + i * 5 // Much bigger, closer to main orb
-							const orbitDuration = 6 + i * 0.8 // Faster movement
-
-							// Calculate orbit positions with varying radius for more movement
-							const orbitX = (angle: number, radiusOffset: number = 0) =>
-								Math.cos((angle * Math.PI) / 180) * (baseOrbitRadius + radiusOffset)
-							const orbitY = (angle: number, radiusOffset: number = 0) =>
-								Math.sin((angle * Math.PI) / 180) * (baseOrbitRadius + radiusOffset)
+							const angle = (i * 360) / 6
+							const radius = 140
+							const particleX = Math.cos((angle * Math.PI) / 180) * radius
+							const particleY = Math.sin((angle * Math.PI) / 180) * radius
 
 							return (
 								<motion.div
 									key={i}
 									className="absolute rounded-full blur-2xl"
 									style={{
-										width: particleSize,
-										height: particleSize,
-										background: particleColors[i],
+										width: 50 + (i % 3) * 15,
+										height: 50 + (i % 3) * 15,
+										background: `rgba(221, 80, 19, ${0.4 + (i % 3) * 0.1})`,
 										left: '50%',
 										top: '50%',
 									}}
 									animate={{
 										x: [
-											orbitX(initialAngle, -15) - particleSize / 2,
-											orbitX(initialAngle + 180, 20) - particleSize / 2,
-											orbitX(initialAngle + 360, -15) - particleSize / 2,
+											particleX - 25,
+											particleX + 15,
+											particleX - 20,
+											particleX + 10,
+											particleX - 25,
 										],
 										y: [
-											orbitY(initialAngle, -15) - particleSize / 2,
-											orbitY(initialAngle + 180, 20) - particleSize / 2,
-											orbitY(initialAngle + 360, -15) - particleSize / 2,
+											particleY - 15,
+											particleY + 20,
+											particleY - 10,
+											particleY + 15,
+											particleY - 15,
 										],
-										scale: [0.9, 1.2, 0.85, 1.15, 0.9],
-										opacity: [0.5, 0.85, 0.6, 0.8, 0.5],
+										scale: [0.7, 1.2, 0.8, 1.1, 0.7],
+										opacity: [0.4, 0.7, 0.5, 0.65, 0.4],
 									}}
 									transition={{
-										x: {
-											duration: orbitDuration,
-											repeat: Infinity,
-											ease: 'easeInOut',
-										},
-										y: {
-											duration: orbitDuration,
-											repeat: Infinity,
-											ease: 'easeInOut',
-										},
-										scale: {
-											duration: 2.5 + i * 0.4,
-											repeat: Infinity,
-											ease: 'easeInOut',
-											delay: i * 0.15,
-										},
-										opacity: {
-											duration: 2 + i * 0.3,
-											repeat: Infinity,
-											ease: 'easeInOut',
-											delay: i * 0.1,
-										},
+										duration: 5 + i * 0.4,
+										repeat: Infinity,
+										ease: 'easeInOut',
+										delay: i * 0.25,
 									}}
 								/>
 							)
@@ -234,13 +346,19 @@ export function LandingPage() {
 
 				{/* Right 1/3 - Content */}
 				<div className="w-1/3 flex flex-col justify-center items-end pl-8 pr-20 py-12 text-right">
-					<h1 className="text-[clamp(2.5rem,5vw,4rem)] font-black mb-10 tracking-tight text-[#3b110c]">
+					<h1 className="text-[clamp(2.5rem,5vw,4rem)] font-black mb-4 tracking-tight text-[#3b110c]">
 						VibeChecked
 					</h1>
 
+					<p className="text-[clamp(1rem,2vw,1.25rem)] mb-10 text-[#3b110c]/80 leading-relaxed">
+						You've been vibe coding.
+						<br />
+						Claude Code's been watching.
+					</p>
+
 					<div className="mb-10">
 						<p className="text-sm uppercase tracking-widest mb-4 text-[#3b110c]/70">
-							Check Your Vibes
+							Get Your Vibe Check
 						</p>
 						<div
 							className="rounded-2xl p-6 bg-[#3b110c]/10 border border-[#3b110c]/10 cursor-pointer hover:bg-[#3b110c]/15 transition-colors"
@@ -289,24 +407,6 @@ export function LandingPage() {
 									)}
 								</button>
 							</div>
-						</div>
-					</div>
-
-					<div>
-						<p className="text-sm uppercase tracking-widest mb-4 text-[#3b110c]/50">
-							Or try a demo
-						</p>
-						<div className="flex flex-col gap-3">
-							{samples.map((sample) => (
-								<Link
-									key={sample.path}
-									to={sample.path}
-									className="px-5 py-2 rounded-lg hover:bg-[#3b110c]/10 transition-colors flex items-center justify-end gap-2 text-sm text-[#3b110c]/80"
-								>
-									<span>{sample.icon}</span>
-									<span>{sample.label}</span>
-								</Link>
-							))}
 						</div>
 					</div>
 				</div>

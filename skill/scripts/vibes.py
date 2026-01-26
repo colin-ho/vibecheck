@@ -432,7 +432,7 @@ For each, include a brief "context" explaining why you picked it.
 - **mostDemanding**: Most direct/demanding request (truncate to ~150 chars)
 
 ### 5. Word Analysis
-- **topWords**: 10 most meaningful words (exclude common stopwords like "the", "is", "code", "file")
+- **topWords**: 20 most meaningful words (exclude common stopwords like "the", "is", "code", "file")
 - **topPhrases**: 5 most common meaningful 2-3 word phrases
 - **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring
 
