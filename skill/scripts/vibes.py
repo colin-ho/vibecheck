@@ -36,6 +36,7 @@ from bundle_types import (
     Stats,
     TokenCounts,
 )
+from session_duration import calculate_total_session_minutes
 
 # Common English stopwords to filter out from word counts
 STOPWORDS = frozenset(
@@ -795,6 +796,9 @@ def build_bundle(
     longest_session = base_stats.get("longestSession", {})
     longest_minutes = longest_session.get("duration", 0) // 60000
 
+    # Calculate total session time from timestamps
+    total_minutes = calculate_total_session_minutes(projects_dir)
+
     stats = Stats(
         totalSessions=base_stats.get("totalSessions", 0),
         totalMessages=base_stats.get("totalMessages", 0),
@@ -809,6 +813,7 @@ def build_bundle(
         hourCounts=hour_counts,
         peakHour=peak_hour,
         longestSessionMinutes=longest_minutes,
+        totalMinutes=total_minutes,
         projectCount=project_count,
         daysActive=days_active,
         activeDates=[DailyActivity(date=d["date"], sessions=d["sessions"]) for d in active_dates],

@@ -91,6 +91,10 @@ export interface Stats {
   ];
   peakHour: number;
   longestSessionMinutes: number;
+  /**
+   * Total time across all sessions in minutes (calculated from timestamps)
+   */
+  totalMinutes?: number;
   projectCount: number;
   daysActive: number;
   /**

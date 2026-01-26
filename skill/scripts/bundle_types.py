@@ -93,7 +93,9 @@ class Obsessions(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    topics: Optional[List[str]] = Field(None, description='Technical areas they focus on')
+    topics: Optional[List[str]] = Field(
+        None, description='Technical areas they focus on'
+    )
     frequentlyRevisited: Optional[List[str]] = Field(
         None, description='Problems they kept coming back to'
     )
@@ -113,7 +115,9 @@ class Contrasts(BaseModel):
         None, description='When they really went off (truncated)'
     )
     politestMoment: Optional[str] = Field(None, description='Most courteous request')
-    mostDemanding: Optional[str] = Field(None, description='Most direct/demanding request')
+    mostDemanding: Optional[str] = Field(
+        None, description='Most direct/demanding request'
+    )
     capsLockPrompts: Optional[conint(ge=0)] = Field(
         None, description='Count of prompts that were mostly ALL CAPS'
     )
@@ -160,6 +164,10 @@ class Stats(BaseModel):
     )
     peakHour: conint(ge=0, le=23)
     longestSessionMinutes: conint(ge=0)
+    totalMinutes: Optional[conint(ge=0)] = Field(
+        None,
+        description='Total time across all sessions in minutes (calculated from timestamps)',
+    )
     projectCount: conint(ge=0)
     daysActive: conint(ge=0)
     activeDates: Optional[List[DailyActivity]] = Field(

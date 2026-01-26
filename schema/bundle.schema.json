@@ -112,6 +112,11 @@
           "type": "integer",
           "minimum": 0
         },
+        "totalMinutes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total time across all sessions in minutes (calculated from timestamps)"
+        },
         "projectCount": {
           "type": "integer",
           "minimum": 0
