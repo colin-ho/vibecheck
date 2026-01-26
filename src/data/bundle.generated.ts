@@ -148,16 +148,13 @@ export interface Insights {
   dominantTopics?: string[];
 }
 /**
- * Notable prompts found during analysis
+ * Notable prompts found during analysis - aim for all 4, allow nulls if data sparse
  */
 export interface MemorablePrompts {
   funniest?: PromptWithContext;
   mostFrustrated?: PromptWithContext;
   mostAmbitious?: PromptWithContext;
-  biggestFacepalm?: PromptWithContext;
-  mostGrateful?: PromptWithContext;
   weirdest?: PromptWithContext;
-  lateNightRamble?: PromptWithContext;
 }
 export interface PromptWithContext {
   /**
@@ -216,7 +213,7 @@ export interface Obsessions {
   actualProjects?: string[];
 }
 /**
- * Interesting contrasts in prompting style
+ * Interesting contrasts in prompting style - aim for all 4, allow nulls if data sparse
  */
 export interface Contrasts {
   /**

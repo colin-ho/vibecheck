@@ -5,8 +5,10 @@ import { UsageData } from '../data/types'
 import {
 	mockData,
 	generateNightOwlMockData,
-	generatePoliteMockData,
+	generateSquirrelBrainMockData,
 	generateEssayWriterMockData,
+	generateDebugDemonMockData,
+	generateDomainDisasterMockData,
 } from '../data/mockData'
 
 function LoadingScreen() {
@@ -76,7 +78,7 @@ function ErrorScreen({ error }: { error: string }) {
 	)
 }
 
-export type SampleId = 'default' | 'night_owl' | 'polite' | 'essay_writer'
+export type SampleId = 'default' | 'night_owl' | 'squirrel' | 'essay_writer' | 'debug' | 'domain'
 
 interface StatsPageProps {
 	sampleId?: SampleId
@@ -89,11 +91,17 @@ function getSampleData(sampleId: SampleId): UsageData {
 		case 'night_owl':
 			data = generateNightOwlMockData()
 			break
-		case 'polite':
-			data = generatePoliteMockData()
+		case 'squirrel':
+			data = generateSquirrelBrainMockData()
 			break
 		case 'essay_writer':
 			data = generateEssayWriterMockData()
+			break
+		case 'debug':
+			data = generateDebugDemonMockData()
+			break
+		case 'domain':
+			data = generateDomainDisasterMockData()
 			break
 		case 'default':
 		default:

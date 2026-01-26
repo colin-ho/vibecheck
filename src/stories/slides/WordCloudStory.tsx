@@ -16,6 +16,13 @@ export function WordCloudStory({ data, isActive }: StorySlideProps) {
 	const signatureOpeners = communicationStyle?.signatureOpeners || []
 	const verbalTics = communicationStyle?.verbalTics || []
 
+	// Check if we have any vocabulary data to show
+	const hasVocabData =
+		topWords.length > 0 ||
+		catchphrases.length > 0 ||
+		signatureOpeners.length > 0 ||
+		verbalTics.length > 0
+
 	const getPatternRoast = () => {
 		if (!insights) return 'Your vocabulary is... interesting.'
 
@@ -39,6 +46,30 @@ export function WordCloudStory({ data, isActive }: StorySlideProps) {
 		}
 
 		return 'Your vocabulary has been noted.'
+	}
+
+	// Empty state
+	if (!hasVocabData) {
+		return (
+			<SlideLayout>
+				<motion.div
+					className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
+					initial={{ opacity: 0, y: -20 }}
+					animate={isActive ? { opacity: 1, y: 0 } : {}}
+					transition={{ duration: 0.6 }}
+				>
+					YOUR VOCABULARY, EXPOSED
+				</motion.div>
+				<motion.div
+					className="text-dark/60 text-sm text-center"
+					initial={{ opacity: 0 }}
+					animate={isActive ? { opacity: 1 } : {}}
+					transition={{ delay: 0.3 }}
+				>
+					Not enough prompts analyzed yet to reveal your vocabulary patterns.
+				</motion.div>
+			</SlideLayout>
+		)
 	}
 
 	return (

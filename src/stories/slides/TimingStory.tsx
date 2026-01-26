@@ -4,8 +4,10 @@ import { StorySlideProps } from '../../data/types'
 export function TimingStory({ data, isActive }: StorySlideProps) {
 	const { stats, percentiles } = data
 
-	const maxHour = Math.max(...stats.hourCounts)
-	const peakHour = stats.peakHour
+	// Safe handling for empty/zero hourCounts
+	const hasHourData = stats.hourCounts.some((count) => count > 0)
+	const maxHour = hasHourData ? Math.max(...stats.hourCounts) : 1
+	const peakHour = stats.peakHour ?? 12
 
 	const getTimePersonality = (): { title: string; description: string } => {
 		// Peak hour should be the primary signal
@@ -73,7 +75,7 @@ export function TimingStory({ data, isActive }: StorySlideProps) {
 					<g transform={`translate(${clockRadius + 20}, ${clockRadius + 20})`}>
 						{/* Hour segments */}
 						{stats.hourCounts.map((count, hour) => {
-							const intensity = count / maxHour
+							const intensity = maxHour > 0 ? count / maxHour : 0
 							const startAngle = (hour - 6) * segmentAngle // Start at 6am (top)
 							const endAngle = (hour - 5) * segmentAngle
 

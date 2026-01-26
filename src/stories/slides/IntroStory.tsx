@@ -27,7 +27,7 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 		return n.toString()
 	}
 
-	const totalTokens = stats.totalTokens.input + stats.totalTokens.output
+	const totalTokens = (stats.totalTokens?.input ?? 0) + (stats.totalTokens?.output ?? 0)
 
 	return (
 		<SlideLayout>

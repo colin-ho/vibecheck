@@ -36,15 +36,20 @@ function getTopicRoast(topic: string): string {
 export function ObsessionsStory({ data, isActive }: StorySlideProps) {
 	const { insights } = data
 
-	// Get dominant topics from insights
+	// Get dominant topics from insights (predefined categories for colors)
 	const dominantTopics = insights?.dominantTopics || []
 	const obsessions = insights?.obsessions
 
 	// Get detailed topics from obsessions (more specific than dominantTopics)
 	const detailedTopics = obsessions?.topics || []
 
+	// Use dominantTopics if available, otherwise fall back to obsessions.topics
+	// This ensures we have something to display even if Claude doesn't output dominantTopics
+	const topicsForVisualization =
+		dominantTopics.length > 0 ? dominantTopics : detailedTopics.slice(0, 5)
+
 	// Build topic data with percentages (decreasing by rank to show hierarchy)
-	const topicData = dominantTopics.map((topic, index) => ({
+	const topicData = topicsForVisualization.map((topic, index) => ({
 		name: topic,
 		// First topic gets most, decreasing from there: 100, 70, 50, 35, 25...
 		percentage: Math.round(100 * Math.pow(0.7, index)),
@@ -56,8 +61,35 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
 	// Get actual projects
 	const actualProjects = obsessions?.actualProjects || []
 
+	// Check if we have any obsessions data
+	const hasObsessionsData = topicData.length > 0 || actualProjects.length > 0
+
 	// Calculate max percentage for bubble sizing
 	const maxPercentage = Math.max(...topicData.map((t) => t.percentage), 1)
+
+	// Empty state
+	if (!hasObsessionsData) {
+		return (
+			<SlideLayout>
+				<motion.div
+					className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
+					initial={{ opacity: 0, y: -20 }}
+					animate={isActive ? { opacity: 1, y: 0 } : {}}
+					transition={{ duration: 0.6 }}
+				>
+					YOUR UNHEALTHY OBSESSIONS
+				</motion.div>
+				<motion.div
+					className="text-dark/60 text-sm text-center"
+					initial={{ opacity: 0 }}
+					animate={isActive ? { opacity: 1 } : {}}
+					transition={{ delay: 0.3 }}
+				>
+					Not enough data to identify your obsessions yet. Keep coding!
+				</motion.div>
+			</SlideLayout>
+		)
+	}
 
 	return (
 		<SlideLayout>

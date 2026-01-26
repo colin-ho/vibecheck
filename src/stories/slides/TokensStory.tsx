@@ -6,7 +6,7 @@ import { SlideLayout } from '../../components/SlideLayout'
 
 export function TokensStory({ data, isActive }: StorySlideProps) {
 	const { stats, percentiles } = data
-	const { totalTokens } = stats
+	const totalTokens = stats.totalTokens ?? { input: 0, output: 0, cached: 0 }
 
 	const total = totalTokens.input + totalTokens.output
 

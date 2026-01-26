@@ -37,16 +37,36 @@ async function main() {
   console.log('Generating Python types...')
   try {
     execSync(
-      `datamodel-codegen --input "${schemaPath}" --output "${pyOutputPath}" --input-file-type jsonschema --output-model-type pydantic_v2.BaseModel --use-standard-collections --use-union-operator --target-python-version 3.10`,
+      `datamodel-codegen --input "${schemaPath}" --output "${pyOutputPath}" --input-file-type jsonschema --output-model-type pydantic_v2.BaseModel --target-python-version 3.10`,
       { stdio: 'inherit' }
     )
     console.log(`  Written to ${pyOutputPath}`)
 
-    // Add header comment to Python file
-    const pyContent = readFileSync(pyOutputPath, 'utf-8')
+    // Post-process for Python 3.8 compatibility
+    let pyContent = readFileSync(pyOutputPath, 'utf-8')
+
+    // Convert union syntax: X | None -> Optional[X]
+    // Also handle: list[X] | None -> Optional[List[X]]
+    pyContent = pyContent
+      // Convert dict[K, V] to Dict[K, V]
+      .replace(/\bdict\[/g, 'Dict[')
+      // Convert list[X] to List[X]
+      .replace(/\blist\[/g, 'List[')
+      // Convert X | None to Optional[X] - match type annotation after colon until | None
+      // Use non-greedy match up to " | None"
+      .replace(/: (.+?) \| None/g, ': Optional[$1]')
+
+    // Add typing imports after __future__ import
+    pyContent = pyContent.replace(
+      /^from __future__ import annotations\n/m,
+      'from __future__ import annotations\n\nfrom typing import Dict, List, Optional\n'
+    )
+
     const pyHeader = `# AUTO-GENERATED FILE - DO NOT EDIT
 # Generated from schema/bundle.schema.json
 # Run 'npm run generate:types' to regenerate
+
+# Modified for Python 3.8 compatibility
 
 `
     writeFileSync(pyOutputPath, pyHeader + pyContent)

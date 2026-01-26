@@ -508,7 +508,7 @@ class TestMergeBatchResults:
             {
                 "communicationStyle": {"catchphrases": ["just fix it"]},
                 "topPhrases": [{"phrase": "fix bug", "count": 5}],
-                "dominantTopics": ["debugging"],
+                "dominantTopics": ["debugging", "frontend"],
                 "obsessions": {"topics": ["python"]},
             },
             None,
@@ -516,7 +516,7 @@ class TestMergeBatchResults:
         merged = merge_batch_results(results)
         assert merged["insights"]["communicationStyle"]["catchphrases"] == ["just fix it"]
         assert merged["insights"]["topPhrases"][0]["phrase"] == "fix bug"
-        assert merged["insights"]["dominantTopics"] == ["debugging"]
+        assert merged["insights"]["dominantTopics"] == ["debugging", "frontend"]
         assert merged["insights"]["obsessions"]["topics"] == ["python"]
 
     def test_merges_batch_c_keys(self):
@@ -524,7 +524,7 @@ class TestMergeBatchResults:
             None,
             None,
             {
-                "persona": "debug-addict",
+                "persona": "debug-demon",
                 "traits": ["persistent", "curious"],
                 "promptingStyle": "terse",
                 "communicationTone": "direct",
@@ -532,7 +532,7 @@ class TestMergeBatchResults:
             },
         ]
         merged = merge_batch_results(results)
-        assert merged["persona"] == "debug-addict"
+        assert merged["persona"] == "debug-demon"
         assert merged["traits"] == ["persistent", "curious"]
         assert merged["promptingStyle"] == "terse"
         assert merged["communicationTone"] == "direct"
@@ -542,12 +542,12 @@ class TestMergeBatchResults:
         results = [
             {"memorablePrompts": {"funniest": {"prompt": "haha", "context": "joke"}}},
             {"communicationStyle": {"catchphrases": ["please"]}},
-            {"persona": "polite-menace", "traits": ["polite"]},
+            {"persona": "squirrel-brain", "traits": ["chaotic"]},
         ]
         merged = merge_batch_results(results)
         assert merged["insights"]["memorablePrompts"]["funniest"]["prompt"] == "haha"
         assert merged["insights"]["communicationStyle"]["catchphrases"] == ["please"]
-        assert merged["persona"] == "polite-menace"
+        assert merged["persona"] == "squirrel-brain"
 
     def test_handles_all_none(self):
         results = [None, None, None]

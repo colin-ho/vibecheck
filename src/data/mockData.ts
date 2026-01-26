@@ -128,22 +128,9 @@ export const mockData: UsageData = {
 					"I need you to help me understand why this React component is re-rendering so many times. I've tried using useMemo and useCallback but nothing seems to work...",
 				context: 'A deep dive into React performance optimization spanning multiple components',
 			},
-			biggestFacepalm: {
-				prompt: 'oh wait I forgot to save the file',
-				context: 'Classic developer moment after 30 minutes of debugging',
-			},
-			mostGrateful: {
-				prompt: "you're a lifesaver, that fixed everything!",
-				context: 'After Claude solved a tricky authentication bug',
-			},
 			weirdest: {
 				prompt: 'make the button more... buttony',
 				context: 'A UI request that somehow made perfect sense in context',
-			},
-			lateNightRamble: {
-				prompt:
-					'so basically i have this thing and it needs to do the thing but its not doing the thing right now...',
-				context: 'Sent at 3:47 AM, coherence optional',
 			},
 		},
 		communicationStyle: {
@@ -222,28 +209,34 @@ export function generateMockData(personaId?: string): UsageData {
 	}
 }
 
-// Generate mock data for a "polite menace" user
-export function generatePoliteMockData(): UsageData {
+// Generate mock data for a "squirrel brain" user (behavioral chaos)
+export function generateSquirrelBrainMockData(): UsageData {
 	return {
 		...mockData,
+		quirks: {
+			...mockData.quirks!,
+			interruptCount: 47,
+			abandonedSessions: 89,
+		},
 		insights: {
 			...mockData.insights!,
 			communicationStyle: {
 				...mockData.insights!.communicationStyle,
-				politenessLevel: 'diplomatic',
-				catchphrases: ['if you could please', 'when you have a moment', 'thank you so much'],
+				catchphrases: ['actually wait', 'never mind', 'go back'],
 			},
-			contrasts: {
-				...mockData.insights!.contrasts,
-				politestMoment:
-					'I apologize for bothering you, but would it be possible for you to help me understand this error?',
-			},
+			topWords: [
+				{ word: 'actually', count: 234 },
+				{ word: 'wait', count: 189 },
+				{ word: 'undo', count: 156 },
+				{ word: 'fix', count: 134 },
+				{ word: 'help', count: 98 },
+			],
 		},
-		personaId: 'polite-menace',
-		persona: getPersona('polite-menace'),
-		traits: ['polite', 'chaotic', 'suspiciously-nice'],
-		promptingStyle: 'Aggressively courteous while everything burns',
-		communicationTone: 'Canadian energy. Pure chaos hidden behind manners.',
+		personaId: 'squirrel-brain',
+		persona: getPersona('squirrel-brain'),
+		traits: ['distracted', 'chaotic', 'indecisive'],
+		promptingStyle: 'Actually wait go back. No the other way. Never mind.',
+		communicationTone: 'Your attention span is measured in nanoseconds.',
 	}
 }
 
@@ -289,8 +282,10 @@ export function generateNightOwlMockData(): UsageData {
 		insights: {
 			...mockData.insights!,
 			memorablePrompts: {
-				...mockData.insights!.memorablePrompts,
-				lateNightRamble: {
+				funniest: mockData.insights!.memorablePrompts!.funniest,
+				mostAmbitious: mockData.insights!.memorablePrompts!.mostAmbitious,
+				weirdest: mockData.insights!.memorablePrompts!.weirdest,
+				mostFrustrated: {
 					prompt:
 						'ok so this thing needs to do the stuff but its not working and i think maybe its the database or maybe the api or possibly cosmic rays',
 					context: 'Sent at 4:23 AM, caffeine levels critical',
@@ -312,7 +307,9 @@ export function generateEssayWriterMockData(): UsageData {
 		insights: {
 			...mockData.insights!,
 			contrasts: {
-				...mockData.insights!.contrasts,
+				shortestEffective: mockData.insights!.contrasts!.shortestEffective,
+				politestMoment: mockData.insights!.contrasts!.politestMoment,
+				mostDemanding: mockData.insights!.contrasts!.mostDemanding,
 				longestRamble:
 					'I need a comprehensive analysis of this codebase including all the architectural decisions, the patterns used, potential improvements, performance optimizations, security considerations, testing strategies, documentation needs, deployment pipelines, monitoring solutions, and a detailed roadmap...',
 			},
@@ -330,8 +327,8 @@ export function generateEssayWriterMockData(): UsageData {
 	}
 }
 
-// Generate mock data for a "debug addict"
-export function generateDebugAddictMockData(): UsageData {
+// Generate mock data for a "debug demon"
+export function generateDebugDemonMockData(): UsageData {
 	return {
 		...mockData,
 		insights: {
@@ -350,22 +347,36 @@ export function generateDebugAddictMockData(): UsageData {
 				{ word: 'please', count: 156 },
 			],
 		},
-		personaId: 'debug-addict',
-		persona: getPersona('debug-addict'),
+		personaId: 'debug-demon',
+		persona: getPersona('debug-demon'),
 		traits: ['bug-magnet', 'fix-obsessed', 'error-prone'],
 		promptingStyle: '"Fix" is your love language. "Why" is your catchphrase.',
 		communicationTone: 'Desperately optimistic that this time it will work.',
 	}
 }
 
-// Generate mock data for a "plan skipper"
-export function generatePlanSkipperMockData(): UsageData {
+// Generate mock data for a "domain disaster" (CSS/regex/git struggles)
+export function generateDomainDisasterMockData(): UsageData {
 	return {
 		...mockData,
-		personaId: 'plan-skipper',
-		persona: getPersona('plan-skipper'),
-		traits: ['accepting', 'trusting', 'non-reviewing', 'yolo'],
-		promptingStyle: 'Yes. Sure. Sounds good. Ship it.',
-		communicationTone: 'Reading is for nerds. You trust Claude more than yourself.',
+		insights: {
+			...mockData.insights!,
+			dominantTopics: ['frontend', 'css', 'git'],
+			topWords: [
+				{ word: 'css', count: 234 },
+				{ word: 'center', count: 189 },
+				{ word: 'flexbox', count: 156 },
+				{ word: 'git', count: 134 },
+				{ word: 'merge', count: 98 },
+				{ word: 'regex', count: 87 },
+				{ word: 'rebase', count: 76 },
+				{ word: 'why', count: 234 },
+			],
+		},
+		personaId: 'domain-disaster',
+		persona: getPersona('domain-disaster'),
+		traits: ['css-challenged', 'regex-confused', 'git-traumatized'],
+		promptingStyle: 'How do I center this div? Why does git hate me?',
+		communicationTone: 'CSS, regex, and git: your holy trinity of pain.',
 	}
 }

@@ -27,6 +27,7 @@ export function ToolsStory({ data, isActive }: StorySlideProps) {
 	const maxUsage = sortedTools[0]?.[1] || 1
 	const totalTools = Object.values(stats.toolUsage).reduce((a, b) => a + b, 0)
 	const toolCount = Object.keys(stats.toolUsage).length
+	const hasToolData = sortedTools.length > 0 && totalTools > 0
 
 	const topTool = sortedTools[0]
 
@@ -58,6 +59,30 @@ export function ToolsStory({ data, isActive }: StorySlideProps) {
 		color: toolColors[tool] || '#8b372b',
 		label: tool,
 	}))
+
+	// Empty state
+	if (!hasToolData) {
+		return (
+			<SlideLayout>
+				<motion.div
+					className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
+					initial={{ opacity: 0, y: -20 }}
+					animate={isActive ? { opacity: 1, y: 0 } : {}}
+					transition={{ duration: 0.6 }}
+				>
+					YOUR TOOL ARSENAL
+				</motion.div>
+				<motion.div
+					className="text-dark/60 text-sm text-center"
+					initial={{ opacity: 0 }}
+					animate={isActive ? { opacity: 1 } : {}}
+					transition={{ delay: 0.3 }}
+				>
+					No tool usage data available yet.
+				</motion.div>
+			</SlideLayout>
+		)
+	}
 
 	return (
 		<SlideLayout>

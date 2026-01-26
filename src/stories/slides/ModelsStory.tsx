@@ -42,10 +42,13 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
 		.sort((a, b) => b[1] - a[1])
 		.slice(0, 3)
 
+	// Handle empty model data
+	const hasModelData = sortedModels.length > 0 && total > 0
+
 	const modelData = sortedModels.map(([model, tokens]) => ({
 		model,
 		tokens,
-		percentage: (tokens / total) * 100,
+		percentage: total > 0 ? (tokens / total) * 100 : 0,
 		...(modelInfo[model] || { name: model, color: '#8b372b', description: 'Model' }),
 	}))
 
@@ -76,6 +79,30 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
 		radius: 80 - index * 20,
 		strokeWidth: Math.max(8, 16 - index * 4),
 	}))
+
+	// Empty state
+	if (!hasModelData) {
+		return (
+			<SlideLayout>
+				<motion.div
+					className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-6 text-center"
+					initial={{ opacity: 0, y: -20 }}
+					animate={isActive ? { opacity: 1, y: 0 } : {}}
+					transition={{ duration: 0.6 }}
+				>
+					YOUR MODEL MIX
+				</motion.div>
+				<motion.div
+					className="text-dark/60 text-sm text-center"
+					initial={{ opacity: 0 }}
+					animate={isActive ? { opacity: 1 } : {}}
+					transition={{ delay: 0.3 }}
+				>
+					No model usage data available yet.
+				</motion.div>
+			</SlideLayout>
+		)
+	}
 
 	return (
 		<SlideLayout>

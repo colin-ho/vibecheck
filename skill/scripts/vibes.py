@@ -870,28 +870,29 @@ PROMPT_BATCH_A = """Analyze the user's prompts to find memorable quotes and cont
 ## Your Task
 Read through the prompts using Read/Grep/Glob tools. Find specific examples:
 
-### 1. Memorable Prompts (find actual quotes, truncate to ~150 chars)
-Find examples for as many of these categories as you can:
+### 1. Memorable Prompts (aim for ALL 4, truncate to ~150 chars)
+Search thoroughly through ALL prompt files. Try to find all 4 categories:
 - **funniest**: Most amusing/entertaining request
 - **mostFrustrated**: When they were clearly annoyed (caps, swearing, exasperation)
 - **mostAmbitious**: Biggest/most complex ask
-- **biggestFacepalm**: When they realized they made a dumb mistake ("oh wait", "nevermind", "I'm an idiot")
-- **mostGrateful**: When they were happiest with results
 - **weirdest**: Most unusual or unexpected request
-- **lateNightRamble**: Incoherent/rambling prompt (if any exist)
 
-For each, include a brief "context" explaining why you picked it.
+For each found, include a brief "context" explaining why you picked it.
+If the user has very limited data and a category truly doesn't exist, use null for that field.
 
-### 2. Contrasts (find actual examples)
+### 2. Contrasts (aim for ALL 4)
+Search thoroughly. Try to find all 4 contrasts:
 - **shortestEffective**: Shortest prompt that still made sense (e.g., "fix typo")
 - **longestRamble**: When they really went off (truncate to ~200 chars)
 - **politestMoment**: Most courteous request (truncate to ~150 chars)
 - **mostDemanding**: Most direct/demanding request (truncate to ~150 chars)
 
+If data is sparse and a contrast truly doesn't exist, use null for that field.
+
 ## Output Format
 Write JSON to {output_file} with this structure (use Write tool):
 
-{{"memorablePrompts": {{"funniest": {{"prompt": "...", "context": "..."}}, "mostFrustrated": {{"prompt": "...", "context": "..."}}, "mostAmbitious": {{"prompt": "...", "context": "..."}}, "biggestFacepalm": {{"prompt": "...", "context": "..."}}, "mostGrateful": {{"prompt": "...", "context": "..."}}, "weirdest": {{"prompt": "...", "context": "..."}}, "lateNightRamble": {{"prompt": "...", "context": "..."}}}}, "contrasts": {{"shortestEffective": "...", "longestRamble": "...", "politestMoment": "...", "mostDemanding": "..."}}}}
+{{"memorablePrompts": {{"funniest": {{"prompt": "...", "context": "..."}} | null, "mostFrustrated": {{"prompt": "...", "context": "..."}} | null, "mostAmbitious": {{"prompt": "...", "context": "..."}} | null, "weirdest": {{"prompt": "...", "context": "..."}} | null}}, "contrasts": {{"shortestEffective": "..." | null, "longestRamble": "..." | null, "politestMoment": "..." | null, "mostDemanding": "..." | null}}}}
 
 CONSTRAINTS:
 - Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
@@ -917,12 +918,12 @@ Read through the prompts using Read/Grep/Glob tools. Find the dirt:
 - **signatureOpeners**: 2-3 ways they start prompts - especially low-effort ones like "fix", "help"
 - **verbalTics**: Filler words, hedging ("basically", "just", "like", "idk") - these reveal lazy habits
 - **politenessLevel**: One of: "diplomatic", "direct", "demanding", "apologetic"
-- **averagePromptLength**: Estimate average chars (< 50 = one-word-wonder, > 400 = essay-writer)
+- **averagePromptLength**: Estimate average chars (< 50 = vibe-coder, > 400 = essay-writer)
 - **promptingEvolution**: One roasty sentence about their style
 
 ### 2. Phrase Analysis (find embarrassing patterns)
 - **topPhrases**: 5 most common 2-3 word phrases (e.g., "just fix", "make it work", "I don't know")
-- **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring, deployment, database
+- **dominantTopics**: REQUIRED - Pick 3-5 from this list based on what they work on most: debugging, frontend, backend, devops, ai, testing, refactoring
 
 ### 3. Obsessions (what kept them up at night)
 - **topics**: 4-5 technical areas they focus on most
@@ -937,7 +938,7 @@ Read through the prompts using Read/Grep/Glob tools. Find the dirt:
 ## Output Format
 Write JSON to {output_file} with this structure (use Write tool):
 
-{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "averagePromptLength": 150, "promptingEvolution": "..."}}, "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}, "contrasts": {{"capsLockPrompts": 0, "vaguePromptCount": 0, "undoRequests": 0}}}}
+{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "averagePromptLength": 150, "promptingEvolution": "..."}}, "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend", "backend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}, "contrasts": {{"capsLockPrompts": 0, "vaguePromptCount": 0, "undoRequests": 0}}}}
 
 CONSTRAINTS:
 - Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
@@ -963,52 +964,25 @@ Analyze stats and prompts. Pick the persona that roasts them HARDEST. There are 
 ### 1. Persona
 Choose ONE persona. ALL personas roast the user. Find their weakness and exploit it for humor.
 
-**Vibe Coders / Lazy Prompters:**
-- `vibe-coder`: Vague prompts like "fix", "just make it work", expects AI to figure it out
-- `one-word-wonder`: Extremely short prompts, no context, "fix" "help" "why"
-- `yolo-delegator`: Accepts everything without reviewing, lets AI do all the thinking
-- `plan-skipper`: Never reads plans, just says yes to everything
-- `magic-words-believer`: Thinks "correctly" and "please make sure" are magic incantations
+**9 CONSOLIDATED PERSONAS - Pick the one that roasts them HARDEST:**
 
-**Debug Obsessed:**
-- `debug-addict`: Constantly debugging, "fix" is their most used word
-- `bug-whisperer`: Attracts bugs like a magnet, constant errors
-- `infinite-looper`: Fix one bug, create two more, endless cycles
+1. `token-burner`: Heavy/power user - Over 2M tokens, uses every tool, custom MCP integrations. "Anthropic's favorite customer"
 
-**Essay Writers:**
-- `essay-writer`: Prompts are 400+ chars, could write the code themselves
-- `context-novelist`: Prompts are 800+ chars, provides entire life story as context
-- `over-explainer`: Spends more time explaining than it would take to just code it
+2. `vibe-coder`: Lazy prompting - Short/vague prompts ("fix" "help" "why"), accepts plans without reading, deploys without testing, adds "please" like magic. "Just make it work lol"
 
-**Behavioral:**
-- `3am-demon`: Codes late at night (lateNightSessions > 15 or >20% night usage)
-- `squirrel-brain`: Interrupts constantly, abandons sessions, can't focus
-- `caps-lock-commander`: TYPES IN ALL CAPS, clearly frustrated
-- `polite-menace`: Suspiciously polite while everything is on fire
-- `undo-enthusiast`: "Actually wait go back", constant mind-changing
-- `copy-paste-warrior`: Pastes code without understanding it
+3. `debug-demon`: Debugging pain - Constantly fixing bugs, "fix" is their love language, fix one bug create two more. "Your code: broken. Your spirit: also broken."
 
-**Tool/Model:**
-- `bash-berserker`: Over 50% Bash usage, lives in terminal
-- `opus-maximalist`: Uses Opus for everything, even trivial tasks
-- `context-amnesiac`: Very low cache rate, paying full price repeatedly
+4. `essay-writer`: Verbose - Prompts 400+ chars, provides context for the context, could've coded it themselves. "Your prompts need a TL;DR"
 
-**Domain Struggles:**
-- `css-casualty`: Struggles with CSS, centering divs, flexbox
-- `regex-refugee`: Regex questions that never work
-- `git-disaster`: Git history is a crime scene
+5. `3am-demon`: Time-based chaos - Codes after midnight, deadline-driven, procrastination artist. "Sleep is for the weak"
 
-**Other Roasts:**
-- `refactor-addict`: Can't stop refactoring working code
-- `yolo-deployer`: Ships without tests, straight to production
-- `deadline-demon`: Only productive under deadline pressure
-- `code-roulette`: Tries random things until something works (fallback roast)
+6. `squirrel-brain`: Behavioral chaos - Interrupts constantly, abandons sessions, types in ALL CAPS, "actually wait go back". "Ooh shiny— wait what were we doing?"
 
-**High-Usage Roasts (for heavy users - still roasts!):**
-- `token-burner`: Over 2M total tokens - "Anthropic's favorite customer"
-- `tool-hoarder`: Uses 8+ different tools - "Jack of all tools, master of none"
-- `over-engineer`: Uses custom MCP tools - "Why use 1 tool when you can build 12?"
-- `tryhard`: High cache rate AND efficient prompts - "Optimized prompts but not life choices"
+7. `bash-berserker`: Terminal warrior - Over 50% Bash usage, low cache rate, lives in terminal. "When in doubt, sudo"
+
+8. `domain-disaster`: Domain struggles - CSS, regex, git nightmares. Centering divs is their villain origin story. "Flexbox? More like flex-nope."
+
+9. `code-roulette`: Fallback/chaotic - Tries random things, refactors working code, trial and error methodology. "Spin the wheel, see what happens"
 
 ### 2. Traits
 3-5 keyword traits. Roasty ones like: "accepting" (accepts plans without reading), "delegating" (lazy), "repetitive" (same bugs), "copy-paster", "chaotic", "indecisive", etc.
@@ -1426,10 +1400,7 @@ def main() -> None:
                 funniest=valid_prompt("funniest"),
                 mostFrustrated=valid_prompt("mostFrustrated"),
                 mostAmbitious=valid_prompt("mostAmbitious"),
-                biggestFacepalm=valid_prompt("biggestFacepalm"),
-                mostGrateful=valid_prompt("mostGrateful"),
                 weirdest=valid_prompt("weirdest"),
-                lateNightRamble=valid_prompt("lateNightRamble"),
             )
 
         # Build CommunicationStyle
@@ -1476,8 +1447,10 @@ def main() -> None:
                 if p.get("phrase") and p.get("count") is not None
             ]
 
+        # dominantTopics is required from Claude
         dominant_topics = raw_insights.get("dominantTopics")
 
+    # Build Insights object
     bundle.insights = Insights(
         memorablePrompts=memorable,
         communicationStyle=comm_style,

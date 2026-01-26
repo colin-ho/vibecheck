@@ -226,7 +226,7 @@
     },
     "MemorablePrompts": {
       "type": "object",
-      "description": "Notable prompts found during analysis",
+      "description": "Notable prompts found during analysis - aim for all 4, allow nulls if data sparse",
       "additionalProperties": false,
       "properties": {
         "funniest": {
@@ -238,16 +238,7 @@
         "mostAmbitious": {
           "$ref": "#/$defs/PromptWithContext"
         },
-        "biggestFacepalm": {
-          "$ref": "#/$defs/PromptWithContext"
-        },
-        "mostGrateful": {
-          "$ref": "#/$defs/PromptWithContext"
-        },
         "weirdest": {
-          "$ref": "#/$defs/PromptWithContext"
-        },
-        "lateNightRamble": {
           "$ref": "#/$defs/PromptWithContext"
         }
       }
@@ -327,7 +318,7 @@
     },
     "Contrasts": {
       "type": "object",
-      "description": "Interesting contrasts in prompting style",
+      "description": "Interesting contrasts in prompting style - aim for all 4, allow nulls if data sparse",
       "additionalProperties": false,
       "properties": {
         "shortestEffective": {

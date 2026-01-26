@@ -4,15 +4,12 @@ import { StorySlideProps } from '../../data/types'
 import { SlideLayout } from '../../components/SlideLayout'
 import { PromptWithContext } from '../../data/bundle.generated'
 
-// Category labels for memorable prompts
+// Category labels for memorable prompts (all 4 are required)
 const promptLabels: Record<string, string> = {
 	mostAmbitious: 'Most Ambitious',
-	biggestFacepalm: 'Biggest Facepalm',
 	funniest: 'Funniest',
 	weirdest: 'Weirdest',
 	mostFrustrated: 'Peak Frustration',
-	mostGrateful: 'Most Grateful',
-	lateNightRamble: 'Late Night Ramble',
 }
 
 interface PromptCandidate {
@@ -30,15 +27,12 @@ export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
 		const candidates: PromptCandidate[] = []
 		const memorablePrompts = insights?.memorablePrompts
 
-		// Priority order: mostAmbitious → biggestFacepalm → funniest → weirdest → mostFrustrated → mostGrateful → lateNightRamble
+		// All 4 memorable prompts are required
 		const priorityOrder: (keyof typeof promptLabels)[] = [
 			'mostAmbitious',
-			'biggestFacepalm',
 			'funniest',
 			'weirdest',
 			'mostFrustrated',
-			'mostGrateful',
-			'lateNightRamble',
 		]
 
 		for (const key of priorityOrder) {
