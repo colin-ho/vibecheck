@@ -353,7 +353,7 @@ export function LandingPage() {
 
 					<div className="mb-10">
 						<p className="text-sm uppercase tracking-widest mb-4 text-[#3b110c]/70">
-							Get Your Vibe Check
+							Get Your Vibe Checked
 						</p>
 						<div
 							className="rounded-2xl p-6 bg-[#3b110c]/10 border border-[#3b110c]/10 cursor-pointer hover:bg-[#3b110c]/15 transition-colors"

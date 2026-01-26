@@ -416,6 +416,22 @@ CLAUDE_DIR = Path(os.environ.get("CLAUDE_DIR", Path.home() / ".claude"))
 STATS_FILE = CLAUDE_DIR / "stats-cache.json"
 PROJECTS_DIR = CLAUDE_DIR / "projects"
 
+
+# ANSI color codes - brand colors
+class Colors:
+    """Terminal colors matching the VibeChecked brand palette."""
+
+    # Brand colors (true color)
+    LAVENDER = "\033[38;2;189;183;252m"  # #bdb7fc
+    SUNSET = "\033[38;2;255;138;91m"  # #FF8A5B (twilight coral)
+    RED = "\033[38;2;218;28;28m"  # #da1c1c
+    # Standard ANSI
+    GREEN = "\033[32m"
+    DIM = "\033[2m"
+    RESET = "\033[0m"
+    CLEAR_LINE = "\033[2K\r"
+
+
 # Pattern to identify system-injected messages (not real user input)
 SYSTEM_TAG_PATTERN = re.compile(
     r"^<(local-command-caveat|command-name|command-message|command-args|"
@@ -435,20 +451,15 @@ def warn(msg: str) -> None:
 
 def error(msg: str) -> None:
     """Print error message (always visible)."""
-    RED = "\033[31m"
-    RESET = "\033[0m"
-    print(f"{RED}✗{RESET} {msg}", file=sys.stderr)
+    print(f"{Colors.RED}✗{Colors.RESET} {msg}", file=sys.stderr)
 
 
 def progress(msg: str, done: bool = False) -> None:
     """Print colored progress message."""
-    GREEN = "\033[32m"
-    CYAN = "\033[36m"
-    RESET = "\033[0m"
     if done:
-        print(f"{GREEN}✓{RESET} {msg}", file=sys.stderr)
+        print(f"{Colors.GREEN}✓{Colors.RESET} {msg}", file=sys.stderr)
     else:
-        print(f"{CYAN}→{RESET} {msg}", file=sys.stderr)
+        print(f"{Colors.LAVENDER}→{Colors.RESET} {msg}", file=sys.stderr)
 
 
 class Spinner:
@@ -456,11 +467,6 @@ class Spinner:
 
     FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     WORDS = ["Thinking", "Tinkering", "Fermenting", "Pondering", "Concocting", "Brewing", "Vibing", "Scheming"]
-    # ANSI colors
-    CYAN = "\033[36m"
-    MAGENTA = "\033[35m"
-    RESET = "\033[0m"
-    CLEAR_LINE = "\033[2K\r"
 
     def __init__(self):
         self._stop = threading.Event()
@@ -473,14 +479,16 @@ class Spinner:
         word_counter = 0
         while not self._stop.is_set():
             frame = next(frames)
-            sys.stderr.write(f"{self.CLEAR_LINE}{self.CYAN}{frame}{self.RESET} {self.MAGENTA}{word}...{self.RESET}")
+            sys.stderr.write(
+                f"{Colors.CLEAR_LINE}{Colors.LAVENDER}{frame}{Colors.RESET} {Colors.SUNSET}{word}...{Colors.RESET}"
+            )
             sys.stderr.flush()
             word_counter += 1
             if word_counter >= 8:  # Change word every ~0.8s
                 word = next(words)
                 word_counter = 0
             time.sleep(0.1)
-        sys.stderr.write(self.CLEAR_LINE)
+        sys.stderr.write(Colors.CLEAR_LINE)
         sys.stderr.flush()
 
     def start(self):
@@ -497,12 +505,6 @@ class ParallelProgress:
     """Progress reporter for parallel batch execution."""
 
     FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
-    CYAN = "\033[36m"
-    GREEN = "\033[32m"
-    YELLOW = "\033[33m"
-    DIM = "\033[2m"
-    RESET = "\033[0m"
-    CLEAR_LINE = "\033[2K\r"
 
     def __init__(self, batch_names: list[str]):
         self._batch_names = batch_names
@@ -517,13 +519,13 @@ class ParallelProgress:
             parts = []
             for name in self._batch_names:
                 if name in self._completed:
-                    parts.append(f"{self.GREEN}{name} ✓{self.RESET}")
+                    parts.append(f"{Colors.GREEN}{name} ✓{Colors.RESET}")
                 else:
                     count = self._activity.get(name, 0)
                     if count > 0:
-                        parts.append(f"{self.YELLOW}{name}{self.RESET} {self.DIM}({count}){self.RESET}")
+                        parts.append(f"{Colors.SUNSET}{name}{Colors.RESET} {Colors.DIM}({count}){Colors.RESET}")
                     else:
-                        parts.append(f"{self.YELLOW}{name}{self.RESET}")
+                        parts.append(f"{Colors.SUNSET}{name}{Colors.RESET}")
             return " | ".join(parts) if parts else "Starting..."
 
     def _spin(self):
@@ -531,10 +533,10 @@ class ParallelProgress:
         while not self._stop.is_set():
             frame = next(frames)
             status = self._get_status()
-            sys.stderr.write(f"{self.CLEAR_LINE}{self.CYAN}{frame}{self.RESET} {status}")
+            sys.stderr.write(f"{Colors.CLEAR_LINE}{Colors.LAVENDER}{frame}{Colors.RESET} {status}")
             sys.stderr.flush()
             time.sleep(0.1)
-        sys.stderr.write(self.CLEAR_LINE)
+        sys.stderr.write(Colors.CLEAR_LINE)
         sys.stderr.flush()
 
     def update(self, batch_name: str, count: int):
@@ -1050,11 +1052,11 @@ def write_prompts_to_files(projects_dir: Path, show_progress: bool = True) -> tu
         project_prompts[project_name].append(prompt_text)
         prompt_count += 1
         if show_progress and prompt_count % 500 == 0:
-            sys.stderr.write(f"\033[2K\r\033[36m→\033[0m Extracted {prompt_count} prompts...")
+            sys.stderr.write(f"{Colors.CLEAR_LINE}{Colors.LAVENDER}→{Colors.RESET} Extracted {prompt_count} prompts...")
             sys.stderr.flush()
 
     if show_progress and prompt_count > 0:
-        sys.stderr.write("\033[2K\r")
+        sys.stderr.write(Colors.CLEAR_LINE)
         sys.stderr.flush()
 
     total_prompts = 0
@@ -1484,12 +1486,20 @@ def main() -> None:
     bundle_id = upload_bundle(bundle)
     if bundle_id:
         progress("Upload complete", done=True)
-        print(f"{BASE_URL}/vibes?id={bundle_id}")
+        url = f"{BASE_URL}/vibes?id={bundle_id}"
+        print()
+        print("  ✨ Your vibe check is ready!")
+        print(f"  {url}")
+        print()
     else:
         # Fall back to encoded URL if upload fails
         warn("Upload failed, falling back to encoded URL")
         encoded = encode_bundle(bundle)
-        print(f"{BASE_URL}/vibes?d={encoded}")
+        url = f"{BASE_URL}/vibes?d={encoded}"
+        print()
+        print("  ✨ Your vibe check is ready!")
+        print(f"  {url}")
+        print()
 
 
 if __name__ == "__main__":
