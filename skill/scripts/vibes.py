@@ -22,6 +22,7 @@ import time
 import urllib.error
 import urllib.request
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterator
@@ -47,12 +48,21 @@ SYSTEM_TAG_PATTERN = re.compile(
 )
 
 verbose = False
+debug_mode = False
+DEBUG_DIR = Path("/tmp/vibes-debug")
 
 
 def warn(msg: str) -> None:
     """Print warning in verbose mode."""
     if verbose:
         print(f"Warning: {msg}", file=sys.stderr)
+
+
+def error(msg: str) -> None:
+    """Print error message (always visible)."""
+    RED = "\033[31m"
+    RESET = "\033[0m"
+    print(f"{RED}✗{RESET} {msg}", file=sys.stderr)
 
 
 def progress(msg: str, done: bool = False) -> None:
@@ -97,6 +107,68 @@ class Spinner:
             time.sleep(0.1)
         sys.stderr.write(self.CLEAR_LINE)
         sys.stderr.flush()
+
+    def start(self):
+        self._thread = threading.Thread(target=self._spin, daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._stop.set()
+        if self._thread:
+            self._thread.join()
+
+
+class ParallelProgress:
+    """Progress reporter for parallel batch execution."""
+
+    FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    CYAN = "\033[36m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    DIM = "\033[2m"
+    RESET = "\033[0m"
+    CLEAR_LINE = "\033[2K\r"
+
+    def __init__(self, batch_names: list[str]):
+        self._batch_names = batch_names
+        self._completed: set[str] = set()
+        self._activity: dict[str, int] = {name: 0 for name in batch_names}
+        self._lock = threading.Lock()
+        self._stop = threading.Event()
+        self._thread = None
+
+    def _get_status(self) -> str:
+        with self._lock:
+            parts = []
+            for name in self._batch_names:
+                if name in self._completed:
+                    parts.append(f"{self.GREEN}{name} ✓{self.RESET}")
+                else:
+                    count = self._activity.get(name, 0)
+                    if count > 0:
+                        parts.append(f"{self.YELLOW}{name}{self.RESET} {self.DIM}({count}){self.RESET}")
+                    else:
+                        parts.append(f"{self.YELLOW}{name}{self.RESET}")
+            return " | ".join(parts) if parts else "Starting..."
+
+    def _spin(self):
+        frames = itertools.cycle(self.FRAMES)
+        while not self._stop.is_set():
+            frame = next(frames)
+            status = self._get_status()
+            sys.stderr.write(f"{self.CLEAR_LINE}{self.CYAN}{frame}{self.RESET} {status}")
+            sys.stderr.flush()
+            time.sleep(0.1)
+        sys.stderr.write(self.CLEAR_LINE)
+        sys.stderr.flush()
+
+    def update(self, batch_name: str, count: int):
+        with self._lock:
+            self._activity[batch_name] = count
+
+    def mark_complete(self, batch_name: str):
+        with self._lock:
+            self._completed.add(batch_name)
 
     def start(self):
         self._thread = threading.Thread(target=self._spin, daemon=True)
@@ -388,18 +460,14 @@ def upload_bundle(bundle: AnonymousBundle) -> str | None:
     return None
 
 
-ENRICHMENT_PROMPT = """Analyze this user's Claude Code usage and generate rich insights from their prompts.
-
-## Numeric Stats (from stats-cache.json)
-{stats_json}
+# Batch A: Memorable prompts and contrasts (reading-heavy, finds specific quotes)
+PROMPT_BATCH_A = """Analyze the user's prompts to find memorable quotes and contrasts.
 
 ## User Prompts
 {prompts_instruction}
 
 ## Your Task
-
-Read through ALL the user's prompts using Read/Grep/Glob tools on the prompt files.
-Extract meaningful insights about their communication style and behavior.
+Read through the prompts using Read/Grep/Glob tools. Find specific examples:
 
 ### 1. Memorable Prompts (find actual quotes, truncate to ~150 chars)
 Find examples for as many of these categories as you can:
@@ -413,30 +481,75 @@ Find examples for as many of these categories as you can:
 
 For each, include a brief "context" explaining why you picked it.
 
-### 2. Communication Style
+### 2. Contrasts (find actual examples)
+- **shortestEffective**: Shortest prompt that still made sense (e.g., "fix typo")
+- **longestRamble**: When they really went off (truncate to ~200 chars)
+- **politestMoment**: Most courteous request (truncate to ~150 chars)
+- **mostDemanding**: Most direct/demanding request (truncate to ~150 chars)
+
+## Output Format
+Write JSON to {output_file} with this structure (use Write tool):
+
+{{"memorablePrompts": {{"funniest": {{"prompt": "...", "context": "..."}}, "mostFrustrated": {{"prompt": "...", "context": "..."}}, "mostAmbitious": {{"prompt": "...", "context": "..."}}, "biggestFacepalm": {{"prompt": "...", "context": "..."}}, "mostGrateful": {{"prompt": "...", "context": "..."}}, "weirdest": {{"prompt": "...", "context": "..."}}, "lateNightRamble": {{"prompt": "...", "context": "..."}}}}, "contrasts": {{"shortestEffective": "...", "longestRamble": "...", "politestMoment": "...", "mostDemanding": "..."}}}}
+
+CONSTRAINTS:
+- Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
+- Do NOT create scripts or spawn subagents. Just read the files directly.
+- Keep it simple: read prompts → analyze → write JSON output.
+
+IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
+
+# Batch B: Communication style, word analysis, obsessions
+PROMPT_BATCH_B = """Analyze the user's prompts for communication patterns and word usage.
+
+## User Prompts
+{prompts_instruction}
+
+## Your Task
+Read through the prompts using Read/Grep/Glob tools. Analyze patterns:
+
+### 1. Communication Style
 - **catchphrases**: 2-5 unique phrases they repeat often
 - **signatureOpeners**: 2-3 ways they typically start prompts ("Hey Claude", "Can you", etc.)
 - **verbalTics**: Filler words, hedging patterns ("basically", "just", "like")
 - **politenessLevel**: One of: "diplomatic", "direct", "demanding", "apologetic"
 - **promptingEvolution**: One sentence about how their style changed over time (if noticeable)
 
+### 2. Word Analysis
+- **topWords**: 20 most meaningful words (exclude common stopwords like "the", "is", "code", "file")
+- **topPhrases**: 5 most common meaningful 2-3 word phrases
+- **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring
+
 ### 3. Obsessions
 - **topics**: 3-5 technical areas they focus on most
 - **frequentlyRevisited**: 2-3 problems they kept coming back to
 - **actualProjects**: 2-4 things they were actually building (infer from context)
 
-### 4. Contrasts (find actual examples)
-- **shortestEffective**: Shortest prompt that still made sense (e.g., "fix typo")
-- **longestRamble**: When they really went off (truncate to ~200 chars)
-- **politestMoment**: Most courteous request (truncate to ~150 chars)
-- **mostDemanding**: Most direct/demanding request (truncate to ~150 chars)
+## Output Format
+Write JSON to {output_file} with this structure (use Write tool):
 
-### 5. Word Analysis
-- **topWords**: 20 most meaningful words (exclude common stopwords like "the", "is", "code", "file")
-- **topPhrases**: 5 most common meaningful 2-3 word phrases
-- **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring
+{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "promptingEvolution": "..."}}, "topWords": [{{"word": "...", "count": 0}}], "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}}}
 
-### 6. Persona
+CONSTRAINTS:
+- Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
+- Do NOT create scripts or spawn subagents. Just read the files directly.
+- Keep it simple: read prompts → analyze → write JSON output.
+
+IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
+
+# Batch C: Persona, traits, style, tone, fun facts (uses stats)
+PROMPT_BATCH_C = """Determine the user's persona and characteristics from their stats and prompts.
+
+## Numeric Stats
+{stats_json}
+
+## User Prompts
+{prompts_instruction}
+
+## Your Task
+Analyze stats and prompts to determine:
+
+### 1. Persona
 Choose ONE based on stats AND prompt style:
 
 **Legendary** (exceptional stats):
@@ -465,44 +578,57 @@ Choose ONE based on stats AND prompt style:
 - `context-amnesiac`: Cache rate <15%
 - `agent-interrupter`: High interruptCount
 
-### 7. Traits
+### 2. Traits
 3-5 keyword traits that describe this user (e.g., "night-owl", "verbose", "impatient")
 
-### 8. Prompting Style
+### 3. Prompting Style
 One sentence describing their prompting style
 
-### 9. Communication Tone
+### 4. Communication Tone
 One sentence describing their communication tone
 
-### 10. Fun Facts
+### 5. Fun Facts
 3-5 specific, number-backed observations (e.g., "You said 'please' 847 times")
 
 ## Output Format
+Write JSON to {output_file} with this structure (use Write tool):
 
-Write a JSON file to {output_file} with this structure (use the Write tool):
+{{"persona": "persona-id", "traits": ["trait1", "trait2", "trait3"], "promptingStyle": "description", "communicationTone": "description", "funFacts": ["Fact 1", "Fact 2", "Fact 3"]}}
 
-{{"insights": {{"memorablePrompts": {{"funniest": {{"prompt": "...", "context": "..."}}, "mostFrustrated": {{"prompt": "...", "context": "..."}}, "mostAmbitious": {{"prompt": "...", "context": "..."}}, "biggestFacepalm": {{"prompt": "...", "context": "..."}}, "mostGrateful": {{"prompt": "...", "context": "..."}}, "weirdest": {{"prompt": "...", "context": "..."}}, "lateNightRamble": {{"prompt": "...", "context": "..."}}}}, "communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "promptingEvolution": "..."}}, "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}, "contrasts": {{"shortestEffective": "...", "longestRamble": "...", "politestMoment": "...", "mostDemanding": "..."}}, "topWords": [{{"word": "...", "count": 0}}], "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"]}}, "persona": "persona-id", "traits": ["trait1", "trait2", "trait3"], "promptingStyle": "description", "communicationTone": "description", "funFacts": ["Fact 1", "Fact 2", "Fact 3"]}}
+CONSTRAINTS:
+- Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
+- Do NOT create scripts or spawn subagents. Just read the files directly.
+- Keep it simple: read prompts → analyze → write JSON output.
 
-IMPORTANT: Use the Write tool to write the JSON to {output_file}. Do not output the JSON to stdout."""
+IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
 
 PROMPTS_DIR = Path("/tmp/vibes-prompts")
 OUTPUT_FILE = Path("/tmp/vibes-enrichment.json")
 PROMPTS_PER_CHUNK = 500
 
 
-def write_prompts_to_files(projects_dir: Path) -> tuple[int, int]:
+def write_prompts_to_files(projects_dir: Path, show_progress: bool = True) -> tuple[int, int]:
     """Write prompts to temp files organized by project. Returns (total_prompts, total_files)."""
     # Clean up any existing directory
     if PROMPTS_DIR.exists():
         shutil.rmtree(PROMPTS_DIR)
     PROMPTS_DIR.mkdir(parents=True)
 
-    # Group prompts by project
+    # Group prompts by project with progress updates
     project_prompts: dict[str, list[str]] = {}
+    prompt_count = 0
     for project_name, prompt_text in extract_user_prompts_by_project(projects_dir):
         if project_name not in project_prompts:
             project_prompts[project_name] = []
         project_prompts[project_name].append(prompt_text)
+        prompt_count += 1
+        if show_progress and prompt_count % 500 == 0:
+            sys.stderr.write(f"\033[2K\r\033[36m→\033[0m Extracted {prompt_count} prompts...")
+            sys.stderr.flush()
+
+    if show_progress and prompt_count > 0:
+        sys.stderr.write("\033[2K\r")
+        sys.stderr.flush()
 
     total_prompts = 0
     total_files = 0
@@ -527,84 +653,248 @@ def write_prompts_to_files(projects_dir: Path) -> tuple[int, int]:
     return total_prompts, total_files
 
 
+def run_claude_batch(
+    batch_id: str,
+    prompt: str,
+    output_file: Path,
+    progress: ParallelProgress | None = None,
+) -> tuple[dict | None, str | None]:
+    """Run a single Claude batch and return (result, error_message)."""
+    # Clean up any existing output file
+    if output_file.exists():
+        output_file.unlink()
+
+    # Set up debug file if debug mode enabled
+    debug_file = None
+    if debug_mode:
+        DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+        debug_file = open(DEBUG_DIR / f"{batch_id.lower()}-stream.jsonl", "w")
+
+    try:
+        process = subprocess.Popen(
+            [
+                "claude",
+                "--print",
+                "--output-format",
+                "stream-json",
+                "--verbose",
+                "--model",
+                "haiku",
+                "--tools",
+                "Read,Grep,Glob,Write",
+                "--add-dir",
+                str(PROMPTS_DIR),
+                "--dangerously-skip-permissions",
+                "-p",
+                prompt,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,  # Suppress Claude's stderr, we show our own progress
+            text=True,
+            stdin=subprocess.DEVNULL,
+        )
+
+        # Consume stream-json events, counting for progress
+        event_count = 0
+        for line in process.stdout:
+            if line.strip():
+                event_count += 1
+                if progress:
+                    progress.update(batch_id, event_count)
+                if debug_file:
+                    debug_file.write(line)
+                    debug_file.flush()
+
+        process.wait(timeout=90)  # 90s timeout per batch
+
+        # Mark complete
+        if progress:
+            progress.mark_complete(batch_id)
+
+        # Check return code
+        if process.returncode != 0:
+            return None, f"Batch {batch_id}: Exit code {process.returncode}"
+
+        # Read the output file
+        if output_file.exists():
+            try:
+                return json.loads(output_file.read_text()), None
+            except json.JSONDecodeError as e:
+                return None, f"Batch {batch_id}: Failed to parse JSON: {e}"
+        else:
+            return None, f"Batch {batch_id}: Claude did not write output file"
+
+    except subprocess.TimeoutExpired:
+        process.kill()
+        if progress:
+            progress.mark_complete(batch_id)
+        return None, f"Batch {batch_id}: Timed out after 90s"
+    except Exception as e:
+        if progress:
+            progress.mark_complete(batch_id)
+        return None, f"Batch {batch_id}: {e}"
+    finally:
+        if debug_file:
+            debug_file.close()
+        if output_file.exists():
+            output_file.unlink()
+
+
+def merge_batch_results(results: list[dict | None]) -> dict:
+    """Merge results from all batches into a single enrichment dict."""
+    merged: dict = {"insights": {}}
+
+    for result in results:
+        if not result:
+            continue
+
+        # Batch A keys (go into insights)
+        if "memorablePrompts" in result:
+            merged["insights"]["memorablePrompts"] = result["memorablePrompts"]
+        if "contrasts" in result:
+            merged["insights"]["contrasts"] = result["contrasts"]
+
+        # Batch B keys (go into insights)
+        if "communicationStyle" in result:
+            merged["insights"]["communicationStyle"] = result["communicationStyle"]
+        if "topWords" in result:
+            merged["insights"]["topWords"] = result["topWords"]
+        if "topPhrases" in result:
+            merged["insights"]["topPhrases"] = result["topPhrases"]
+        if "dominantTopics" in result:
+            merged["insights"]["dominantTopics"] = result["dominantTopics"]
+        if "obsessions" in result:
+            merged["insights"]["obsessions"] = result["obsessions"]
+
+        # Batch C keys (top-level)
+        for key in ["persona", "traits", "promptingStyle", "communicationTone", "funFacts"]:
+            if key in result:
+                merged[key] = result[key]
+
+    return merged
+
+
 def call_claude_for_enrichment(bundle: AnonymousBundle, projects_dir: Path) -> dict | None:
-    """Call Claude CLI to analyze stats and return enrichment data."""
+    """Call Claude CLI to analyze stats in parallel batches."""
     if not shutil.which("claude"):
-        warn("Claude CLI not found in PATH")
+        error("Claude CLI not found in PATH")
         return None
 
-    # Clean up any existing output file
-    if OUTPUT_FILE.exists():
-        OUTPUT_FILE.unlink()
-
-    # Write prompts to temp files organized by project
-    total_prompts, total_files = write_prompts_to_files(projects_dir)
+    # Write prompts to temp files with progress
+    progress("Extracting prompts...")
+    total_prompts, total_files = write_prompts_to_files(projects_dir, show_progress=True)
+    progress(f"Prepared {total_prompts} prompts in {total_files} files", done=True)
 
     prompts_instruction = f"""All {total_prompts} prompts are saved in {PROMPTS_DIR}/ across {total_files} files.
 Files are named: project-{{hash}}-chunk-{{n}}.txt (one file per project, chunked at {PROMPTS_PER_CHUNK} prompts).
 Use Read tool to read them. Use Grep to search for patterns. Explore thoroughly."""
 
-    prompt = ENRICHMENT_PROMPT.format(
-        stats_json=bundle.model_dump_json(by_alias=True, indent=2),
-        prompts_instruction=prompts_instruction,
-        output_file=OUTPUT_FILE,
-    )
+    stats_json = bundle.model_dump_json(by_alias=True, indent=2)
+
+    # Define the three batches
+    batches = [
+        (
+            "Quotes",
+            PROMPT_BATCH_A.format(
+                prompts_instruction=prompts_instruction,
+                output_file=Path("/tmp/vibes-quotes.json"),
+            ),
+            Path("/tmp/vibes-quotes.json"),
+        ),
+        (
+            "Style",
+            PROMPT_BATCH_B.format(
+                prompts_instruction=prompts_instruction,
+                output_file=Path("/tmp/vibes-style.json"),
+            ),
+            Path("/tmp/vibes-style.json"),
+        ),
+        (
+            "Persona",
+            PROMPT_BATCH_C.format(
+                stats_json=stats_json,
+                prompts_instruction=prompts_instruction,
+                output_file=Path("/tmp/vibes-persona.json"),
+            ),
+            Path("/tmp/vibes-persona.json"),
+        ),
+    ]
+
+    # Start progress reporter
+    progress_reporter = ParallelProgress([b[0] for b in batches])
+    progress_reporter.start()
+
+    errors: list[str] = []
 
     try:
-        spinner = Spinner()
-        spinner.start()
+        # Run batches in parallel
+        results: list[dict | None] = [None, None, None]
 
-        process = subprocess.Popen(
-            ["claude", "--print", "--model", "haiku", "--allowedTools", "Read,Grep,Glob,Write", "-p", prompt],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            stdin=subprocess.DEVNULL,
-        )
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = {
+                executor.submit(run_claude_batch, batch_id, prompt, output_file, progress_reporter): idx
+                for idx, (batch_id, prompt, output_file) in enumerate(batches)
+            }
 
-        # Consume stdout silently (don't display Claude's work)
-        process.stdout.read()
-        process.wait(timeout=120)  # Increased timeout for thorough analysis
+            for future in as_completed(futures):
+                idx = futures[future]
+                try:
+                    result, err = future.result()
+                    results[idx] = result
+                    if err:
+                        errors.append(err)
+                except Exception as e:
+                    errors.append(f"Batch {batches[idx][0]} failed: {e}")
 
-        spinner.stop()
-        progress("Analysis complete", done=True)
+        progress_reporter.stop()
 
-        # Read the output file
-        if OUTPUT_FILE.exists():
-            try:
-                return json.loads(OUTPUT_FILE.read_text())
-            except json.JSONDecodeError as e:
-                warn(f"Failed to parse Claude's JSON output: {e}")
-                return None
-        else:
-            warn("Claude did not write output file")
+        # Report any errors
+        if errors:
+            for err in errors:
+                error(err)
+
+        # Check if we got any successful results
+        if all(r is None for r in results):
             return None
 
-    except subprocess.TimeoutExpired:
-        spinner.stop()
-        process.kill()
-        warn("Claude CLI timed out")
-        return None
+        progress("Analysis complete", done=True)
+
+        # Merge results
+        merged = merge_batch_results(results)
+
+        # Check if we got meaningful results
+        if not merged.get("persona") and not merged.get("insights"):
+            error("No meaningful results from any batch")
+            return None
+
+        return merged
+
     except Exception as e:
-        spinner.stop()
-        warn(f"Error calling Claude CLI: {e}")
+        progress_reporter.stop()
+        error(f"Error during parallel enrichment: {e}")
         return None
     finally:
         # Cleanup temp files
         if PROMPTS_DIR.exists():
             shutil.rmtree(PROMPTS_DIR)
-        if OUTPUT_FILE.exists():
-            OUTPUT_FILE.unlink()
+        for _, _, output_file in batches:
+            if output_file.exists():
+                output_file.unlink()
 
 
 def main() -> None:
-    global verbose
+    global verbose, debug_mode
 
     parser = argparse.ArgumentParser(description="Generate VibeChecked URL")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode")
+    parser.add_argument("--debug", action="store_true", help="Save stream-json output to /tmp/vibes-debug/")
     parser.add_argument("--stats-only", action="store_true", help="Output raw stats JSON without Claude analysis")
     args = parser.parse_args()
     verbose = args.verbose
+    debug_mode = args.debug
+
+    if debug_mode:
+        progress(f"Debug mode: stream output will be saved to {DEBUG_DIR}/")
 
     # Load base stats
     progress("Loading stats...")

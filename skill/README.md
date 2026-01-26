@@ -5,7 +5,7 @@ An interactive journey through your Claude Code usage statistics.
 ## Usage
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
+curl -fsSL https://howsyourvibecoding.vercel.app/install.sh | bash
 ```
 
 This command:

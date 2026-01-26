@@ -18,8 +18,7 @@ export function LandingPage() {
 	// Create motion template for reactive gradient
 	const outerGlowGradient = useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, rgba(221, 80, 19, 0.7) 0%, rgba(221, 80, 19, 0.3) 50%, transparent 100%)`
 
-	const installCommand =
-		'curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash'
+	const installCommand = 'curl -fsSL https://howsyourvibecoding.vercel.app/install.sh | bash'
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText(installCommand)
@@ -346,11 +345,7 @@ export function LandingPage() {
 
 				{/* Right 1/3 - Content */}
 				<div className="w-1/3 flex flex-col justify-center items-end pl-8 pr-20 py-12 text-right">
-					<h1 className="text-[clamp(2.5rem,5vw,4rem)] font-black mb-4 tracking-tight text-[#3b110c]">
-						VibeChecked
-					</h1>
-
-					<p className="text-[clamp(1rem,2vw,1.25rem)] mb-10 text-[#3b110c]/80 leading-relaxed">
+					<p className="text-[clamp(1rem,2vw,1.25rem)] mb-10 text-[#3b110c] leading-relaxed">
 						You've been vibe coding.
 						<br />
 						Claude Code's been watching.

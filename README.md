@@ -122,7 +122,7 @@ http://localhost:5173/?d=<base64url-encoded-gzipped-json>
 ## Usage
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
+curl -fsSL https://howsyourvibecoding.vercel.app/install.sh | bash
 ```
 
 This downloads and runs the script, which:

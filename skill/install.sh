@@ -1,6 +1,6 @@
 #!/bin/bash
 # VibeChecked Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
+# Usage: curl -fsSL https://howsyourvibecoding.vercel.app/install.sh | bash
 
 set -e
 
