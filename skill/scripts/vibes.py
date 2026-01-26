@@ -7,6 +7,8 @@ Usage:
     python3 vibes.py -v           # Verbose mode with warnings
 """
 
+from __future__ import annotations
+
 import argparse
 import base64
 import gzip
@@ -25,7 +27,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Iterator
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from bundle_types import (
     AnonymousBundle,
@@ -506,10 +508,10 @@ class ParallelProgress:
 
     FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
-    def __init__(self, batch_names: list[str]):
+    def __init__(self, batch_names: List[str]):
         self._batch_names = batch_names
-        self._completed: set[str] = set()
-        self._activity: dict[str, int] = {name: 0 for name in batch_names}
+        self._completed: set = set()
+        self._activity: Dict[str, int] = dict.fromkeys(batch_names, 0)
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread = None
@@ -594,7 +596,7 @@ def iter_jsonl_records(projects_dir: Path) -> Iterator[dict]:
             warn(f"Error reading {path}: {e}")
 
 
-def extract_tools(projects_dir: Path) -> dict[str, int]:
+def extract_tools(projects_dir: Path) -> Dict[str, int]:
     """Count tool usage from all session files."""
     counts: Counter = Counter()
     for record in iter_jsonl_records(projects_dir):
@@ -608,7 +610,7 @@ def extract_tools(projects_dir: Path) -> dict[str, int]:
     return dict(counts.most_common())
 
 
-def extract_user_prompts_by_project(projects_dir: Path) -> Iterator[tuple[str, str]]:
+def extract_user_prompts_by_project(projects_dir: Path) -> Iterator[Tuple[str, str]]:
     """Extract user prompts grouped by project. Yields (project_name, prompt) tuples."""
     if not projects_dir.exists():
         return
@@ -642,7 +644,7 @@ def extract_user_prompts_by_project(projects_dir: Path) -> Iterator[tuple[str, s
             warn(f"Error reading {jsonl_path}: {e}")
 
 
-def longest_streak(dates: list[str]) -> int:
+def longest_streak(dates: List[str]) -> int:
     """Calculate longest consecutive day streak."""
     if not dates:
         return 1
@@ -663,7 +665,7 @@ def longest_streak(dates: list[str]) -> int:
     return max_streak
 
 
-def weekend_percentage(dates: list[str]) -> int:
+def weekend_percentage(dates: List[str]) -> int:
     """Calculate percentage of activity on weekends."""
     if not dates:
         return 0
@@ -675,7 +677,7 @@ def weekend_percentage(dates: list[str]) -> int:
     return round(weekends / len(parsed) * 100)
 
 
-def compute_top_words(projects_dir: Path, top_n: int = 20) -> list[tuple[str, int]]:
+def compute_top_words(projects_dir: Path, top_n: int = 20) -> List[Tuple[str, int]]:
     """Count word frequencies from all user prompts, excluding stopwords.
 
     Returns list of (word, count) tuples sorted by count descending.
@@ -744,7 +746,7 @@ def calculate_quirks(stats: dict, projects_dir: Path) -> Quirks:
 
 def build_bundle(
     base_stats: dict,
-    tool_usage: dict[str, int],
+    tool_usage: Dict[str, int],
     quirks: Quirks,
     projects_dir: Path = PROJECTS_DIR,
 ) -> AnonymousBundle:
@@ -756,7 +758,7 @@ def build_bundle(
     cached_tokens = sum(v.get("cacheReadInputTokens", 0) for v in model_usage_raw.values())
 
     # Normalize model names and aggregate
-    model_usage: dict[str, int] = {}
+    model_usage: Dict[str, int] = {}
     for key, value in model_usage_raw.items():
         total = value.get("inputTokens", 0) + value.get("outputTokens", 0)
         if "opus" in key:
@@ -1036,7 +1038,7 @@ OUTPUT_FILE = Path("/tmp/vibes-enrichment.json")
 PROMPTS_PER_CHUNK = 500
 
 
-def write_prompts_to_files(projects_dir: Path, show_progress: bool = True) -> tuple[int, int]:
+def write_prompts_to_files(projects_dir: Path, show_progress: bool = True) -> Tuple[int, int]:
     """Write prompts to temp files organized by project. Returns (total_prompts, total_files)."""
     # Clean up any existing directory
     if PROMPTS_DIR.exists():
@@ -1044,7 +1046,7 @@ def write_prompts_to_files(projects_dir: Path, show_progress: bool = True) -> tu
     PROMPTS_DIR.mkdir(parents=True)
 
     # Group prompts by project with progress updates
-    project_prompts: dict[str, list[str]] = {}
+    project_prompts: Dict[str, List[str]] = {}
     prompt_count = 0
     for project_name, prompt_text in extract_user_prompts_by_project(projects_dir):
         if project_name not in project_prompts:
@@ -1086,8 +1088,8 @@ def run_claude_batch(
     batch_id: str,
     prompt: str,
     output_file: Path,
-    progress: ParallelProgress | None = None,
-) -> tuple[dict | None, str | None]:
+    progress: Optional[ParallelProgress] = None,
+) -> Tuple[Optional[dict], Optional[str]]:
     """Run a single Claude batch and return (result, error_message)."""
     # Clean up any existing output file
     if output_file.exists():
@@ -1169,7 +1171,7 @@ def run_claude_batch(
             output_file.unlink()
 
 
-def merge_batch_results(results: list[dict | None]) -> dict:
+def merge_batch_results(results: List[Optional[dict]]) -> dict:
     """Merge results from all batches into a single enrichment dict."""
     merged: dict = {"insights": {}}
 
@@ -1204,8 +1206,8 @@ def merge_batch_results(results: list[dict | None]) -> dict:
 def call_claude_for_enrichment(
     bundle: AnonymousBundle,
     projects_dir: Path,
-    top_words: list[tuple[str, int]] | None = None,
-) -> dict | None:
+    top_words: Optional[List[Tuple[str, int]]] = None,
+) -> Optional[dict]:
     """Call Claude CLI to analyze stats in parallel batches."""
     if not shutil.which("claude"):
         error("Claude CLI not found in PATH")
@@ -1262,11 +1264,11 @@ Use Read tool to read them. Use Grep to search for patterns. Explore thoroughly.
     progress_reporter = ParallelProgress([b[0] for b in batches])
     progress_reporter.start()
 
-    errors: list[str] = []
+    errors: List[str] = []
 
     try:
         # Run batches in parallel
-        results: list[dict | None] = [None, None, None]
+        results: List[Optional[dict]] = [None, None, None]
 
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {
