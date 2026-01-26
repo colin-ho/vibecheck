@@ -10,19 +10,19 @@ echo ""
 echo "=== VibeChecked ==="
 echo ""
 
-# Find Python 3.10+
+# Find Python 3.8+
 PYTHON=""
 
-# First check if default python3 is 3.10+
+# First check if default python3 is 3.8+
 if command -v python3 &> /dev/null; then
-    if python3 -c 'import sys; exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+    if python3 -c 'import sys; exit(0 if sys.version_info >= (3, 8) else 1)' 2>/dev/null; then
         PYTHON="python3"
     fi
 fi
 
 # If python3 is too old, try versioned alternatives
 if [ -z "$PYTHON" ]; then
-    for cmd in python3.12 python3.11 python3.10; do
+    for cmd in python3.14 python3.13 python3.12 python3.11 python3.10 python3.9 python3.8; do
         if command -v "$cmd" &> /dev/null; then
             PYTHON="$cmd"
             break
@@ -31,7 +31,7 @@ if [ -z "$PYTHON" ]; then
 fi
 
 if [ -z "$PYTHON" ]; then
-    echo "Error: Python 3.10+ is required."
+    echo "Error: Python 3.8+ is required."
     echo "  Install with:"
     echo "    macOS:  brew install python3"
     echo "    Ubuntu: sudo apt install python3"
