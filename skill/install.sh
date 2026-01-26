@@ -10,10 +10,6 @@ echo ""
 echo "=== VibeChecked ==="
 echo ""
 
-# Clean up old installations
-rm -rf "$HOME/.claude/skills/vibes" 2>/dev/null || true
-rm -rf "$HOME/.claude/plugins/vibechecked" 2>/dev/null || true
-
 # Check for Python 3
 if ! command -v python3 &> /dev/null; then
     echo "Error: Python 3 is required."
