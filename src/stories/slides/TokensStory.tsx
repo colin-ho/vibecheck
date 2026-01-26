@@ -11,11 +11,11 @@ export function TokensStory({ data, isActive }: StorySlideProps) {
 	const total = totalTokens.input + totalTokens.output
 
 	const getTokenComment = (tokens: number): string => {
-		if (tokens > 10000000) return "You've fed Claude a small library"
-		if (tokens > 5000000) return "That's a lot of context"
-		if (tokens > 1000000) return 'Over a million tokens of collaboration'
-		if (tokens > 500000) return 'Half a million tokens and counting'
-		return 'Every token counts'
+		if (tokens > 10000000) return "Anthropic's accountants thank you for your service"
+		if (tokens > 5000000) return "That's a small fortune in API calls"
+		if (tokens > 1000000) return 'A million tokens? Your wallet is crying'
+		if (tokens > 500000) return 'Half a million tokens of asking Claude to fix things'
+		return "Either you're efficient or you're not trying hard enough"
 	}
 
 	return (
@@ -26,7 +26,7 @@ export function TokensStory({ data, isActive }: StorySlideProps) {
 				animate={isActive ? { opacity: 1, y: 0 } : {}}
 				transition={{ duration: 0.6 }}
 			>
-				YOU EXCHANGED
+				YOU BURNED THROUGH
 			</motion.div>
 
 			{/* Hero stat */}

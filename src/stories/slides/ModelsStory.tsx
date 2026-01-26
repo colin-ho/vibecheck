@@ -54,20 +54,20 @@ export function ModelsStory({ data, isActive }: StorySlideProps) {
 	const getModelComment = (model: string, percentage: number): string => {
 		const modelKey = model.toLowerCase()
 		if (modelKey.includes('opus')) {
-			if (percentage > 80) return 'Only the best for you'
-			if (percentage > 50) return 'Quality over quantity'
-			return 'Opus for the important stuff'
+			if (percentage > 80) return 'Expensive taste for simple problems'
+			if (percentage > 50) return 'Your token bill could fund a startup'
+			return 'Opus for everything? Bold. Expensive.'
 		}
 		if (modelKey.includes('sonnet')) {
-			if (percentage > 80) return 'Balanced and efficient'
-			if (percentage > 50) return 'The workhorse of your toolkit'
-			return 'Sonnet knows the way'
+			if (percentage > 80) return 'Middle of the road. Very you.'
+			if (percentage > 50) return 'The safe choice. Predictable.'
+			return "Can't commit to one model either"
 		}
 		if (modelKey.includes('haiku')) {
-			if (percentage > 50) return 'Speed is your priority'
-			return 'Quick and nimble'
+			if (percentage > 50) return 'Speed over quality? Bold choice.'
+			return 'Quick and cheap. Like your code.'
 		}
-		return 'A diverse model diet'
+		return 'Model indecision detected.'
 	}
 
 	// Concentric rings visualization

@@ -135,7 +135,7 @@ export function TimeStory({ data, isActive }: StorySlideProps) {
 				initial={{ opacity: 0 }}
 				animate={isActive ? { opacity: 1 } : {}}
 			>
-				YOU SPENT APPROXIMATELY
+				YOUR CODING ADDICTION VISUALIZED
 			</motion.div>
 
 			<motion.div
@@ -153,7 +153,7 @@ export function TimeStory({ data, isActive }: StorySlideProps) {
 				animate={isActive ? { opacity: 1 } : {}}
 				transition={{ delay: 0.6 }}
 			>
-				pair programming with Claude
+				of your life given to Claude
 			</motion.div>
 
 			{/* GitHub-style contribution graph */}

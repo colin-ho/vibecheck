@@ -192,16 +192,6 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 									}}
 								/>
 
-								{/* Category badge */}
-								<motion.div
-									className="inline-block px-3 py-1 rounded-full text-xs uppercase tracking-widest mb-3 bg-dark/10 text-dark"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									transition={{ delay: 0.6 }}
-								>
-									{persona.category}
-								</motion.div>
-
 								{/* Persona name */}
 								<motion.h1
 									className="text-3xl md:text-4xl font-black text-dark tracking-tight"
@@ -263,7 +253,7 @@ export function PersonaStory({ data, isActive }: StorySlideProps) {
 									transition={{ delay: 0.3 }}
 								>
 									<div className="text-dark/80 text-xs uppercase tracking-wider mb-3 text-center">
-										Why you got this:
+										Guilty as charged:
 									</div>
 									<div className="space-y-2">
 										{evidenceLines.map((line, index) => (

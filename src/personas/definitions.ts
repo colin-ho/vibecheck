@@ -1,54 +1,73 @@
 import { PersonaDefinition } from '../data/types'
 
 export const personas: Record<string, PersonaDefinition> = {
-	// ===== NON-ROASTS (~20%) - Only for truly exceptional users =====
+	// ===== ALL PERSONAS ROAST - NO EXCEPTIONS =====
 
-	'token-titan': {
-		id: 'token-titan',
-		name: 'TOKEN TITAN',
-		tagline: 'Feeding the machine since day one',
+	// --- Former "Legendary" (now roasts) ---
+
+	'token-burner': {
+		id: 'token-burner',
+		name: 'TOKEN BURNER',
+		tagline: "Anthropic's favorite customer",
 		description:
-			"You've processed more tokens than most people have typed characters. The models know you by name. Genuinely impressive dedication.",
+			"You've processed more tokens than most people have read words. Your API bill could fund a small startup. At least someone at Anthropic is getting a holiday bonus.",
 		color: '#ffd700',
 		gradient: 'linear-gradient(135deg, #ffd700, #ff8c00, #ff4500)',
-		category: 'legendary',
-		icon: '⚡',
-	},
-	'tool-master': {
-		id: 'tool-master',
-		name: 'TOOL MASTER',
-		tagline: 'Every tool, every situation',
-		description:
-			"Read, Write, Bash, Edit, Grep... you've mastered them all. You actually understand what each tool does. A rare specimen.",
-		color: '#00d4ff',
-		gradient: 'linear-gradient(135deg, #00d4ff, #0099cc, #006699)',
-		category: 'legendary',
-		icon: '🛠️',
-	},
-	'mcp-pioneer': {
-		id: 'mcp-pioneer',
-		name: 'MCP PIONEER',
-		tagline: 'Extending the boundaries',
-		description:
-			"Custom integrations, custom tools. You're not just using Claude, you're augmenting it. Actually impressive.",
-		color: '#a855f7',
-		gradient: 'linear-gradient(135deg, #a855f7, #8b5cf6, #7c3aed)',
-		category: 'legendary',
-		icon: '🔮',
-	},
-	'prompt-surgeon': {
-		id: 'prompt-surgeon',
-		name: 'PROMPT SURGEON',
-		tagline: 'Maximum output, minimum input',
-		description:
-			'Your prompts are surgical. High efficiency, low waste. You actually think before you type. We stan.',
-		color: '#00ff88',
-		gradient: 'linear-gradient(135deg, #00ff88, #00cc6a, #009944)',
-		category: 'legendary',
-		icon: '🎯',
+		icon: '🔥',
+		evidence: [
+			'Token usage: absolutely unhinged',
+			"You're keeping the lights on at Anthropic",
+			'Your wallet is crying',
+		],
 	},
 
-	// ===== ROASTS (~80%) - The majority =====
+	'tool-hoarder': {
+		id: 'tool-hoarder',
+		name: 'TOOL HOARDER',
+		tagline: 'Jack of all tools, master of none',
+		description:
+			"Read, Write, Bash, Edit, Grep, Task... you've touched them all. But do you actually know what they do, or are you just clicking buttons and hoping for the best?",
+		color: '#00d4ff',
+		gradient: 'linear-gradient(135deg, #00d4ff, #0099cc, #006699)',
+		icon: '🧰',
+		evidence: [
+			'Used every tool in the arsenal',
+			'Quantity over quality',
+			"Tool diversity: impressive. Results: we'll see.",
+		],
+	},
+
+	'over-engineer': {
+		id: 'over-engineer',
+		name: 'OVER ENGINEER',
+		tagline: 'Why use 1 tool when you can build 12?',
+		description:
+			"Custom MCP integrations, elaborate tool chains, bespoke workflows. You're not just using Claude, you're building a spaceship to go to the corner store.",
+		color: '#a855f7',
+		gradient: 'linear-gradient(135deg, #a855f7, #8b5cf6, #7c3aed)',
+		icon: '🔮',
+		evidence: [
+			'Custom tool count: concerning',
+			'Simple solution? Never heard of it.',
+			'You built infrastructure for a todo list',
+		],
+	},
+
+	tryhard: {
+		id: 'tryhard',
+		name: 'TRYHARD',
+		tagline: 'You optimized your prompts but not your life choices',
+		description:
+			"High cache rate, efficient prompts, perfect token hygiene. You've mastered prompt engineering. Shame about the 3AM sessions and the coffee addiction.",
+		color: '#00ff88',
+		gradient: 'linear-gradient(135deg, #00ff88, #00cc6a, #009944)',
+		icon: '🎯',
+		evidence: [
+			'Prompt efficiency: suspiciously high',
+			'You read the docs. Show off.',
+			'Type A personality detected',
+		],
+	},
 
 	// --- Vibe Coders / Lazy Prompters ---
 
@@ -60,7 +79,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"You don't write code, you manifest it. Your prompts are vibes, not instructions. \"idk fix it\" is your love language. You're not lazy, you're ✨delegating✨.",
 		color: '#ff6b6b',
 		gradient: 'linear-gradient(135deg, #ff6b6b, #ee5a24, #ff3838)',
-		category: 'roast',
 		icon: '🎲',
 		evidence: [
 			'Your most common prompt: variations of "fix"',
@@ -77,7 +95,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your prompts are haikus without the poetry. "fix" "help" "why" - that\'s the entire conversation. Claude isn\'t a mind reader, but you\'re testing that theory daily.',
 		color: '#95a5a6',
 		gradient: 'linear-gradient(135deg, #95a5a6, #7f8c8d, #636e72)',
-		category: 'roast',
 		icon: '💬',
 		evidence: [
 			'Average prompt length: a tweet',
@@ -94,7 +111,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"Why think when Claude can think for you? Your job is to press enter and accept whatever comes back. You're not coding, you're supervising. Barely.",
 		color: '#e056fd',
 		gradient: 'linear-gradient(135deg, #e056fd, #be2edd, #8e44ad)',
-		category: 'roast',
 		icon: '🎰',
 		evidence: [
 			'You accept every suggestion without reading',
@@ -111,7 +127,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Claude writes a thoughtful plan. You say "yes" without reading a single word. Every. Single. Time. You trust Claude more than you trust yourself. Concerning.',
 		color: '#00cec9',
 		gradient: 'linear-gradient(135deg, #00cec9, #0984e3, #6c5ce7)',
-		category: 'roast',
 		icon: '⏭️',
 		evidence: [
 			'Plans accepted: all of them',
@@ -128,7 +143,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You think adding "please" and "correctly" to your prompts changes the output. "Please fix this correctly and make sure it works" - ah yes, the secret incantation.',
 		color: '#fd79a8',
 		gradient: 'linear-gradient(135deg, #fd79a8, #e84393, #d63031)',
-		category: 'roast',
 		icon: '🪄',
 		evidence: [
 			'"correctly" appears in most of your prompts',
@@ -147,7 +161,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You\'ve said "fix" more times than "hello". Debugging is your entire personality. Maybe... write tests? Or read the error message? Just a thought.',
 		color: '#e67e22',
 		gradient: 'linear-gradient(135deg, #e67e22, #d35400, #c0392b)',
-		category: 'roast',
 		icon: '🐛',
 		evidence: [
 			'Debugging sessions: too many to count',
@@ -164,7 +177,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"Your code doesn't have bugs, it IS bugs. Every session starts with \"it's broken again\". At this point, the bugs have squatter's rights.",
 		color: '#d63031',
 		gradient: 'linear-gradient(135deg, #d63031, #c0392b, #a93226)',
-		category: 'roast',
 		icon: '🪲',
 		evidence: [
 			'Error messages: your most common conversation topic',
@@ -181,7 +193,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You fix one bug, create two more. It\'s like whack-a-mole but the moles are winning. Every "fix" spawns a new issue. You\'re job security for Claude.',
 		color: '#6c5ce7',
 		gradient: 'linear-gradient(135deg, #6c5ce7, #5f27cd, #341f97)',
-		category: 'roast',
 		icon: '🔄',
 		evidence: [
 			'Sessions that never seem to end',
@@ -200,7 +211,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your prompts are longer than the code you want written. You provide the entire history of the project, your life story, and your hopes and dreams. Just ask the question.',
 		color: '#3498db',
 		gradient: 'linear-gradient(135deg, #3498db, #2980b9, #1a5276)',
-		category: 'roast',
 		icon: '📚',
 		evidence: [
 			'Average prompt length: dissertation',
@@ -217,7 +227,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You could literally just write the code yourself in the time it takes you to explain what you want. Your "quick question" comes with 3 paragraphs of backstory.',
 		color: '#9b59b6',
 		gradient: 'linear-gradient(135deg, #9b59b6, #8e44ad, #6c3483)',
-		category: 'roast',
 		icon: '📖',
 		evidence: [
 			'Your prompts have chapters',
@@ -234,7 +243,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You spend more time explaining what you want than it would take to just... do it. Your prompt-to-code ratio is concerning. Have you considered typing less?',
 		color: '#1abc9c',
 		gradient: 'linear-gradient(135deg, #1abc9c, #16a085, #0d7377)',
-		category: 'roast',
 		icon: '🗣️',
 		evidence: [
 			'Words typed explaining: thousands',
@@ -253,7 +261,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your peak coding hours are when normal humans are unconscious. Your circadian rhythm is a myth. The bugs you write at 3AM will haunt you by 9AM.',
 		color: '#2c3e50',
 		gradient: 'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
-		category: 'roast',
 		icon: '👹',
 		evidence: [
 			'Most active between midnight and 4 AM',
@@ -270,7 +277,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You interrupt Claude mid-thought. You abandon sessions constantly. Your attention span is measured in nanoseconds. You started 47 things and finished 2.',
 		color: '#f39c12',
 		gradient: 'linear-gradient(135deg, #f39c12, #f1c40f, #e67e22)',
-		category: 'roast',
 		icon: '🐿️',
 		evidence: [
 			'Interrupted Claude multiple times per session',
@@ -287,7 +293,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"CALM DOWN. THE CODE ISN'T GOING ANYWHERE. Your caps lock key is crying. Your prompts read like a frustrated parent. Maybe try decaf?",
 		color: '#e74c3c',
 		gradient: 'linear-gradient(135deg, #e74c3c, #c0392b, #a93226)',
-		category: 'roast',
 		icon: '📢',
 		evidence: [
 			'Multiple ALL CAPS prompts detected',
@@ -301,10 +306,9 @@ export const personas: Record<string, PersonaDefinition> = {
 		name: 'POLITE MENACE',
 		tagline: 'Says please while destroying production',
 		description:
-			'You\'re suspiciously polite for someone whose code is on fire. "Could you please fix this critical bug? Thank you so much! 🙏" Manners won\'t save your deploy.',
+			'You\'re suspiciously polite for someone whose code is on fire. "Could you please fix this critical bug? Thank you so much!" Manners won\'t save your deploy.',
 		color: '#2ecc71',
 		gradient: 'linear-gradient(135deg, #2ecc71, #27ae60, #1abc9c)',
-		category: 'roast',
 		icon: '🎭',
 		evidence: [
 			'Said "please" an alarming number of times',
@@ -321,7 +325,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'"Do this. Wait no, undo that. Actually, do it again but different. Never mind, go back." Your sessions are a choose-your-own-adventure where you choose wrong.',
 		color: '#00b894',
 		gradient: 'linear-gradient(135deg, #00b894, #00cec9, #0984e3)',
-		category: 'roast',
 		icon: '↩️',
 		evidence: [
 			'Undo requests: constant',
@@ -338,7 +341,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"Why understand code when you can just copy it? You paste code, get errors, paste the errors, get fixes, paste those. It's copy-paste all the way down.",
 		color: '#4ecdc4',
 		gradient: 'linear-gradient(135deg, #4ecdc4, #44a08d, #009688)',
-		category: 'roast',
 		icon: '📋',
 		evidence: [
 			'Heavy code pasting in prompts',
@@ -357,7 +359,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your solution to everything is a bash command. Read a file? Bash. Edit code? Bash. Emotional problems? Probably bash. You live in the terminal.',
 		color: '#fb923c',
 		gradient: 'linear-gradient(135deg, #fb923c, #f97316, #ea580c)',
-		category: 'roast',
 		icon: '💥',
 		evidence: ['Bash usage: over 60%', 'You think in terminal commands', 'GUI is for the weak'],
 	},
@@ -370,7 +371,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Why use Haiku when Opus exists? You use the most expensive model for everything. Your token bill could fund a startup. Simple tasks deserve premium treatment.',
 		color: '#c084fc',
 		gradient: 'linear-gradient(135deg, #c084fc, #a855f7, #9333ea)',
-		category: 'roast',
 		icon: '👑',
 		evidence: [
 			'Opus for everything, even typo fixes',
@@ -387,7 +387,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"You pay full price for the same context every single time. Your cache hit rate is tragic. You're basically funding Anthropic's holiday party.",
 		color: '#94a3b8',
 		gradient: 'linear-gradient(135deg, #94a3b8, #64748b, #475569)',
-		category: 'roast',
 		icon: '🤔',
 		evidence: [
 			'Cache hit rate: embarrassingly low',
@@ -406,7 +405,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"Flexbox? More like flex-nope. You've asked how to center things more times than you'd like to admit. The cascade has claimed another victim.",
 		color: '#e84393',
 		gradient: 'linear-gradient(135deg, #e84393, #d63031, #c0392b)',
-		category: 'roast',
 		icon: '🎨',
 		evidence: [
 			'CSS keywords appear constantly',
@@ -423,7 +421,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'You came with one problem and asked for regex help. Now you have two problems. Every regex prompt ends with "why doesn\'t this work?" You know why.',
 		color: '#636e72',
 		gradient: 'linear-gradient(135deg, #636e72, #2d3436, #1e272e)',
-		category: 'roast',
 		icon: '🔣',
 		evidence: [
 			'Regex requests: too many',
@@ -440,7 +437,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your git history is a crime scene. You\'ve asked how to undo a force push. Multiple times. "git rebase" gives you nightmares. At least your commits are... committed.',
 		color: '#f97316',
 		gradient: 'linear-gradient(135deg, #f97316, #ea580c, #c2410c)',
-		category: 'roast',
 		icon: '📜',
 		evidence: [
 			'Git questions: suspiciously frequent',
@@ -459,7 +455,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your usage spikes right before deadlines. Procrastination is your art form. You work best under pressure because you only work under pressure.',
 		color: '#ff4757',
 		gradient: 'linear-gradient(135deg, #ff4757, #ff6b81, #ee5a24)',
-		category: 'roast',
 		icon: '⏰',
 		evidence: [
 			'Usage spikes before deadlines',
@@ -476,7 +471,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your code works perfectly but you want to "clean it up." Three refactors later, it\'s broken and you don\'t know why. The enemy of good is perfect.',
 		color: '#a29bfe',
 		gradient: 'linear-gradient(135deg, #a29bfe, #6c5ce7, #5f27cd)',
-		category: 'roast',
 		icon: '✨',
 		evidence: [
 			'Refactoring working code: your hobby',
@@ -493,7 +487,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			"Straight to production. No tests. No staging. Pure chaos energy. You don't believe in safety nets. Your deploys are acts of faith.",
 		color: '#22d3ee',
 		gradient: 'linear-gradient(135deg, #22d3ee, #06b6d4, #0891b2)',
-		category: 'roast',
 		icon: '🚀',
 		evidence: [
 			'Testing mentioned: rarely',
@@ -511,7 +504,6 @@ export const personas: Record<string, PersonaDefinition> = {
 			'Your coding style is best described as "let\'s see what happens." You try things until something works. Science? No. Effective? Sometimes. Chaotic? Always.',
 		color: '#00ff41',
 		gradient: 'linear-gradient(135deg, #00ff41, #00d4ff, #a855f7)',
-		category: 'roast',
 		icon: '🎰',
 		evidence: [
 			'Trial and error is your methodology',
@@ -594,7 +586,7 @@ export function determinePersona(bundle: {
 		return found?.count || 0
 	}
 
-	// ===== ROASTS FIRST (80% of users should get roasted) =====
+	// ===== ALL ROASTS - EVERYONE GETS DUNKED ON =====
 
 	// --- Vibe Coders / Lazy Prompters (check first - most common) ---
 
@@ -775,36 +767,34 @@ export function determinePersona(bundle: {
 		return 'yolo-deployer'
 	}
 
-	// ===== NON-ROASTS (only for truly exceptional ~20%) =====
+	// ===== HIGH USAGE ROASTS (still roasts, but for heavy users) =====
 
-	// These require genuinely impressive stats
-
-	// Token titan - over 2M tokens (very high bar)
+	// Token burner - over 2M tokens (roast version of token-titan)
 	if (totalTokens > 2000000) {
-		return 'token-titan'
+		return 'token-burner'
 	}
 
-	// Tool master - uses 8+ tools extensively
+	// Tool hoarder - uses 8+ tools extensively (roast version of tool-master)
 	if (toolCount >= 8 && totalTools > 2000) {
-		return 'tool-master'
+		return 'tool-hoarder'
 	}
 
-	// MCP pioneer - uses custom MCP tools
+	// Over engineer - uses custom MCP tools (roast version of mcp-pioneer)
 	const hasMcpTools = Object.keys(stats.toolUsage).some(
 		(tool) => tool.startsWith('mcp__') && stats.toolUsage[tool] > 50
 	)
 	if (hasMcpTools) {
-		return 'mcp-pioneer'
+		return 'over-engineer'
 	}
 
-	// Prompt surgeon - high cache rate AND good efficiency
+	// Tryhard - high cache rate AND good efficiency (roast version of prompt-surgeon)
 	if (
 		cacheRate > 0.6 &&
 		totalTokens > 200000 &&
 		averagePromptLength > 50 &&
 		averagePromptLength < 200
 	) {
-		return 'prompt-surgeon'
+		return 'tryhard'
 	}
 
 	// ===== FALLBACK ROASTS =====
@@ -892,16 +882,7 @@ export function getTopicRoast(topic: string, percentage: number): string {
 	return roasts[topic] || `${percentage}% ${topic} - a choice was made.`
 }
 
-// Get all roast persona IDs (for random selection)
-export function getRoastPersonaIds(): string[] {
-	return Object.entries(personas)
-		.filter(([, p]) => p.category === 'roast')
-		.map(([id]) => id)
-}
-
-// Get all legendary persona IDs
-export function getLegendaryPersonaIds(): string[] {
-	return Object.entries(personas)
-		.filter(([, p]) => p.category === 'legendary')
-		.map(([id]) => id)
+// Get all persona IDs (all are roasts now)
+export function getAllPersonaIds(): string[] {
+	return Object.keys(personas)
 }

@@ -106,7 +106,7 @@ export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
 				transition={{ duration: 0.6 }}
 			>
 				<div className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70">
-					YOUR MEMORABLE MOMENTS
+					YOUR GREATEST HITS (AND MISSES)
 				</div>
 			</motion.div>
 

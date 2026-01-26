@@ -10,16 +10,16 @@ export function TimingStory({ data, isActive }: StorySlideProps) {
 	const getTimePersonality = (): { title: string; description: string } => {
 		// Peak hour should be the primary signal
 		if (peakHour >= 22 || peakHour <= 4) {
-			return { title: 'Night Owl', description: 'The quiet hours are your domain' }
+			return { title: 'Night Owl', description: 'Sleep is for people with healthy habits' }
 		}
 		if (peakHour >= 5 && peakHour <= 8) {
-			return { title: 'Early Bird', description: 'Shipping code before the world wakes up' }
+			return { title: 'Early Bird', description: 'Coding before your brain wakes up. Bold.' }
 		}
 		if (peakHour >= 9 && peakHour <= 17) {
-			return { title: 'Day Coder', description: 'Traditional hours, consistent output' }
+			return { title: 'Day Coder', description: '9-5 energy. How... conventional.' }
 		}
 		// peakHour 18-21
-		return { title: 'Evening Warrior', description: 'When the day job ends, the real work begins' }
+		return { title: 'Evening Warrior', description: 'Work-life balance has left the chat' }
 	}
 
 	const personality = getTimePersonality()

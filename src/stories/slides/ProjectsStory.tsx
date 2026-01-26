@@ -8,11 +8,11 @@ export function ProjectsStory({ data, isActive }: StorySlideProps) {
 	const { stats } = data
 
 	const getProjectComment = (count: number): string => {
-		if (count > 30) return 'A true polyglot developer'
-		if (count > 20) return 'Project nomad energy'
-		if (count > 10) return 'Diversified portfolio'
-		if (count > 5) return 'A few favorite codebases'
-		return 'Deep focus on what matters'
+		if (count > 30) return "Can't commit to anything, can you?"
+		if (count > 20) return 'Commitment issues extend to your repos'
+		if (count > 10) return 'Project hopping is your cardio'
+		if (count > 5) return 'A few codebases to ruin'
+		return 'Tunnel vision. Classic.'
 	}
 
 	// Generate orbital constellation positions

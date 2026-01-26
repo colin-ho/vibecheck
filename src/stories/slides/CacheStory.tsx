@@ -14,11 +14,11 @@ export function CacheStory({ data, isActive }: StorySlideProps) {
 	const estimatedSavings = (cachedTokens / 1000) * 0.012
 
 	const getCacheComment = (rate: number): string => {
-		if (rate > 50) return 'Context efficiency master!'
-		if (rate > 30) return 'Smart use of context caching'
-		if (rate > 15) return 'Building up that cache game'
-		if (rate > 5) return "There's room for more caching"
-		return 'Fresh context every time'
+		if (rate > 50) return 'At least something about you is efficient'
+		if (rate > 30) return 'Room for improvement. Like everything else.'
+		if (rate > 15) return 'Your cache game needs work'
+		if (rate > 5) return 'Claude forgets you exist between sessions'
+		return 'Paying full price every time. Anthropic thanks you.'
 	}
 
 	const formatMoney = (n: number): string => {

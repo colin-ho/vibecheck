@@ -38,7 +38,7 @@ export interface UsageData extends AnonymousBundle {
 	persona: PersonaDefinition
 }
 
-// Persona definition
+// Persona definition - all personas roast
 export interface PersonaDefinition {
 	id: string
 	name: string
@@ -46,7 +46,6 @@ export interface PersonaDefinition {
 	description: string
 	color: string
 	gradient: string
-	category: 'legendary' | 'lifestyle' | 'personality' | 'roast'
 	icon: string
 	evidence?: string[] // Evidence lines for why they got this persona
 }

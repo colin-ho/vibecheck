@@ -68,7 +68,7 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
 				animate={isActive ? { opacity: 1, y: 0 } : {}}
 				transition={{ duration: 0.6 }}
 			>
-				WHAT KEPT YOU UP AT NIGHT
+				YOUR UNHEALTHY OBSESSIONS
 			</motion.div>
 
 			{/* Detailed topics pills */}

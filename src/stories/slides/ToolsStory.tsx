@@ -33,21 +33,21 @@ export function ToolsStory({ data, isActive }: StorySlideProps) {
 	const getToolComment = (tool: string): string => {
 		switch (tool) {
 			case 'Read':
-				return 'You like to understand before you act'
+				return 'Analysis paralysis. You read more than you code.'
 			case 'Bash':
-				return 'Command line warrior detected'
+				return 'You think in terminal commands. Concerning.'
 			case 'Edit':
-				return 'Precision editing is your style'
+				return 'Constantly fixing your own mistakes.'
 			case 'Write':
-				return 'Creating new things from scratch'
+				return 'Creating new files to mess up.'
 			case 'Grep':
-				return 'Searching for that needle in the haystack'
+				return 'Still looking for that bug, huh?'
 			case 'Glob':
-				return 'Pattern matching pro'
+				return 'Pattern matching your way out of problems.'
 			case 'Task':
-				return 'Delegation master'
+				return 'Delegating your problems to more Claude.'
 			default:
-				return 'A diverse toolkit'
+				return 'Jack of all tools, master of none.'
 		}
 	}
 

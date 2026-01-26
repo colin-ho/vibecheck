@@ -8,12 +8,12 @@ export function SessionsStory({ data, isActive }: StorySlideProps) {
 	const { stats, percentiles } = data
 
 	const getSessionsComment = (sessions: number): string => {
-		if (sessions > 1000) return 'You basically live in the terminal'
-		if (sessions > 500) return 'Claude is your most frequent collaborator'
-		if (sessions > 200) return 'A true pair programming enthusiast'
-		if (sessions > 100) return "You've found your coding companion"
-		if (sessions > 50) return 'The partnership is growing strong'
-		return 'Just getting started!'
+		if (sessions > 1000) return 'You basically live inside Claude at this point'
+		if (sessions > 500) return 'Touch grass? Never heard of her.'
+		if (sessions > 200) return 'Claude knows you better than your therapist'
+		if (sessions > 100) return 'Getting comfortable with AI dependency'
+		if (sessions > 50) return 'Building a habit. Or an addiction.'
+		return 'Baby steps. Everyone starts somewhere (even you).'
 	}
 
 	return (

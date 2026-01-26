@@ -135,9 +135,9 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 					initial={{ opacity: 0, y: -20 }}
 					animate={isActive ? { opacity: 1, y: 0 } : {}}
 				>
-					<h2 className="text-2xl font-bold text-dark mb-1">Share Your Vibes</h2>
+					<h2 className="text-2xl font-bold text-dark mb-1">Share Your Shame</h2>
 					<p className="leading-[1.65] text-dark/80 text-sm">
-						Let the world know your coding personality
+						Let the world judge your coding habits
 					</p>
 				</motion.div>
 

@@ -90,7 +90,7 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 							transition={{ delay: 2.1 }}
 							className="mt-4 text-dark/70 text-sm"
 						>
-							Analysis complete.
+							Analysis complete. We saw everything.
 						</motion.div>
 
 						{/* Key stats summary */}
@@ -144,7 +144,7 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 								transition={{ delay: 3.1 }}
 								className="mt-4 pt-3 border-t border-dark/10 text-dark/40 text-xs"
 							>
-								Session analyzed: {formattedDate}
+								Coding crimes documented: {formattedDate}
 							</motion.div>
 						)}
 					</motion.div>

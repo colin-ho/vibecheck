@@ -35,6 +35,381 @@ from bundle_types import (
     TokenCounts,
 )
 
+# Common English stopwords to filter out from word counts
+STOPWORDS = frozenset(
+    {
+        "a",
+        "an",
+        "the",
+        "and",
+        "or",
+        "but",
+        "if",
+        "then",
+        "else",
+        "when",
+        "at",
+        "by",
+        "for",
+        "with",
+        "about",
+        "against",
+        "between",
+        "into",
+        "through",
+        "during",
+        "before",
+        "after",
+        "above",
+        "below",
+        "to",
+        "from",
+        "up",
+        "down",
+        "in",
+        "out",
+        "on",
+        "off",
+        "over",
+        "under",
+        "again",
+        "further",
+        "once",
+        "here",
+        "there",
+        "where",
+        "why",
+        "how",
+        "all",
+        "each",
+        "few",
+        "more",
+        "most",
+        "other",
+        "some",
+        "such",
+        "no",
+        "nor",
+        "not",
+        "only",
+        "own",
+        "same",
+        "so",
+        "than",
+        "too",
+        "very",
+        "can",
+        "will",
+        "just",
+        "don",
+        "should",
+        "now",
+        "i",
+        "you",
+        "he",
+        "she",
+        "it",
+        "we",
+        "they",
+        "what",
+        "which",
+        "who",
+        "whom",
+        "this",
+        "that",
+        "these",
+        "those",
+        "am",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "having",
+        "do",
+        "does",
+        "did",
+        "doing",
+        "would",
+        "could",
+        "ought",
+        "im",
+        "youre",
+        "hes",
+        "shes",
+        "its",
+        "theyre",
+        "ive",
+        "youve",
+        "weve",
+        "theyve",
+        "id",
+        "youd",
+        "hed",
+        "shed",
+        "wed",
+        "theyd",
+        "ill",
+        "youll",
+        "hell",
+        "shell",
+        "well",
+        "theyll",
+        "isnt",
+        "arent",
+        "wasnt",
+        "werent",
+        "hasnt",
+        "havent",
+        "hadnt",
+        "doesnt",
+        "dont",
+        "didnt",
+        "wont",
+        "wouldnt",
+        "shant",
+        "shouldnt",
+        "cant",
+        "cannot",
+        "couldnt",
+        "mustnt",
+        "lets",
+        "thats",
+        "whos",
+        "whats",
+        "heres",
+        "theres",
+        "whens",
+        "wheres",
+        "whys",
+        "hows",
+        "because",
+        "as",
+        "until",
+        "while",
+        "of",
+        "also",
+        "like",
+        "get",
+        "got",
+        "go",
+        "going",
+        "went",
+        "come",
+        "came",
+        "make",
+        "made",
+        "take",
+        "took",
+        "see",
+        "saw",
+        "know",
+        "knew",
+        "think",
+        "thought",
+        "want",
+        "need",
+        "use",
+        "used",
+        "try",
+        "tried",
+        "let",
+        "say",
+        "said",
+        "tell",
+        "told",
+        "ask",
+        "asked",
+        "work",
+        "working",
+        "thing",
+        "things",
+        "way",
+        "ways",
+        "time",
+        "times",
+        "year",
+        "years",
+        "day",
+        "days",
+        "man",
+        "men",
+        "woman",
+        "women",
+        "child",
+        "children",
+        "world",
+        "life",
+        "hand",
+        "hands",
+        "part",
+        "parts",
+        "place",
+        "places",
+        "case",
+        "cases",
+        "week",
+        "weeks",
+        "company",
+        "system",
+        "program",
+        "question",
+        "questions",
+        "point",
+        "points",
+        "government",
+        "number",
+        "numbers",
+        "night",
+        "nights",
+        "mr",
+        "mrs",
+        "ms",
+        "home",
+        "water",
+        "room",
+        "mother",
+        "area",
+        "areas",
+        "money",
+        "story",
+        "stories",
+        "fact",
+        "facts",
+        "month",
+        "months",
+        "lot",
+        "lots",
+        "right",
+        "study",
+        "book",
+        "books",
+        "eye",
+        "eyes",
+        "job",
+        "jobs",
+        "word",
+        "words",
+        "business",
+        "issue",
+        "issues",
+        "side",
+        "sides",
+        "kind",
+        "kinds",
+        "head",
+        "heads",
+        "house",
+        "houses",
+        "service",
+        "services",
+        "friend",
+        "friends",
+        "father",
+        "power",
+        "hour",
+        "hours",
+        "game",
+        "games",
+        "line",
+        "lines",
+        "end",
+        "ends",
+        "member",
+        "members",
+        "law",
+        "laws",
+        "car",
+        "cars",
+        "city",
+        "cities",
+        "community",
+        "name",
+        "names",
+        "ok",
+        "okay",
+        "yes",
+        "maybe",
+        "please",
+        "thanks",
+        "thank",
+        "hi",
+        "hello",
+        "hey",
+        "sure",
+        "actually",
+        "really",
+        "probably",
+        "definitely",
+        "basically",
+        "essentially",
+        "currently",
+        "usually",
+        "generally",
+        "simply",
+        "exactly",
+        "already",
+        "still",
+        "even",
+        "though",
+        "however",
+        "therefore",
+        "thus",
+        "hence",
+        "anyway",
+        "anyways",
+        "something",
+        "anything",
+        "everything",
+        "nothing",
+        "someone",
+        "anyone",
+        "everyone",
+        "one",
+        "ones",
+        "two",
+        "three",
+        "first",
+        "second",
+        "new",
+        "old",
+        "good",
+        "bad",
+        "great",
+        "little",
+        "big",
+        "small",
+        "large",
+        "long",
+        "short",
+        "high",
+        "low",
+        "different",
+        "important",
+        "able",
+        "last",
+        "next",
+        "public",
+        "possible",
+        "real",
+        "whole",
+        "best",
+        "better",
+        "true",
+        "false",
+        "available",
+    }
+)
+
+# Word tokenization pattern - matches word characters and common programming tokens
+WORD_PATTERN = re.compile(r"[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9]|[a-zA-Z]")
+
+
 # Constants
 BASE_URL = os.environ.get("WRAPPED_URL", "https://howsyourvibecoding.vercel.app")
 CLAUDE_DIR = Path(os.environ.get("CLAUDE_DIR", Path.home() / ".claude"))
@@ -298,6 +673,23 @@ def weekend_percentage(dates: list[str]) -> int:
     return round(weekends / len(parsed) * 100)
 
 
+def compute_top_words(projects_dir: Path, top_n: int = 20) -> list[tuple[str, int]]:
+    """Count word frequencies from all user prompts, excluding stopwords.
+
+    Returns list of (word, count) tuples sorted by count descending.
+    """
+    word_counts: Counter = Counter()
+
+    for _, prompt_text in extract_user_prompts_by_project(projects_dir):
+        # Tokenize and normalize
+        words = WORD_PATTERN.findall(prompt_text.lower())
+        # Filter stopwords and very short words
+        meaningful_words = [w for w in words if w not in STOPWORDS and len(w) > 1]
+        word_counts.update(meaningful_words)
+
+    return word_counts.most_common(top_n)
+
+
 def calculate_quirks(stats: dict, projects_dir: Path) -> Quirks:
     """Calculate behavioral quirks (time-based, not text-based)."""
     hour_counts = stats.get("hourCounts", {})
@@ -499,56 +891,56 @@ CONSTRAINTS:
 
 IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
 
-# Batch B: Communication style, word analysis, obsessions
-PROMPT_BATCH_B = """Analyze the user's prompts for communication patterns and word usage.
+# Batch B: Communication style, phrase analysis, obsessions - ROAST FOCUSED
+PROMPT_BATCH_B = """Your job is to analyze this user's prompts and find things we can roast them for.
 
 ## User Prompts
 {prompts_instruction}
 
+## Pre-computed Top Words (for reference)
+{top_words_json}
+
 ## Your Task
-Read through the prompts using Read/Grep/Glob tools. Analyze patterns:
+Read through the prompts using Read/Grep/Glob tools. Find the dirt:
 
-### 1. Communication Style
-- **catchphrases**: 2-5 unique phrases they repeat often (especially lazy ones like "just fix", "make it work")
-- **signatureOpeners**: 2-3 ways they typically start prompts ("Hey Claude", "Can you", "fix", etc.)
-- **verbalTics**: Filler words, hedging patterns ("basically", "just", "like", "idk")
+### 1. Communication Style (find roastable patterns)
+- **catchphrases**: 2-5 lazy phrases they repeat ("just fix", "make it work", "idk") - lazier = better for roasting
+- **signatureOpeners**: 2-3 ways they start prompts - especially low-effort ones like "fix", "help"
+- **verbalTics**: Filler words, hedging ("basically", "just", "like", "idk") - these reveal lazy habits
 - **politenessLevel**: One of: "diplomatic", "direct", "demanding", "apologetic"
-- **averagePromptLength**: Estimate average character length of their prompts (important for roasting)
-- **promptingEvolution**: One sentence about how their style changed over time (if noticeable)
+- **averagePromptLength**: Estimate average chars (< 50 = one-word-wonder, > 400 = essay-writer)
+- **promptingEvolution**: One roasty sentence about their style
 
-### 2. Word Analysis
-- **topWords**: 20 most meaningful words with counts. ESPECIALLY look for:
-  - Lazy words: "fix", "help", "just", "work", "broken", "error", "bug"
-  - Magic words: "correctly", "properly", "please", "make sure"
-  - Frustration: "why", "again", "still", "undo", "revert", "actually"
-  - Domain: "css", "center", "regex", "git", "merge", "rebase"
-- **topPhrases**: 5 most common meaningful 2-3 word phrases (e.g., "just fix", "make it work", "I don't know")
+### 2. Phrase Analysis (find embarrassing patterns)
+- **topPhrases**: 5 most common 2-3 word phrases (e.g., "just fix", "make it work", "I don't know")
 - **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring, deployment, database
 
-### 3. Obsessions
-- **topics**: 3-5 technical areas they focus on most
-- **frequentlyRevisited**: 2-3 problems they kept coming back to (bugs they couldn't fix?)
-- **actualProjects**: 2-4 things they were actually building (infer from context)
+### 3. Obsessions (what kept them up at night)
+- **topics**: 4-5 technical areas they focus on most
+- **frequentlyRevisited**: 4-5 problems they kept coming back to (bugs they couldn't fix? Ha!)
+- **actualProjects**: 4-5 things they were building (infer from context)
 
-### 4. Roast Indicators (new)
-- **capsLockPrompts**: Count of prompts that are mostly ALL CAPS
-- **vaguePromptCount**: Count of very short/vague prompts (<30 chars)
-- **undoRequests**: How many times they asked to undo/revert/go back
+### 4. Roast Indicators (the good stuff)
+- **capsLockPrompts**: Count of prompts mostly in ALL CAPS (frustration detected!)
+- **vaguePromptCount**: Count of short/vague prompts (<30 chars) - classic lazy behavior
+- **undoRequests**: How many undo/revert/go back requests (indecisive much?)
 
 ## Output Format
 Write JSON to {output_file} with this structure (use Write tool):
 
-{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "averagePromptLength": 150, "promptingEvolution": "..."}}, "topWords": [{{"word": "...", "count": 0}}], "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}, "contrasts": {{"capsLockPrompts": 0, "vaguePromptCount": 0, "undoRequests": 0}}}}
+{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "averagePromptLength": 150, "promptingEvolution": "..."}}, "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}, "contrasts": {{"capsLockPrompts": 0, "vaguePromptCount": 0, "undoRequests": 0}}}}
 
 CONSTRAINTS:
 - Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
 - Do NOT create scripts or spawn subagents. Just read the files directly.
 - Keep it simple: read prompts → analyze → write JSON output.
+- NOTE: topWords is pre-computed by Python - do NOT include it in your output.
+- We're building a roast profile. Find their weaknesses!
 
 IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
 
-# Batch C: Persona, traits, style, tone, fun facts (uses stats)
-PROMPT_BATCH_C = """Determine the user's persona and characteristics from their stats and prompts.
+# Batch C: Persona, traits, style, tone, fun facts - ROAST EVERYONE
+PROMPT_BATCH_C = """Your job is to ROAST this user based on their coding patterns. Every persona is a roast. Find their most mockable trait.
 
 ## Numeric Stats
 {stats_json}
@@ -557,31 +949,29 @@ PROMPT_BATCH_C = """Determine the user's persona and characteristics from their 
 {prompts_instruction}
 
 ## Your Task
-Analyze stats and prompts to determine:
+Analyze stats and prompts. Pick the persona that roasts them HARDEST. There are NO compliments here.
 
 ### 1. Persona
-Choose ONE persona. MOST USERS SHOULD GET A ROAST (~80%). Only give legendary personas to truly exceptional users.
+Choose ONE persona. ALL personas roast the user. Find their weakness and exploit it for humor.
 
-**ROASTS (default - pick one of these for most users):**
-
-*Vibe Coders / Lazy Prompters:*
+**Vibe Coders / Lazy Prompters:**
 - `vibe-coder`: Vague prompts like "fix", "just make it work", expects AI to figure it out
 - `one-word-wonder`: Extremely short prompts, no context, "fix" "help" "why"
 - `yolo-delegator`: Accepts everything without reviewing, lets AI do all the thinking
 - `plan-skipper`: Never reads plans, just says yes to everything
 - `magic-words-believer`: Thinks "correctly" and "please make sure" are magic incantations
 
-*Debug Obsessed:*
+**Debug Obsessed:**
 - `debug-addict`: Constantly debugging, "fix" is their most used word
 - `bug-whisperer`: Attracts bugs like a magnet, constant errors
 - `infinite-looper`: Fix one bug, create two more, endless cycles
 
-*Essay Writers:*
+**Essay Writers:**
 - `essay-writer`: Prompts are 400+ chars, could write the code themselves
 - `context-novelist`: Prompts are 800+ chars, provides entire life story as context
 - `over-explainer`: Spends more time explaining than it would take to just code it
 
-*Behavioral:*
+**Behavioral:**
 - `3am-demon`: Codes late at night (lateNightSessions > 15 or >20% night usage)
 - `squirrel-brain`: Interrupts constantly, abandons sessions, can't focus
 - `caps-lock-commander`: TYPES IN ALL CAPS, clearly frustrated
@@ -589,39 +979,42 @@ Choose ONE persona. MOST USERS SHOULD GET A ROAST (~80%). Only give legendary pe
 - `undo-enthusiast`: "Actually wait go back", constant mind-changing
 - `copy-paste-warrior`: Pastes code without understanding it
 
-*Tool/Model:*
+**Tool/Model:**
 - `bash-berserker`: Over 50% Bash usage, lives in terminal
 - `opus-maximalist`: Uses Opus for everything, even trivial tasks
 - `context-amnesiac`: Very low cache rate, paying full price repeatedly
 
-*Domain Struggles:*
+**Domain Struggles:**
 - `css-casualty`: Struggles with CSS, centering divs, flexbox
 - `regex-refugee`: Regex questions that never work
 - `git-disaster`: Git history is a crime scene
 
-*Other Roasts:*
+**Other Roasts:**
 - `refactor-addict`: Can't stop refactoring working code
 - `yolo-deployer`: Ships without tests, straight to production
 - `deadline-demon`: Only productive under deadline pressure
 - `code-roulette`: Tries random things until something works (fallback roast)
 
-**LEGENDARY (only for truly exceptional stats - ~20% of users):**
-- `token-titan`: Over 2M total tokens (very high bar)
-- `tool-master`: Uses 8+ different tools extensively (2000+ total calls)
-- `mcp-pioneer`: Actually uses custom MCP tools significantly
-- `prompt-surgeon`: High cache rate (>60%) AND efficient prompt length (50-200 chars) AND 200k+ tokens
+**High-Usage Roasts (for heavy users - still roasts!):**
+- `token-burner`: Over 2M total tokens - "Anthropic's favorite customer"
+- `tool-hoarder`: Uses 8+ different tools - "Jack of all tools, master of none"
+- `over-engineer`: Uses custom MCP tools - "Why use 1 tool when you can build 12?"
+- `tryhard`: High cache rate AND efficient prompts - "Optimized prompts but not life choices"
 
 ### 2. Traits
-3-5 keyword traits. Include traits like: "accepting" (accepts plans without reading), "delegating" (expects AI to figure things out), "repetitive" (same issues), "copy-paster", etc.
+3-5 keyword traits. Roasty ones like: "accepting" (accepts plans without reading), "delegating" (lazy), "repetitive" (same bugs), "copy-paster", "chaotic", "indecisive", etc.
 
 ### 3. Prompting Style
-One roasty sentence describing their prompting style
+One savage sentence describing their prompting style
 
 ### 4. Communication Tone
-One roasty sentence describing their communication tone
+One savage sentence describing their communication tone
 
 ### 5. Fun Facts
-3-5 specific, number-backed roasts (e.g., "You said 'fix' 847 times. Maybe try writing working code?")
+3-5 specific, number-backed ROASTS. Be merciless but playful:
+- "You said 'fix' 847 times. Have you considered writing code that works?"
+- "Your 3AM sessions: when bad decisions are made."
+- "Token bill: enough to fund a small country."
 
 ## Output Format
 Write JSON to {output_file} with this structure (use Write tool):
@@ -632,7 +1025,7 @@ CONSTRAINTS:
 - Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
 - Do NOT create scripts or spawn subagents. Just read the files directly.
 - Keep it simple: read prompts → analyze → write JSON output.
-- LEAN INTO THE ROASTS. Most people should be roasted. Be playful but savage.
+- ROAST EVERYONE. Be playfully savage. No compliments. Find the dirt.
 
 IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
 
@@ -788,11 +1181,9 @@ def merge_batch_results(results: list[dict | None]) -> dict:
         if "contrasts" in result:
             merged["insights"]["contrasts"] = result["contrasts"]
 
-        # Batch B keys (go into insights)
+        # Batch B keys (go into insights) - note: topWords computed by Python, not Claude
         if "communicationStyle" in result:
             merged["insights"]["communicationStyle"] = result["communicationStyle"]
-        if "topWords" in result:
-            merged["insights"]["topWords"] = result["topWords"]
         if "topPhrases" in result:
             merged["insights"]["topPhrases"] = result["topPhrases"]
         if "dominantTopics" in result:
@@ -808,7 +1199,11 @@ def merge_batch_results(results: list[dict | None]) -> dict:
     return merged
 
 
-def call_claude_for_enrichment(bundle: AnonymousBundle, projects_dir: Path) -> dict | None:
+def call_claude_for_enrichment(
+    bundle: AnonymousBundle,
+    projects_dir: Path,
+    top_words: list[tuple[str, int]] | None = None,
+) -> dict | None:
     """Call Claude CLI to analyze stats in parallel batches."""
     if not shutil.which("claude"):
         error("Claude CLI not found in PATH")
@@ -825,6 +1220,12 @@ Use Read tool to read them. Use Grep to search for patterns. Explore thoroughly.
 
     stats_json = bundle.model_dump_json(by_alias=True, indent=2)
 
+    # Format top words for Claude context
+    if top_words:
+        top_words_json = json.dumps([{"word": w, "count": c} for w, c in top_words], indent=2)
+    else:
+        top_words_json = "[]"
+
     # Define the three batches
     batches = [
         (
@@ -839,6 +1240,7 @@ Use Read tool to read them. Use Grep to search for patterns. Explore thoroughly.
             "Style",
             PROMPT_BATCH_B.format(
                 prompts_instruction=prompts_instruction,
+                top_words_json=top_words_json,
                 output_file=Path("/tmp/vibes-style.json"),
             ),
             Path("/tmp/vibes-style.json"),
@@ -945,6 +1347,11 @@ def main() -> None:
     quirks = calculate_quirks(base_stats, PROJECTS_DIR)
     progress("Quirks calculated", done=True)
 
+    # Compute top words from prompts (deterministic)
+    progress("Analyzing word frequencies...")
+    top_words = compute_top_words(PROJECTS_DIR, top_n=20)
+    progress(f"Found {len(top_words)} top words", done=True)
+
     # Build bundle with numeric stats only
     progress("Building bundle...")
     bundle = build_bundle(base_stats, tool_usage, quirks)
@@ -956,50 +1363,67 @@ def main() -> None:
         return
 
     # Call Claude for enrichment (required) - has its own progress message
-    enrichment = call_claude_for_enrichment(bundle, PROJECTS_DIR)
+    enrichment = call_claude_for_enrichment(bundle, PROJECTS_DIR, top_words=top_words)
 
     if not enrichment:
         sys.exit("Error: Claude CLI failed. Use --stats-only for raw stats.")
 
-    # Apply enrichment to bundle
-    bundle.personaId = enrichment.get("persona", "")
-    bundle.traits = enrichment.get("traits", [])
-    bundle.promptingStyle = enrichment.get("promptingStyle", "")
-    bundle.communicationTone = enrichment.get("communicationTone", "")
-    bundle.funFacts = enrichment.get("funFacts", [])
+    # Apply enrichment to bundle (use 'or' to handle both missing keys and null values)
+    bundle.personaId = enrichment.get("persona") or ""
+    bundle.traits = enrichment.get("traits") or []
+    bundle.promptingStyle = enrichment.get("promptingStyle") or ""
+    bundle.communicationTone = enrichment.get("communicationTone") or ""
+    bundle.funFacts = enrichment.get("funFacts") or []
 
-    # Apply insights if present
+    # Build insights (Python-computed topWords always included, Claude fields if available)
+    from bundle_types import (
+        CommunicationStyle,
+        Contrasts,
+        Insights,
+        MemorablePrompts,
+        Obsessions,
+        PhraseCount,
+        PolitenessLevel,
+        PromptWithContext,
+        WordCount,
+    )
+
+    # Python-computed top words (accurate counts, always included)
+    top_words_typed = [WordCount(word=w, count=c) for w, c in top_words] if top_words else None
+
+    # Initialize Claude-provided fields
+    memorable = None
+    comm_style = None
+    obsessions = None
+    contrasts = None
+    top_phrases_typed = None
+    dominant_topics = None
+
+    # Apply Claude insights if present
     if "insights" in enrichment:
-        from bundle_types import (
-            CommunicationStyle,
-            Contrasts,
-            Insights,
-            MemorablePrompts,
-            Obsessions,
-            PhraseCount,
-            PolitenessLevel,
-            PromptWithContext,
-            WordCount,
-        )
-
         raw_insights = enrichment["insights"]
 
         # Build MemorablePrompts
-        memorable = None
         if "memorablePrompts" in raw_insights:
             mp = raw_insights["memorablePrompts"]
+
+            def valid_prompt(key: str) -> PromptWithContext | None:
+                """Only create PromptWithContext if the prompt field is valid."""
+                if mp.get(key) and mp[key].get("prompt"):
+                    return PromptWithContext(**mp[key])
+                return None
+
             memorable = MemorablePrompts(
-                funniest=PromptWithContext(**mp["funniest"]) if mp.get("funniest") else None,
-                mostFrustrated=PromptWithContext(**mp["mostFrustrated"]) if mp.get("mostFrustrated") else None,
-                mostAmbitious=PromptWithContext(**mp["mostAmbitious"]) if mp.get("mostAmbitious") else None,
-                biggestFacepalm=PromptWithContext(**mp["biggestFacepalm"]) if mp.get("biggestFacepalm") else None,
-                mostGrateful=PromptWithContext(**mp["mostGrateful"]) if mp.get("mostGrateful") else None,
-                weirdest=PromptWithContext(**mp["weirdest"]) if mp.get("weirdest") else None,
-                lateNightRamble=PromptWithContext(**mp["lateNightRamble"]) if mp.get("lateNightRamble") else None,
+                funniest=valid_prompt("funniest"),
+                mostFrustrated=valid_prompt("mostFrustrated"),
+                mostAmbitious=valid_prompt("mostAmbitious"),
+                biggestFacepalm=valid_prompt("biggestFacepalm"),
+                mostGrateful=valid_prompt("mostGrateful"),
+                weirdest=valid_prompt("weirdest"),
+                lateNightRamble=valid_prompt("lateNightRamble"),
             )
 
         # Build CommunicationStyle
-        comm_style = None
         if "communicationStyle" in raw_insights:
             cs = raw_insights["communicationStyle"]
             politeness = None
@@ -1017,7 +1441,6 @@ def main() -> None:
             )
 
         # Build Obsessions
-        obsessions = None
         if "obsessions" in raw_insights:
             obs = raw_insights["obsessions"]
             obsessions = Obsessions(
@@ -1027,7 +1450,6 @@ def main() -> None:
             )
 
         # Build Contrasts
-        contrasts = None
         if "contrasts" in raw_insights:
             con = raw_insights["contrasts"]
             contrasts = Contrasts(
@@ -1037,24 +1459,25 @@ def main() -> None:
                 mostDemanding=con.get("mostDemanding"),
             )
 
-        # Build word/phrase counts
-        top_words = None
-        if "topWords" in raw_insights:
-            top_words = [WordCount(word=w["word"], count=w["count"]) for w in raw_insights["topWords"]]
-
-        top_phrases = None
+        # Build phrase counts from Claude (Claude still analyzes phrases)
         if "topPhrases" in raw_insights:
-            top_phrases = [PhraseCount(phrase=p["phrase"], count=p["count"]) for p in raw_insights["topPhrases"]]
+            top_phrases_typed = [
+                PhraseCount(phrase=p["phrase"], count=p["count"])
+                for p in raw_insights["topPhrases"]
+                if p.get("phrase") and p.get("count") is not None
+            ]
 
-        bundle.insights = Insights(
-            memorablePrompts=memorable,
-            communicationStyle=comm_style,
-            obsessions=obsessions,
-            contrasts=contrasts,
-            topWords=top_words,
-            topPhrases=top_phrases,
-            dominantTopics=raw_insights.get("dominantTopics"),
-        )
+        dominant_topics = raw_insights.get("dominantTopics")
+
+    bundle.insights = Insights(
+        memorablePrompts=memorable,
+        communicationStyle=comm_style,
+        obsessions=obsessions,
+        contrasts=contrasts,
+        topWords=top_words_typed,
+        topPhrases=top_phrases_typed,
+        dominantTopics=dominant_topics,
+    )
 
     # Upload to server for short URL
     progress("Uploading...")
