@@ -10,9 +10,28 @@ echo ""
 echo "=== VibeChecked ==="
 echo ""
 
-# Check for Python 3
-if ! command -v python3 &> /dev/null; then
-    echo "Error: Python 3 is required."
+# Find Python 3.10+
+PYTHON=""
+
+# First check if default python3 is 3.10+
+if command -v python3 &> /dev/null; then
+    if python3 -c 'import sys; exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+        PYTHON="python3"
+    fi
+fi
+
+# If python3 is too old, try versioned alternatives
+if [ -z "$PYTHON" ]; then
+    for cmd in python3.12 python3.11 python3.10; do
+        if command -v "$cmd" &> /dev/null; then
+            PYTHON="$cmd"
+            break
+        fi
+    done
+fi
+
+if [ -z "$PYTHON" ]; then
+    echo "Error: Python 3.10+ is required."
     echo "  Install with:"
     echo "    macOS:  brew install python3"
     echo "    Ubuntu: sudo apt install python3"
@@ -53,4 +72,4 @@ echo "[2/2] Generating your vibe check..."
 echo ""
 
 cd "$SCRIPT_DIR"
-python3 vibes.py
+$PYTHON vibes.py
