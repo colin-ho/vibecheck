@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://howsyourvibecoding.vercel.app/schema/bundle.schema.json",
+  "$id": "https://getyourvibechecked.vercel.app/schema/bundle.schema.json",
   "title": "AnonymousBundle",
   "description": "Anonymous bundle sent to server - no PII. Shared between Python (vibes.py) and TypeScript (types.ts).",
   "type": "object",

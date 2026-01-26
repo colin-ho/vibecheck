@@ -82,14 +82,14 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 
 	const handleShareTwitter = () => {
 		const text = `I'm a ${persona.name}! ${persona.tagline}\n\n${formatNumber(totalTokens)} tokens \u2022 ${stats.totalSessions} sessions \u2022 ${stats.projectCount} projects\n\nGet your VibeChecked:`
-		const url = `https://howsyourvibecoding.vercel.app/?d=${encodeDataForUrl(data)}`
+		const url = `https://getyourvibechecked.vercel.app/?d=${encodeDataForUrl(data)}`
 		const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
 		window.open(twitterUrl, '_blank')
 	}
 
 	const handleCopyLink = async () => {
 		try {
-			const url = `https://howsyourvibecoding.vercel.app/?d=${encodeDataForUrl(data)}`
+			const url = `https://getyourvibechecked.vercel.app/?d=${encodeDataForUrl(data)}`
 			await navigator.clipboard.writeText(url)
 			setCopySuccess(true)
 			setTimeout(() => setCopySuccess(false), 2000)
@@ -283,7 +283,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 				transition={{ delay: 0.8 }}
 			>
 				<p>Made with Claude</p>
-				<p className="mt-0.5">howsyourvibecoding.vercel.app</p>
+				<p className="mt-0.5">getyourvibechecked.vercel.app</p>
 			</motion.div>
 
 			{/* Hidden share card for export - using opacity instead of off-screen for better rendering */}

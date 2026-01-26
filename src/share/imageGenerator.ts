@@ -97,7 +97,7 @@ export async function copyImageToClipboard(element: HTMLElement): Promise<boolea
  */
 export function generateShareUrl(
 	data: UsageData,
-	baseUrl = 'https://howsyourvibecoding.vercel.app'
+	baseUrl = 'https://getyourvibechecked.vercel.app'
 ): string {
 	// Import the encoder from decoder module
 	// This is a simplified version - the actual encoding happens in decoder.ts
@@ -126,7 +126,7 @@ ${formatNumber(totalTokens)} tokens • ${data.stats.totalSessions} sessions •
 
 Get your VibeChecked:`
 
-	const url = 'https://howsyourvibecoding.vercel.app'
+	const url = 'https://getyourvibechecked.vercel.app'
 
 	return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
 }

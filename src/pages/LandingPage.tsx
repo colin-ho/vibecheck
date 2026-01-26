@@ -18,7 +18,7 @@ export function LandingPage() {
 	// Create motion template for reactive gradient
 	const outerGlowGradient = useMotionTemplate`radial-gradient(circle at ${x}% ${y}%, rgba(221, 80, 19, 0.7) 0%, rgba(221, 80, 19, 0.3) 50%, transparent 100%)`
 
-	const installCommand = 'curl -fsSL https://howsyourvibecoding.vercel.app/install.sh | bash'
+	const installCommand = 'curl -fsSL https://getyourvibechecked.vercel.app/install.sh | bash'
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText(installCommand)

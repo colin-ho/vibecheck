@@ -88,7 +88,7 @@ export const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ data }, r
 
 			{/* Footer */}
 			<div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
-				<div className="text-white/70 text-xs">howsyourvibecoding.vercel.app</div>
+				<div className="text-white/70 text-xs">getyourvibechecked.vercel.app</div>
 				<div className="flex items-center gap-2 text-white/60 text-sm">
 					<span>Made with</span>
 					<span className="text-brand-red">♥</span>

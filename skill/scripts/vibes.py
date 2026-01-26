@@ -411,7 +411,7 @@ WORD_PATTERN = re.compile(r"[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9]|[a-zA-Z]")
 
 
 # Constants
-BASE_URL = os.environ.get("WRAPPED_URL", "https://howsyourvibecoding.vercel.app")
+BASE_URL = os.environ.get("WRAPPED_URL", "https://getyourvibechecked.vercel.app")
 CLAUDE_DIR = Path(os.environ.get("CLAUDE_DIR", Path.home() / ".claude"))
 STATS_FILE = CLAUDE_DIR / "stats-cache.json"
 PROJECTS_DIR = CLAUDE_DIR / "projects"
