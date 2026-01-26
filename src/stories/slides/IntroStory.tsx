@@ -173,7 +173,7 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 				animate={isActive ? { opacity: 1 } : {}}
 				transition={{ delay: 3.6 }}
 			>
-				Tap anywhere to continue
+				Welcome to your vibe check
 			</motion.div>
 		</SlideLayout>
 	)
