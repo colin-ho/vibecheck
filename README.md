@@ -30,16 +30,12 @@ vibechecked/
 │   ├── submit.ts                 # Receive bundles, compute percentiles
 │   └── stats.ts                  # Global aggregate stats
 │
-├── plugin/                       # Claude Code plugin
-│   ├── .claude-plugin/
-│   │   └── plugin.json           # Plugin metadata
-│   ├── commands/
-│   │   └── vibes.md              # /vibes command definition
+├── skill/                        # Stats extraction scripts
 │   ├── scripts/
-│   │   ├── extract-stats.sh      # Read stats-cache.json
-│   │   ├── extract-tools.sh      # Count tool usage from JSONL
-│   │   └── bundle.sh             # Combine into anonymous bundle
-│   ├── install.sh                # Installation script
+│   │   ├── vibes.py              # Main script: extract stats, call Claude, upload
+│   │   └── bundle_types.py       # Pydantic models (generated from schema)
+│   ├── tests/                    # Python tests
+│   ├── install.sh                # One-line installer
 │   └── README.md
 │
 ├── src/
@@ -123,27 +119,18 @@ Encode your data and pass it as a URL parameter:
 http://localhost:5173/?d=<base64url-encoded-gzipped-json>
 ```
 
-## Plugin Installation
-
-### For Users
+## Usage
 
 ```bash
-# Install the plugin
-curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/plugin/install.sh | bash
-
-# Generate your journey
-/vibes
+curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
 ```
 
-### For Development
+This downloads and runs the script, which:
+1. Extracts your Claude Code usage stats locally
+2. Calls Claude to analyze and determine your persona
+3. Uploads anonymous stats and returns a personalized URL
 
-```bash
-# Copy plugin to Claude plugins directory
-cp -r plugin ~/.claude/plugins/vibechecked
-
-# Make scripts executable
-chmod +x ~/.claude/plugins/vibechecked/scripts/*.sh
-```
+**Requirements:** Claude Code CLI, Python 3.8+, existing usage stats
 
 ## Story Screens
 

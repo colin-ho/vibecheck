@@ -1,0 +1,360 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://howsyourvibecoding.vercel.app/schema/bundle.schema.json",
+  "title": "AnonymousBundle",
+  "description": "Anonymous bundle sent to server - no PII. Shared between Python (vibes.py) and TypeScript (types.ts).",
+  "type": "object",
+  "required": [
+    "stats",
+    "personaId",
+    "traits",
+    "promptingStyle",
+    "communicationTone",
+    "funFacts",
+    "generatedAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "stats": {
+      "$ref": "#/$defs/Stats"
+    },
+    "quirks": {
+      "$ref": "#/$defs/Quirks"
+    },
+    "insights": {
+      "$ref": "#/$defs/Insights"
+    },
+    "personaId": {
+      "type": "string",
+      "description": "Persona identifier"
+    },
+    "traits": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of trait keywords"
+    },
+    "promptingStyle": {
+      "type": "string",
+      "description": "Description of prompting style"
+    },
+    "communicationTone": {
+      "type": "string",
+      "description": "Description of communication tone"
+    },
+    "funFacts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of fun facts about usage"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of bundle generation"
+    }
+  },
+  "$defs": {
+    "Stats": {
+      "type": "object",
+      "description": "Core usage statistics",
+      "required": [
+        "totalSessions",
+        "totalMessages",
+        "totalTokens",
+        "totalToolCalls",
+        "toolUsage",
+        "modelUsage",
+        "hourCounts",
+        "peakHour",
+        "longestSessionMinutes",
+        "projectCount",
+        "daysActive"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "totalSessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalMessages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "totalTokens": {
+          "$ref": "#/$defs/TokenCounts"
+        },
+        "totalToolCalls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "toolUsage": {
+          "type": "object",
+          "additionalProperties": { "type": "integer" },
+          "description": "Map of tool name to usage count"
+        },
+        "modelUsage": {
+          "type": "object",
+          "additionalProperties": { "type": "integer" },
+          "description": "Map of model name to token count"
+        },
+        "hourCounts": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "minItems": 24,
+          "maxItems": 24,
+          "description": "Session counts by hour (0-23)"
+        },
+        "peakHour": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 23
+        },
+        "longestSessionMinutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "projectCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "daysActive": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "activeDates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DailyActivity" },
+          "description": "Daily activity for contribution grid"
+        }
+      }
+    },
+    "TokenCounts": {
+      "type": "object",
+      "required": ["input", "output", "cached"],
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cached": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "DailyActivity": {
+      "type": "object",
+      "required": ["date", "sessions"],
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Date in YYYY-MM-DD format"
+        },
+        "sessions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "Quirks": {
+      "type": "object",
+      "description": "Behavioral quirks (time-based, computed from session data)",
+      "required": [
+        "interruptCount",
+        "abandonedSessions",
+        "lateNightSessions",
+        "earlyMorningSessions",
+        "weekendPercentage",
+        "shortestSessionSeconds",
+        "longestStreakDays"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "interruptCount": { "type": "integer", "minimum": 0 },
+        "abandonedSessions": { "type": "integer", "minimum": 0 },
+        "lateNightSessions": { "type": "integer", "minimum": 0 },
+        "earlyMorningSessions": { "type": "integer", "minimum": 0 },
+        "weekendPercentage": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "shortestSessionSeconds": { "type": "integer", "minimum": 0 },
+        "longestStreakDays": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Insights": {
+      "type": "object",
+      "description": "Claude-generated insights from prompt analysis",
+      "additionalProperties": false,
+      "properties": {
+        "memorablePrompts": {
+          "$ref": "#/$defs/MemorablePrompts"
+        },
+        "communicationStyle": {
+          "$ref": "#/$defs/CommunicationStyle"
+        },
+        "obsessions": {
+          "$ref": "#/$defs/Obsessions"
+        },
+        "contrasts": {
+          "$ref": "#/$defs/Contrasts"
+        },
+        "topWords": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/WordCount" },
+          "description": "Most meaningful words used"
+        },
+        "topPhrases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PhraseCount" },
+          "description": "Most common meaningful phrases"
+        },
+        "dominantTopics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Primary areas of focus (debugging, frontend, backend, devops, ai, testing, refactoring)"
+        }
+      }
+    },
+    "MemorablePrompts": {
+      "type": "object",
+      "description": "Notable prompts found during analysis",
+      "additionalProperties": false,
+      "properties": {
+        "funniest": {
+          "$ref": "#/$defs/PromptWithContext"
+        },
+        "mostFrustrated": {
+          "$ref": "#/$defs/PromptWithContext"
+        },
+        "mostAmbitious": {
+          "$ref": "#/$defs/PromptWithContext"
+        },
+        "biggestFacepalm": {
+          "$ref": "#/$defs/PromptWithContext"
+        },
+        "mostGrateful": {
+          "$ref": "#/$defs/PromptWithContext"
+        },
+        "weirdest": {
+          "$ref": "#/$defs/PromptWithContext"
+        },
+        "lateNightRamble": {
+          "$ref": "#/$defs/PromptWithContext"
+        }
+      }
+    },
+    "PromptWithContext": {
+      "type": "object",
+      "required": ["prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "The actual prompt text (truncated if needed)"
+        },
+        "context": {
+          "type": "string",
+          "description": "Brief context about why this prompt was selected"
+        }
+      }
+    },
+    "CommunicationStyle": {
+      "type": "object",
+      "description": "Analysis of how the user communicates",
+      "additionalProperties": false,
+      "properties": {
+        "catchphrases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Unique phrases they repeat"
+        },
+        "signatureOpeners": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "How they typically start prompts"
+        },
+        "verbalTics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Filler words, hedging patterns"
+        },
+        "politenessLevel": {
+          "type": "string",
+          "enum": ["diplomatic", "direct", "demanding", "apologetic"],
+          "description": "Overall politeness characterization"
+        },
+        "promptingEvolution": {
+          "type": "string",
+          "description": "How their style changed over time"
+        }
+      }
+    },
+    "Obsessions": {
+      "type": "object",
+      "description": "What the user focused on",
+      "additionalProperties": false,
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Technical areas they focus on"
+        },
+        "frequentlyRevisited": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Problems they kept coming back to"
+        },
+        "actualProjects": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "What they were actually building (inferred)"
+        }
+      }
+    },
+    "Contrasts": {
+      "type": "object",
+      "description": "Interesting contrasts in prompting style",
+      "additionalProperties": false,
+      "properties": {
+        "shortestEffective": {
+          "type": "string",
+          "description": "Shortest prompt that still got results"
+        },
+        "longestRamble": {
+          "type": "string",
+          "description": "When they really went off (truncated)"
+        },
+        "politestMoment": {
+          "type": "string",
+          "description": "Most courteous request"
+        },
+        "mostDemanding": {
+          "type": "string",
+          "description": "Most direct/demanding request"
+        }
+      }
+    },
+    "WordCount": {
+      "type": "object",
+      "required": ["word", "count"],
+      "additionalProperties": false,
+      "properties": {
+        "word": { "type": "string" },
+        "count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "PhraseCount": {
+      "type": "object",
+      "required": ["phrase", "count"],
+      "additionalProperties": false,
+      "properties": {
+        "phrase": { "type": "string" },
+        "count": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

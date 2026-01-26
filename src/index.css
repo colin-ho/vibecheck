@@ -1,41 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+html,
+body,
+#root {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: linear-gradient(135deg, #FFF8F0 0%, #FFCBA4 50%, #FFB08A 100%);
-  color: #3b110c;
+	font-family: 'Inter', system-ui, sans-serif;
+	background: linear-gradient(135deg, #fff8f0 0%, #ffcba4 50%, #ffb08a 100%);
+	color: #3b110c;
 }
 
 @utility glow-lavender {
-  text-shadow: 0 0 10px rgba(189, 183, 252, 0.6),
-               0 0 20px rgba(189, 183, 252, 0.4),
-               0 0 40px rgba(189, 183, 252, 0.2);
+	text-shadow:
+		0 0 10px rgba(189, 183, 252, 0.6),
+		0 0 20px rgba(189, 183, 252, 0.4),
+		0 0 40px rgba(189, 183, 252, 0.2);
 }
 
 @utility glow-sunset {
-  text-shadow: 0 0 10px rgba(221, 80, 19, 0.6),
-               0 0 20px rgba(221, 80, 19, 0.4),
-               0 0 40px rgba(221, 80, 19, 0.2);
+	text-shadow:
+		0 0 10px rgba(221, 80, 19, 0.6),
+		0 0 20px rgba(221, 80, 19, 0.4),
+		0 0 40px rgba(221, 80, 19, 0.2);
 }
 
 @utility glow-red {
-  text-shadow: 0 0 10px rgba(218, 28, 28, 0.6),
-               0 0 20px rgba(218, 28, 28, 0.4),
-               0 0 40px rgba(218, 28, 28, 0.2);
+	text-shadow:
+		0 0 10px rgba(218, 28, 28, 0.6),
+		0 0 20px rgba(218, 28, 28, 0.4),
+		0 0 40px rgba(218, 28, 28, 0.2);
 }
 
 @utility drop-glow-lavender {
-  filter: drop-shadow(0 0 8px rgba(189, 183, 252, 0.5));
+	filter: drop-shadow(0 0 8px rgba(189, 183, 252, 0.5));
 }
 
 @utility drop-glow-sunset {
-  filter: drop-shadow(0 0 8px rgba(221, 80, 19, 0.5));
+	filter: drop-shadow(0 0 8px rgba(221, 80, 19, 0.5));
 }

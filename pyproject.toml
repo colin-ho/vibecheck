@@ -1,0 +1,39 @@
+[project]
+name = "vibechecked-skill"
+version = "1.0.0"
+description = "VibeChecked skill for Claude Code"
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = [
+    "datamodel-code-generator>=0.25.0",
+    "pytest>=7.0.0",
+]
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+src = ["skill"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["skill/tests"]
+python_files = ["test_*.py"]
+addopts = "-v"

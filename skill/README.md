@@ -1,56 +1,23 @@
-# VibeChecked Skill
+# VibeChecked
 
 An interactive journey through your Claude Code usage statistics.
 
-## Installation
-
-### Quick Install (Recommended)
+## Usage
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/colin-ho/vibecheck/main/skill/install.sh | bash
 ```
 
-This single command:
-1. Installs the VibeChecked skill to `~/.claude/skills/vibes/`
-2. Automatically analyzes your Claude Code usage
-3. Displays your personalized URL to visit
+This command:
+1. Downloads the analysis script
+2. Analyzes your Claude Code usage locally
+3. Calls Claude to determine your persona
+4. Outputs a personalized URL to visit
 
-**Requirements:** Claude Code CLI must be installed and you need existing usage stats.
-
-### Manual Install
-
-1. Create the skill directory:
-   ```bash
-   mkdir -p ~/.claude/skills/vibes
-   ```
-
-2. Clone this repository and copy the skill files:
-   ```bash
-   git clone https://github.com/colin-ho/vibecheck /tmp/vibecheck
-   cp /tmp/vibecheck/skill/SKILL.md ~/.claude/skills/vibes/
-   cp -r /tmp/vibecheck/skill/scripts ~/.claude/skills/vibes/
-   rm -rf /tmp/vibecheck
-   ```
-
-3. Make scripts executable:
-   ```bash
-   chmod +x ~/.claude/skills/vibes/scripts/*.py
-   ```
-
-4. Run `/vibes` in Claude Code to generate your vibe check.
-
-## Regenerating Your Vibe Check
-
-To regenerate your stats later (after more Claude Code usage), run the `/vibes` command in Claude Code:
-
-```
-/vibes
-```
-
-Claude will:
-1. Analyze your usage statistics
-2. Determine your developer persona
-3. Display a URL with your personalized results
+**Requirements:**
+- Claude Code CLI installed and in PATH
+- Python 3.8+
+- Existing Claude Code usage stats (`~/.claude/stats-cache.json`)
 
 ## What You'll See
 
@@ -100,13 +67,9 @@ You might be assigned one of these developer personas:
 ## Requirements
 
 - Claude Code CLI
-- Python 3.8+ (**required**)
+- Python 3.8+
   - macOS: `brew install python3`
   - Ubuntu/Debian: `sudo apt install python3`
-
-## Contributing
-
-Contributions welcome! Please read our contributing guidelines first.
 
 ## License
 

@@ -1,0 +1,60 @@
+repos:
+  # Schema - Verify generated types are in sync
+  - repo: local
+    hooks:
+      - id: check-generated-types
+        name: check generated types
+        entry: node schema/check-generated.js
+        language: system
+        pass_filenames: false
+        files: ^(schema/bundle\.schema\.json|src/data/bundle\.generated\.ts|skill/scripts/bundle_types\.py)$
+
+  # Python - Ruff linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^skill/
+      - id: ruff-format
+        files: ^skill/
+
+  # Python - Tests via uv
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        files: ^skill/
+        types: [python]
+
+  # Frontend - ESLint
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        entry: npx eslint --fix --max-warnings=100
+        language: system
+        files: ^src/.*\.(ts|tsx)$
+        types: [file]
+
+  # Frontend - TypeScript type check
+  - repo: local
+    hooks:
+      - id: typescript
+        name: typescript
+        entry: npx tsc --noEmit
+        language: system
+        pass_filenames: false
+        files: ^src/.*\.(ts|tsx)$
+        types: [file]
+
+  # Frontend - Prettier formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        files: ^src/.*\.(ts|tsx|css|json)$
+        exclude: ^(node_modules|dist)/
