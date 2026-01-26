@@ -6,12 +6,12 @@ import { PromptWithContext } from '../../data/bundle.generated'
 
 // Category labels for memorable prompts
 const promptLabels: Record<string, string> = {
-	mostAmbitious: 'Your Most Ambitious Ask',
-	biggestFacepalm: 'Biggest Facepalm Moment',
-	funniest: 'Your Funniest Request',
-	weirdest: 'Your Weirdest Ask',
+	mostAmbitious: 'Most Ambitious',
+	biggestFacepalm: 'Biggest Facepalm',
+	funniest: 'Funniest',
+	weirdest: 'Weirdest',
 	mostFrustrated: 'Peak Frustration',
-	mostGrateful: 'Most Grateful Moment',
+	mostGrateful: 'Most Grateful',
 	lateNightRamble: 'Late Night Ramble',
 }
 
@@ -75,23 +75,14 @@ export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
 			}
 		}
 
-		return candidates
+		// Limit to first 5 prompts
+		return candidates.slice(0, 5)
 	}, [insights])
-
-	// Use the first (highest priority) available prompt
-	const selectedPrompt = availablePrompts[0]
-	const memorablePrompt = selectedPrompt.prompt
-	const promptContext = selectedPrompt.context
-	const promptLabel = selectedPrompt.label
-
-	// Truncate if too long
-	const displayPrompt =
-		memorablePrompt.length > 180 ? memorablePrompt.slice(0, 180) + '...' : memorablePrompt
 
 	// Pre-generate stable random positions for floating particles
 	const floatingParticles = useMemo(
 		() =>
-			[...Array(8)].map(() => ({
+			[...Array(6)].map(() => ({
 				left: 20 + Math.random() * 60,
 				top: 20 + Math.random() * 60,
 				duration: 5 + Math.random() * 2,
@@ -100,105 +91,88 @@ export function OpeningMemoryStory({ data, isActive }: StorySlideProps) {
 		[]
 	)
 
-	// Use context from insights or generate based on characteristics
-	const getRoast = () => {
-		if (promptContext && promptContext !== 'Your journey began') {
-			return promptContext
-		}
-		const lowerPrompt = memorablePrompt.toLowerCase()
-		if (
-			lowerPrompt.includes('fix') ||
-			lowerPrompt.includes('bug') ||
-			lowerPrompt.includes('error')
-		) {
-			return 'Debugging mode activated. Some things never change.'
-		}
-		if (lowerPrompt.includes('help')) {
-			return 'A humble request. Claude was happy to assist.'
-		}
-		if (memorablePrompt === memorablePrompt.toUpperCase() && memorablePrompt.length > 10) {
-			return 'ALL CAPS energy. We can hear you.'
-		}
-		if (lowerPrompt.includes('please')) {
-			return 'Polite! Claude appreciates the manners.'
-		}
-		return 'And so the journey continued...'
+	// Truncate prompt if too long
+	const truncatePrompt = (prompt: string, maxLen: number = 100) => {
+		return prompt.length > maxLen ? prompt.slice(0, maxLen) + '...' : prompt
 	}
 
 	return (
 		<SlideLayout className="relative">
-			{/* Header with category badge */}
+			{/* Header */}
 			<motion.div
-				className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70 mb-10"
+				className="text-center mb-6"
 				initial={{ opacity: 0, y: -20 }}
 				animate={isActive ? { opacity: 1, y: 0 } : {}}
 				transition={{ duration: 0.6 }}
 			>
-				{promptLabel.toUpperCase()}
+				<div className="text-[0.65rem] font-semibold tracking-[0.2em] uppercase text-dark/70">
+					YOUR MEMORABLE MOMENTS
+				</div>
 			</motion.div>
 
-			{/* Memory card - warm refined style */}
+			{/* Stacked prompts list */}
 			<motion.div
-				className="w-full max-w-md"
+				className="w-full max-w-md space-y-3"
 				initial={{ opacity: 0, scale: 0.95 }}
 				animate={isActive ? { opacity: 1, scale: 1 } : {}}
-				transition={{ delay: 0.3, duration: 0.8 }}
+				transition={{ delay: 0.2, duration: 0.6 }}
 			>
-				<div className="bg-cream/90 border border-dark/10 rounded-xl overflow-hidden">
-					{/* Terminal header - warm minimal */}
-					<div className="flex items-center gap-2 px-4 py-2.5 bg-sunset-afternoon border-b border-dark/10">
+				{availablePrompts.map((item, index) => {
+					// Alternate colors for variety - using hex values for reliability
+					const colorSchemes = [
+						{ border: '#bdb7fc', bg: 'rgba(189,183,252,0.2)' }, // lavender
+						{ border: '#dd5013', bg: 'rgba(221,80,19,0.15)' }, // sunset
+						{ border: '#da1c1c', bg: 'rgba(218,28,28,0.15)' }, // red
+						{ border: '#bdb7fc', bg: 'rgba(189,183,252,0.2)' }, // lavender
+						{ border: '#dd5013', bg: 'rgba(221,80,19,0.15)' }, // sunset
+					]
+					const scheme = colorSchemes[index % colorSchemes.length]
+
+					return (
 						<motion.div
-							className="w-2 h-2 rounded-full bg-lavender"
-							animate={{
-								opacity: [0.5, 1, 0.5],
+							key={item.key}
+							className="rounded-xl overflow-hidden shadow-sm"
+							style={{
+								background:
+									'linear-gradient(to right, rgba(255,248,240,0.95), rgba(255,248,240,0.8))',
+								borderLeft: `4px solid ${scheme.border}`,
 							}}
-							transition={{ duration: 2.5, repeat: Infinity }}
-						/>
-						<span className="text-dark/70 text-xs font-mono">your-journey</span>
-					</div>
-
-					{/* Content */}
-					<div className="p-5">
-						{/* "You wrote:" label */}
-						<motion.div
-							className="text-dark/80 text-xs mb-2"
-							initial={{ opacity: 0 }}
-							animate={isActive ? { opacity: 1 } : {}}
-							transition={{ delay: 0.7 }}
+							initial={{ opacity: 0, y: 20 }}
+							animate={isActive ? { opacity: 1, y: 0 } : {}}
+							transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
 						>
-							You wrote:
-						</motion.div>
+							{/* Category label header */}
+							<div
+								className="flex items-center gap-2 px-4 py-2"
+								style={{ backgroundColor: scheme.bg }}
+							>
+								<motion.div
+									className="w-1.5 h-1.5 rounded-full"
+									style={{ backgroundColor: scheme.border }}
+									animate={{
+										opacity: [0.5, 1, 0.5],
+									}}
+									transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.3 }}
+								/>
+								<span className="text-xs font-semibold" style={{ color: scheme.border }}>
+									{item.label}
+								</span>
+							</div>
 
-						{/* The actual prompt with typing cursor */}
-						<motion.div
-							className="relative"
-							initial={{ opacity: 0, x: -10 }}
-							animate={isActive ? { opacity: 1, x: 0 } : {}}
-							transition={{ delay: 0.9, duration: 0.6 }}
-						>
-							<div className="border-l-2 border-lavender/60 pl-4 py-2">
-								<p className="text-dark/90 text-base font-mono leading-relaxed">
-									"{displayPrompt}"
-									<motion.span
-										className="inline-block w-2 h-4 bg-lavender/50 ml-1 align-middle"
-										animate={{ opacity: [1, 0, 1] }}
-										transition={{ duration: 1.2, repeat: Infinity }}
-									/>
-								</p>
+							{/* Prompt content */}
+							<div className="p-4">
+								<div className="pl-3" style={{ borderLeft: `2px solid ${scheme.border}80` }}>
+									<p className="text-dark/85 text-sm font-mono leading-relaxed">
+										"{truncatePrompt(item.prompt)}"
+									</p>
+								</div>
+								{item.context && (
+									<p className="text-sunset-accent text-xs italic mt-2 pl-3">{item.context}</p>
+								)}
 							</div>
 						</motion.div>
-
-						{/* Roast/comment - italic sunset orange */}
-						<motion.p
-							className="leading-[1.65] text-sunset-accent text-sm italic mt-5"
-							initial={{ opacity: 0 }}
-							animate={isActive ? { opacity: 1 } : {}}
-							transition={{ delay: 1.8 }}
-						>
-							{getRoast()}
-						</motion.p>
-					</div>
-				</div>
+					)
+				})}
 			</motion.div>
 
 			{/* Subtle floating particles */}

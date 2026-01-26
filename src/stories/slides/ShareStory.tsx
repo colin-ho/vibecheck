@@ -10,6 +10,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 	const [isGenerating, setIsGenerating] = useState(false)
 	const [showPreview, setShowPreview] = useState(false)
 	const [showConfetti, setShowConfetti] = useState(false)
+	const [copySuccess, setCopySuccess] = useState(false)
 	const shareCardRef = useRef<HTMLDivElement>(null)
 
 	const totalTokens = stats.totalTokens.input + stats.totalTokens.output
@@ -52,10 +53,21 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 
 		setIsGenerating(true)
 		try {
-			const dataUrl = await toPng(shareCardRef.current, {
+			// Temporarily make the hidden card visible for rendering
+			const cardElement = shareCardRef.current
+			const originalStyle = cardElement.style.cssText
+			cardElement.style.cssText =
+				'position: absolute; left: 0; top: 0; opacity: 1; pointer-events: none;'
+
+			const dataUrl = await toPng(cardElement, {
 				quality: 1,
 				pixelRatio: 2,
+				cacheBust: true,
+				backgroundColor: '#FFF8F0',
 			})
+
+			// Restore original styling
+			cardElement.style.cssText = originalStyle
 
 			const link = document.createElement('a')
 			link.download = `vibechecked-${persona.id}.png`
@@ -76,8 +88,14 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 	}
 
 	const handleCopyLink = async () => {
-		const url = `https://howsyourvibecoding.vercel.app/?d=${encodeDataForUrl(data)}`
-		await navigator.clipboard.writeText(url)
+		try {
+			const url = `https://howsyourvibecoding.vercel.app/?d=${encodeDataForUrl(data)}`
+			await navigator.clipboard.writeText(url)
+			setCopySuccess(true)
+			setTimeout(() => setCopySuccess(false), 2000)
+		} catch (error) {
+			console.error('Failed to copy link:', error)
+		}
 	}
 
 	return (
@@ -110,27 +128,27 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 				</div>
 			)}
 
-			<div className="min-h-dvh h-dvh w-full p-[clamp(2rem,5vw,4rem)] pb-[clamp(3rem,7vw,5.5rem)] pt-[clamp(3rem,7vw,5.5rem)] flex flex-col items-center justify-center text-center gap-[clamp(0.75rem,2.5vw,1.75rem)] max-w-6xl mx-auto overflow-y-auto relative z-10">
+			<div className="min-h-dvh h-dvh w-full p-[clamp(2rem,5vw,4rem)] pb-[clamp(5rem,10vw,7rem)] pt-[clamp(3rem,7vw,5.5rem)] flex flex-col items-center justify-center text-center gap-[clamp(0.75rem,2.5vw,1.75rem)] max-w-6xl mx-auto overflow-y-auto relative z-10">
 				{/* Title */}
 				<motion.div
-					className="text-center mb-6"
+					className="text-center mb-4"
 					initial={{ opacity: 0, y: -20 }}
 					animate={isActive ? { opacity: 1, y: 0 } : {}}
 				>
-					<h2 className="text-2xl font-bold text-dark mb-1">Share Your VibeChecked</h2>
+					<h2 className="text-2xl font-bold text-dark mb-1">Share Your Vibes</h2>
 					<p className="leading-[1.65] text-dark/80 text-sm">
 						Let the world know your coding personality
 					</p>
 				</motion.div>
 
-				{/* Larger card preview - warm styling */}
+				{/* Larger card preview - warm styling with border and shadow */}
 				<motion.div
-					className="bg-cream/80 backdrop-blur-xl rounded-2xl p-5 w-full max-w-sm mb-6 cursor-pointer"
+					className="bg-cream/80 backdrop-blur-xl rounded-2xl p-5 w-full max-w-sm mb-4 cursor-pointer border-2 border-dark/15 shadow-lg shadow-dark/10"
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={isActive ? { opacity: 1, scale: 1 } : {}}
 					transition={{ delay: 0.2 }}
 					onClick={() => setShowPreview(true)}
-					whileHover={{ scale: 1.02 }}
+					whileHover={{ scale: 1.02, boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}
 					whileTap={{ scale: 0.98 }}
 				>
 					<div className="flex items-center gap-4 mb-4">
@@ -173,7 +191,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 					<button
 						onClick={handleDownloadImage}
 						disabled={isGenerating}
-						className="flex items-center justify-center gap-3 bg-dark text-cream font-semibold py-3.5 px-6 rounded-full hover:bg-dark/90 transition-all disabled:opacity-50 shadow-lg shadow-dark/10"
+						className="flex items-center justify-center gap-3 bg-dark text-cream font-semibold py-3.5 px-6 rounded-full border border-dark/20 transition-all duration-150 cursor-pointer hover:scale-[1.03] hover:bg-dark/85 active:scale-[0.98] hover:shadow-lg disabled:opacity-50 shadow-lg shadow-dark/10"
 					>
 						{isGenerating ? (
 							<>
@@ -212,7 +230,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 
 					<button
 						onClick={handleShareTwitter}
-						className="flex items-center justify-center gap-3 bg-dark/20 text-dark font-semibold py-3.5 px-6 rounded-full hover:bg-dark/30 transition-all border border-dark/10"
+						className="flex items-center justify-center gap-3 bg-dark/10 text-dark font-semibold py-3.5 px-6 rounded-full border border-dark/20 transition-all duration-150 cursor-pointer hover:scale-[1.03] hover:bg-dark/25 active:scale-[0.98] hover:shadow-lg"
 					>
 						<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 							<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -222,17 +240,37 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 
 					<button
 						onClick={handleCopyLink}
-						className="flex items-center justify-center gap-3 bg-dark/10 text-dark/80 font-medium py-3 px-6 rounded-full hover:bg-dark/20 transition-all"
+						className={`flex items-center justify-center gap-3 font-semibold py-3.5 px-6 rounded-full border transition-all duration-150 cursor-pointer hover:scale-[1.03] active:scale-[0.98] hover:shadow-lg ${
+							copySuccess
+								? 'bg-green-500/20 text-green-700 border-green-500/30'
+								: 'bg-dark/10 text-dark border-dark/20 hover:bg-dark/25'
+						}`}
 					>
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-							/>
-						</svg>
-						<span>Copy Link</span>
+						{copySuccess ? (
+							<>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M5 13l4 4L19 7"
+									/>
+								</svg>
+								<span>Copied!</span>
+							</>
+						) : (
+							<>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+									/>
+								</svg>
+								<span>Copy Link</span>
+							</>
+						)}
 					</button>
 				</motion.div>
 			</div>
@@ -248,8 +286,8 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 				<p className="mt-0.5">howsyourvibecoding.vercel.app</p>
 			</motion.div>
 
-			{/* Hidden share card for export */}
-			<div className="fixed -left-[9999px] top-0">
+			{/* Hidden share card for export - using opacity instead of off-screen for better rendering */}
+			<div className="fixed left-0 top-0 opacity-0 pointer-events-none" style={{ zIndex: -1 }}>
 				<ShareCard ref={shareCardRef} data={data} />
 			</div>
 
@@ -262,7 +300,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 					onClick={() => setShowPreview(false)}
 				>
 					<motion.div
-						className="max-w-4xl w-full"
+						className="max-w-md w-full flex flex-col items-center"
 						initial={{ scale: 0.9, y: 20 }}
 						animate={{ scale: 1, y: 0 }}
 						onClick={(e) => e.stopPropagation()}

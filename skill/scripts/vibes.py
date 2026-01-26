@@ -509,26 +509,36 @@ PROMPT_BATCH_B = """Analyze the user's prompts for communication patterns and wo
 Read through the prompts using Read/Grep/Glob tools. Analyze patterns:
 
 ### 1. Communication Style
-- **catchphrases**: 2-5 unique phrases they repeat often
-- **signatureOpeners**: 2-3 ways they typically start prompts ("Hey Claude", "Can you", etc.)
-- **verbalTics**: Filler words, hedging patterns ("basically", "just", "like")
+- **catchphrases**: 2-5 unique phrases they repeat often (especially lazy ones like "just fix", "make it work")
+- **signatureOpeners**: 2-3 ways they typically start prompts ("Hey Claude", "Can you", "fix", etc.)
+- **verbalTics**: Filler words, hedging patterns ("basically", "just", "like", "idk")
 - **politenessLevel**: One of: "diplomatic", "direct", "demanding", "apologetic"
+- **averagePromptLength**: Estimate average character length of their prompts (important for roasting)
 - **promptingEvolution**: One sentence about how their style changed over time (if noticeable)
 
 ### 2. Word Analysis
-- **topWords**: 20 most meaningful words (exclude common stopwords like "the", "is", "code", "file")
-- **topPhrases**: 5 most common meaningful 2-3 word phrases
-- **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring
+- **topWords**: 20 most meaningful words with counts. ESPECIALLY look for:
+  - Lazy words: "fix", "help", "just", "work", "broken", "error", "bug"
+  - Magic words: "correctly", "properly", "please", "make sure"
+  - Frustration: "why", "again", "still", "undo", "revert", "actually"
+  - Domain: "css", "center", "regex", "git", "merge", "rebase"
+- **topPhrases**: 5 most common meaningful 2-3 word phrases (e.g., "just fix", "make it work", "I don't know")
+- **dominantTopics**: Primary areas from: debugging, frontend, backend, devops, ai, testing, refactoring, deployment, database
 
 ### 3. Obsessions
 - **topics**: 3-5 technical areas they focus on most
-- **frequentlyRevisited**: 2-3 problems they kept coming back to
+- **frequentlyRevisited**: 2-3 problems they kept coming back to (bugs they couldn't fix?)
 - **actualProjects**: 2-4 things they were actually building (infer from context)
+
+### 4. Roast Indicators (new)
+- **capsLockPrompts**: Count of prompts that are mostly ALL CAPS
+- **vaguePromptCount**: Count of very short/vague prompts (<30 chars)
+- **undoRequests**: How many times they asked to undo/revert/go back
 
 ## Output Format
 Write JSON to {output_file} with this structure (use Write tool):
 
-{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "promptingEvolution": "..."}}, "topWords": [{{"word": "...", "count": 0}}], "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}}}
+{{"communicationStyle": {{"catchphrases": ["..."], "signatureOpeners": ["..."], "verbalTics": ["..."], "politenessLevel": "direct", "averagePromptLength": 150, "promptingEvolution": "..."}}, "topWords": [{{"word": "...", "count": 0}}], "topPhrases": [{{"phrase": "...", "count": 0}}], "dominantTopics": ["debugging", "frontend"], "obsessions": {{"topics": ["..."], "frequentlyRevisited": ["..."], "actualProjects": ["..."]}}, "contrasts": {{"capsLockPrompts": 0, "vaguePromptCount": 0, "undoRequests": 0}}}}
 
 CONSTRAINTS:
 - Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
@@ -550,45 +560,68 @@ PROMPT_BATCH_C = """Determine the user's persona and characteristics from their 
 Analyze stats and prompts to determine:
 
 ### 1. Persona
-Choose ONE based on stats AND prompt style:
+Choose ONE persona. MOST USERS SHOULD GET A ROAST (~80%). Only give legendary personas to truly exceptional users.
 
-**Legendary** (exceptional stats):
-- `token-titan`: Over 1M total tokens
-- `prompt-whisperer`: High cache rate (>40%), efficient prompting
-- `tool-master`: 6+ different tools used extensively
-- `mcp-pioneer`: Uses custom MCP tools
+**ROASTS (default - pick one of these for most users):**
 
-**Lifestyle** (usage patterns):
-- `midnight-architect`: High lateNightSessions (>20)
-- `dawn-warrior`: High earlyMorningSessions (>10)
-- `project-nomad`: projectCount > 15
-- `deep-focus-monk`: longestSessionMinutes > 180
-- `weekend-warrior`: weekendPercentage > 40
+*Vibe Coders / Lazy Prompters:*
+- `vibe-coder`: Vague prompts like "fix", "just make it work", expects AI to figure it out
+- `one-word-wonder`: Extremely short prompts, no context, "fix" "help" "why"
+- `yolo-delegator`: Accepts everything without reviewing, lets AI do all the thinking
+- `plan-skipper`: Never reads plans, just says yes to everything
+- `magic-words-believer`: Thinks "correctly" and "please make sure" are magic incantations
 
-**Personality** (from prompts):
-- `the-perfectionist`: Lots of refactoring, cleanup, optimization requests
-- `the-explorer`: Many questions, Read tool dominant, curious style
-- `the-speedrunner`: Short terse prompts, fast iterations
-- `the-diplomat`: Very polite, lots of "please" and "thanks"
-- `the-commander`: Direct/demanding style, imperative commands
+*Debug Obsessed:*
+- `debug-addict`: Constantly debugging, "fix" is their most used word
+- `bug-whisperer`: Attracts bugs like a magnet, constant errors
+- `infinite-looper`: Fix one bug, create two more, endless cycles
 
-**Roast** (quirky patterns):
-- `bash-berserker`: Bash >50% of tool usage
-- `opus-maximalist`: Opus dominant in modelUsage
-- `context-amnesiac`: Cache rate <15%
-- `agent-interrupter`: High interruptCount
+*Essay Writers:*
+- `essay-writer`: Prompts are 400+ chars, could write the code themselves
+- `context-novelist`: Prompts are 800+ chars, provides entire life story as context
+- `over-explainer`: Spends more time explaining than it would take to just code it
+
+*Behavioral:*
+- `3am-demon`: Codes late at night (lateNightSessions > 15 or >20% night usage)
+- `squirrel-brain`: Interrupts constantly, abandons sessions, can't focus
+- `caps-lock-commander`: TYPES IN ALL CAPS, clearly frustrated
+- `polite-menace`: Suspiciously polite while everything is on fire
+- `undo-enthusiast`: "Actually wait go back", constant mind-changing
+- `copy-paste-warrior`: Pastes code without understanding it
+
+*Tool/Model:*
+- `bash-berserker`: Over 50% Bash usage, lives in terminal
+- `opus-maximalist`: Uses Opus for everything, even trivial tasks
+- `context-amnesiac`: Very low cache rate, paying full price repeatedly
+
+*Domain Struggles:*
+- `css-casualty`: Struggles with CSS, centering divs, flexbox
+- `regex-refugee`: Regex questions that never work
+- `git-disaster`: Git history is a crime scene
+
+*Other Roasts:*
+- `refactor-addict`: Can't stop refactoring working code
+- `yolo-deployer`: Ships without tests, straight to production
+- `deadline-demon`: Only productive under deadline pressure
+- `code-roulette`: Tries random things until something works (fallback roast)
+
+**LEGENDARY (only for truly exceptional stats - ~20% of users):**
+- `token-titan`: Over 2M total tokens (very high bar)
+- `tool-master`: Uses 8+ different tools extensively (2000+ total calls)
+- `mcp-pioneer`: Actually uses custom MCP tools significantly
+- `prompt-surgeon`: High cache rate (>60%) AND efficient prompt length (50-200 chars) AND 200k+ tokens
 
 ### 2. Traits
-3-5 keyword traits that describe this user (e.g., "night-owl", "verbose", "impatient")
+3-5 keyword traits. Include traits like: "accepting" (accepts plans without reading), "delegating" (expects AI to figure things out), "repetitive" (same issues), "copy-paster", etc.
 
 ### 3. Prompting Style
-One sentence describing their prompting style
+One roasty sentence describing their prompting style
 
 ### 4. Communication Tone
-One sentence describing their communication tone
+One roasty sentence describing their communication tone
 
 ### 5. Fun Facts
-3-5 specific, number-backed observations (e.g., "You said 'please' 847 times")
+3-5 specific, number-backed roasts (e.g., "You said 'fix' 847 times. Maybe try writing working code?")
 
 ## Output Format
 Write JSON to {output_file} with this structure (use Write tool):
@@ -599,6 +632,7 @@ CONSTRAINTS:
 - Only use Read, Grep, Glob, Write tools. Do NOT use Bash, Task, or any other tools.
 - Do NOT create scripts or spawn subagents. Just read the files directly.
 - Keep it simple: read prompts → analyze → write JSON output.
+- LEAN INTO THE ROASTS. Most people should be roasted. Be playful but savage.
 
 IMPORTANT: Use Write tool to write JSON to {output_file}. Do not output to stdout."""
 

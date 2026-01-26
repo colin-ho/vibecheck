@@ -189,16 +189,16 @@ export const mockData: UsageData = {
 		dominantTopics: ['debugging', 'frontend', 'testing'],
 	},
 
-	personaId: 'the-commander',
-	traits: ['night-owl', 'impatient', 'debugging-heavy', 'direct'],
-	promptingStyle: 'Terse and direct, gets straight to the point',
-	communicationTone: 'Casual with occasional frustration, prefers efficiency over pleasantries',
+	personaId: 'vibe-coder',
+	traits: ['lazy-prompter', 'impatient', 'debugging-heavy', 'delegating'],
+	promptingStyle: 'Vague and hopeful. "Just fix it" energy.',
+	communicationTone: 'Casual with occasional frustration. Context? Never heard of her.',
 	funFacts: [
-		'You said "fix" 847 times',
-		'Your longest session was 4 hours 7 minutes',
-		"You've worked on 23 different projects",
-		'89 sessions happened after midnight',
-		'You interrupted Claude 23 times',
+		'You said "fix" 847 times. Have you tried writing working code?',
+		'Your longest session was 4 hours 7 minutes. Your attention span: 4 seconds.',
+		"You've worked on 23 different projects. Finished: TBD.",
+		'89 sessions happened after midnight. Your code quality at 3AM: questionable.',
+		'You interrupted Claude 23 times. Patience of a caffeinated squirrel.',
 	],
 	generatedAt: new Date().toISOString(),
 	percentiles: {
@@ -209,12 +209,12 @@ export const mockData: UsageData = {
 		cacheEfficiency: 25,
 		totalSessions: 5,
 	},
-	persona: getPersona('the-commander'),
+	persona: getPersona('vibe-coder'),
 }
 
 // Generate varied mock data for testing different personas
 export function generateMockData(personaId?: string): UsageData {
-	const id = personaId || 'the-commander'
+	const id = personaId || 'vibe-coder'
 	return {
 		...mockData,
 		personaId: id,
@@ -222,7 +222,7 @@ export function generateMockData(personaId?: string): UsageData {
 	}
 }
 
-// Generate mock data for a "polite" user
+// Generate mock data for a "polite menace" user
 export function generatePoliteMockData(): UsageData {
 	return {
 		...mockData,
@@ -239,11 +239,11 @@ export function generatePoliteMockData(): UsageData {
 					'I apologize for bothering you, but would it be possible for you to help me understand this error?',
 			},
 		},
-		personaId: 'the-diplomat',
-		persona: getPersona('the-diplomat'),
-		traits: ['polite', 'methodical', 'thorough'],
-		promptingStyle: 'Detailed and courteous',
-		communicationTone: 'Professional and appreciative',
+		personaId: 'polite-menace',
+		persona: getPersona('polite-menace'),
+		traits: ['polite', 'chaotic', 'suspiciously-nice'],
+		promptingStyle: 'Aggressively courteous while everything burns',
+		communicationTone: 'Canadian energy. Pure chaos hidden behind manners.',
 	}
 }
 
@@ -297,11 +297,11 @@ export function generateNightOwlMockData(): UsageData {
 				},
 			},
 		},
-		personaId: 'midnight-architect',
-		persona: getPersona('midnight-architect'),
-		traits: ['night-owl', 'caffeinated', 'deadline-driven'],
-		promptingStyle: 'Increasingly desperate as the night goes on',
-		communicationTone: 'Exhausted but determined',
+		personaId: '3am-demon',
+		persona: getPersona('3am-demon'),
+		traits: ['night-owl', 'caffeinated', 'deadline-driven', 'incoherent-after-2am'],
+		promptingStyle: 'Increasingly desperate as the night goes on. Coherence optional.',
+		communicationTone: 'Your 3AM code will haunt you by 9AM.',
 	}
 }
 
@@ -319,12 +319,53 @@ export function generateEssayWriterMockData(): UsageData {
 			communicationStyle: {
 				...mockData.insights!.communicationStyle,
 				promptingEvolution: 'Started verbose, became even more verbose. No signs of stopping.',
+				averagePromptLength: 650,
 			},
 		},
-		personaId: 'the-explorer',
-		persona: getPersona('the-explorer'),
-		traits: ['verbose', 'thorough', 'context-heavy'],
-		promptingStyle: 'Exhaustively detailed',
-		communicationTone: 'Professional and comprehensive',
+		personaId: 'essay-writer',
+		persona: getPersona('essay-writer'),
+		traits: ['verbose', 'over-explainer', 'context-novelist'],
+		promptingStyle: 'Your prompts need a TL;DR. And maybe a table of contents.',
+		communicationTone: 'You could have just written the code yourself by now.',
+	}
+}
+
+// Generate mock data for a "debug addict"
+export function generateDebugAddictMockData(): UsageData {
+	return {
+		...mockData,
+		insights: {
+			...mockData.insights!,
+			dominantTopics: ['debugging', 'debugging', 'also debugging'],
+			topWords: [
+				{ word: 'fix', count: 1247 },
+				{ word: 'error', count: 921 },
+				{ word: 'broken', count: 534 },
+				{ word: 'bug', count: 487 },
+				{ word: 'why', count: 356 },
+				{ word: 'again', count: 298 },
+				{ word: 'help', count: 267 },
+				{ word: 'still', count: 212 },
+				{ word: 'work', count: 198 },
+				{ word: 'please', count: 156 },
+			],
+		},
+		personaId: 'debug-addict',
+		persona: getPersona('debug-addict'),
+		traits: ['bug-magnet', 'fix-obsessed', 'error-prone'],
+		promptingStyle: '"Fix" is your love language. "Why" is your catchphrase.',
+		communicationTone: 'Desperately optimistic that this time it will work.',
+	}
+}
+
+// Generate mock data for a "plan skipper"
+export function generatePlanSkipperMockData(): UsageData {
+	return {
+		...mockData,
+		personaId: 'plan-skipper',
+		persona: getPersona('plan-skipper'),
+		traits: ['accepting', 'trusting', 'non-reviewing', 'yolo'],
+		promptingStyle: 'Yes. Sure. Sounds good. Ship it.',
+		communicationTone: 'Reading is for nerds. You trust Claude more than yourself.',
 	}
 }

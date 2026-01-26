@@ -16,8 +16,10 @@ repos:
       - id: ruff
         args: [--fix]
         files: ^skill/
+        exclude: bundle_types\.py$
       - id: ruff-format
         files: ^skill/
+        exclude: bundle_types\.py$
 
   # Python - Tests via uv
   - repo: local
@@ -38,6 +40,7 @@ repos:
         entry: npx eslint --fix --max-warnings=100
         language: system
         files: ^src/.*\.(ts|tsx)$
+        exclude: bundle\.generated\.ts$
         types: [file]
 
   # Frontend - TypeScript type check

@@ -43,19 +43,18 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
 	// Get detailed topics from obsessions (more specific than dominantTopics)
 	const detailedTopics = obsessions?.topics || []
 
-	// Build topic data with percentages (equal distribution if we just have names)
-	const topicCount = dominantTopics.length || 1
+	// Build topic data with percentages (decreasing by rank to show hierarchy)
 	const topicData = dominantTopics.map((topic, index) => ({
 		name: topic,
-		percentage: Math.round(100 / topicCount), // Simple equal distribution
+		// First topic gets most, decreasing from there: 100, 70, 50, 35, 25...
+		percentage: Math.round(100 * Math.pow(0.7, index)),
 		color: getTopicColor(topic, index),
 	}))
 
 	const topTopic = topicData[0]
 
-	// Get actual projects and frequently revisited items
+	// Get actual projects
 	const actualProjects = obsessions?.actualProjects || []
-	const frequentlyRevisited = obsessions?.frequentlyRevisited || []
 
 	// Calculate max percentage for bubble sizing
 	const maxPercentage = Math.max(...topicData.map((t) => t.percentage), 1)
@@ -131,10 +130,14 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
 									stiffness: 200,
 								}}
 							>
-								{index === 0 && (
-									<>
-										<span className="text-dark text-xs font-bold capitalize">{topic.name}</span>
-									</>
+								{/* Show label on all bubbles that are large enough */}
+								{size >= 50 && (
+									<span
+										className="text-dark font-bold capitalize text-center px-1"
+										style={{ fontSize: size >= 80 ? '0.75rem' : '0.6rem' }}
+									>
+										{topic.name}
+									</span>
 								)}
 							</motion.div>
 						)
@@ -185,28 +188,6 @@ export function ObsessionsStory({ data, isActive }: StorySlideProps) {
 						{actualProjects.slice(0, 4).map((project, i) => (
 							<span key={i} className="text-xs bg-cream/60 px-3 py-1 rounded-full text-dark/80">
 								{project}
-							</span>
-						))}
-					</div>
-				</motion.div>
-			)}
-
-			{/* Frequently revisited */}
-			{frequentlyRevisited.length > 0 && (
-				<motion.div
-					className="mt-4 text-center"
-					initial={{ opacity: 0 }}
-					animate={isActive ? { opacity: 1 } : {}}
-					transition={{ delay: 2.4 }}
-				>
-					<div className="text-xs text-dark/70 mb-2">Kept coming back to:</div>
-					<div className="flex flex-wrap justify-center gap-2">
-						{frequentlyRevisited.slice(0, 3).map((item, i) => (
-							<span
-								key={i}
-								className="text-xs bg-sunset/20 px-3 py-1 rounded-full text-dark/80 italic"
-							>
-								"{item}"
 							</span>
 						))}
 					</div>

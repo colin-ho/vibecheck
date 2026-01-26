@@ -287,6 +287,11 @@
           "enum": ["diplomatic", "direct", "demanding", "apologetic"],
           "description": "Overall politeness characterization"
         },
+        "averagePromptLength": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Average character length of prompts"
+        },
         "promptingEvolution": {
           "type": "string",
           "description": "How their style changed over time"
@@ -335,6 +340,21 @@
         "mostDemanding": {
           "type": "string",
           "description": "Most direct/demanding request"
+        },
+        "capsLockPrompts": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of prompts that were mostly ALL CAPS"
+        },
+        "vaguePromptCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of very short/vague prompts (<30 chars)"
+        },
+        "undoRequests": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many times they asked to undo/revert/go back"
         }
       }
     },

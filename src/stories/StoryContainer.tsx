@@ -24,9 +24,9 @@ interface StoryContainerProps {
 
 const slides: React.ComponentType<StorySlideProps>[] = [
 	IntroStory,
-	OpeningMemoryStory,
 	SessionsStory,
 	TimeStory,
+	OpeningMemoryStory,
 	TokensStory,
 	CacheStory,
 	ToolsStory,
@@ -158,19 +158,17 @@ export function StoryContainer({ data }: StoryContainerProps) {
 				{currentSlide + 1} / {slides.length}
 			</div>
 
-			{/* Navigation hints */}
-			<div
-				className="absolute left-1/2 -translate-x-1/2 z-50 text-dark/70 text-xs bg-white/40 backdrop-blur-sm px-3 py-1.5 rounded-full"
-				style={{ bottom: 24 }}
-			>
-				{currentSlide < slides.length - 1 ? (
+			{/* Navigation hints - hidden on last slide to avoid overlapping footer */}
+			{currentSlide < slides.length - 1 && (
+				<div
+					className="absolute left-1/2 -translate-x-1/2 z-50 text-dark/70 text-xs bg-white/40 backdrop-blur-sm px-3 py-1.5 rounded-full"
+					style={{ bottom: 24 }}
+				>
 					<span>
 						Tap or press <span className="text-dark">→</span> to continue
 					</span>
-				) : (
-					<span>Share your journey!</span>
-				)}
-			</div>
+				</div>
+			)}
 
 			{/* Navigation arrows */}
 			{currentSlide > 0 && (

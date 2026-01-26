@@ -7,25 +7,18 @@ export function TimingStory({ data, isActive }: StorySlideProps) {
 	const maxHour = Math.max(...stats.hourCounts)
 	const peakHour = stats.peakHour
 
-	// Calculate night owl vs early bird
-	const nightHours = [22, 23, 0, 1, 2, 3, 4]
-	const morningHours = [5, 6, 7, 8, 9]
-	const nightSessions = nightHours.reduce((sum, h) => sum + (stats.hourCounts[h] || 0), 0)
-	const morningSessions = morningHours.reduce((sum, h) => sum + (stats.hourCounts[h] || 0), 0)
-
-	const totalHourSessions = stats.hourCounts.reduce((a, b) => a + b, 0)
-	const nightPercentage = (nightSessions / totalHourSessions) * 100
-
 	const getTimePersonality = (): { title: string; description: string } => {
-		if (nightPercentage > 40) {
+		// Peak hour should be the primary signal
+		if (peakHour >= 22 || peakHour <= 4) {
 			return { title: 'Night Owl', description: 'The quiet hours are your domain' }
 		}
-		if (morningSessions > nightSessions * 2) {
+		if (peakHour >= 5 && peakHour <= 8) {
 			return { title: 'Early Bird', description: 'Shipping code before the world wakes up' }
 		}
 		if (peakHour >= 9 && peakHour <= 17) {
 			return { title: 'Day Coder', description: 'Traditional hours, consistent output' }
 		}
+		// peakHour 18-21
 		return { title: 'Evening Warrior', description: 'When the day job ends, the real work begins' }
 	}
 

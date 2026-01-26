@@ -44,3 +44,12 @@ body {
 @utility drop-glow-sunset {
 	filter: drop-shadow(0 0 8px rgba(221, 80, 19, 0.5));
 }
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+	display: none;
+}
+
+* {
+	scrollbar-width: none;
+}

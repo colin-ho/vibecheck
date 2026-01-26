@@ -4,7 +4,7 @@ import { StorySlideProps } from '../../data/types'
 import { SlideLayout } from '../../components/SlideLayout'
 
 export function IntroStory({ data, isActive }: StorySlideProps) {
-	const { funFacts, generatedAt } = data
+	const { funFacts, generatedAt, stats } = data
 
 	// Format the generated date
 	const formattedDate = useMemo(() => {
@@ -17,8 +17,17 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 		}
 	}, [generatedAt])
 
-	// Pick a random fun fact for the teaser
-	const funFactTeaser = funFacts && funFacts.length > 0 ? funFacts[0] : null
+	// Get multiple fun facts (up to 3)
+	const displayFunFacts = funFacts?.slice(0, 3) || []
+
+	// Format large numbers
+	const formatNumber = (n: number): string => {
+		if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`
+		if (n >= 1000) return `${(n / 1000).toFixed(0)}K`
+		return n.toString()
+	}
+
+	const totalTokens = stats.totalTokens.input + stats.totalTokens.output
 
 	return (
 		<SlideLayout>
@@ -60,16 +69,16 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 							initial={{ opacity: 0 }}
 							animate={isActive ? { opacity: 1 } : {}}
 							transition={{ delay: 1 }}
-							className="text-sunset-accent text-sm"
+							className="text-sunset-accent text-sm whitespace-nowrap overflow-hidden"
 						>
 							<span className="text-dark/50">[</span>
 							<motion.span
 								initial={{ width: 0 }}
-								animate={isActive ? { width: '100%' } : {}}
+								animate={isActive ? { width: '8ch' } : {}}
 								transition={{ delay: 1, duration: 1, ease: 'linear' }}
 								className="inline-block overflow-hidden"
 							>
-								████████████████████
+								████████
 							</motion.span>
 							<span className="text-dark/50">]</span>
 							<span className="ml-2">100%</span>
@@ -81,18 +90,49 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 							transition={{ delay: 2.1 }}
 							className="mt-4 text-dark/70 text-sm"
 						>
-							Analysis complete. Generating your journey...
+							Analysis complete.
 						</motion.div>
 
-						{/* Fun fact teaser */}
-						{funFactTeaser && (
+						{/* Key stats summary */}
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={isActive ? { opacity: 1 } : {}}
+							transition={{ delay: 2.3 }}
+							className="mt-4 grid grid-cols-3 gap-3 text-center"
+						>
+							<div className="bg-cream/50 rounded-lg py-2 px-1">
+								<div className="text-dark font-bold text-lg">{formatNumber(totalTokens)}</div>
+								<div className="text-dark/60 text-[10px]">tokens</div>
+							</div>
+							<div className="bg-cream/50 rounded-lg py-2 px-1">
+								<div className="text-dark font-bold text-lg">{stats.totalSessions}</div>
+								<div className="text-dark/60 text-[10px]">sessions</div>
+							</div>
+							<div className="bg-cream/50 rounded-lg py-2 px-1">
+								<div className="text-dark font-bold text-lg">{stats.projectCount}</div>
+								<div className="text-dark/60 text-[10px]">projects</div>
+							</div>
+						</motion.div>
+
+						{/* Fun facts */}
+						{displayFunFacts.length > 0 && (
 							<motion.div
 								initial={{ opacity: 0 }}
 								animate={isActive ? { opacity: 1 } : {}}
-								transition={{ delay: 2.4 }}
-								className="mt-3 text-sunset-accent text-xs"
+								transition={{ delay: 2.6 }}
+								className="mt-4 space-y-1.5"
 							>
-								<span className="text-dark/50">{'>'}</span> {funFactTeaser}
+								{displayFunFacts.map((fact, i) => (
+									<motion.div
+										key={i}
+										initial={{ opacity: 0, x: -10 }}
+										animate={isActive ? { opacity: 1, x: 0 } : {}}
+										transition={{ delay: 2.6 + i * 0.15 }}
+										className="text-sunset-accent text-xs"
+									>
+										<span className="text-dark/50">{'>'}</span> {fact}
+									</motion.div>
+								))}
 							</motion.div>
 						)}
 
@@ -101,7 +141,7 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 							<motion.div
 								initial={{ opacity: 0 }}
 								animate={isActive ? { opacity: 1 } : {}}
-								transition={{ delay: 2.6 }}
+								transition={{ delay: 3.1 }}
 								className="mt-4 pt-3 border-t border-dark/10 text-dark/40 text-xs"
 							>
 								Session analyzed: {formattedDate}
@@ -111,36 +151,12 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 				</div>
 			</motion.div>
 
-			{/* Main title - larger with gradient */}
-			<motion.div
-				className="mt-14"
-				initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-				animate={isActive ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
-				transition={{ delay: 2.5, duration: 1 }}
-			>
-				<h1 className="leading-[1.05] text-6xl md:text-8xl font-black tracking-tightest text-sunset-accent">
-					YOUR JOURNEY
-				</h1>
-				<h1 className="leading-[1.05] text-6xl md:text-8xl font-black tracking-tightest mt-1">
-					<span className="text-dark">IN CODE</span>
-				</h1>
-			</motion.div>
-
-			<motion.p
-				className="leading-[1.65] text-dark/70 mt-8 text-base tracking-wide"
-				initial={{ opacity: 0 }}
-				animate={isActive ? { opacity: 1 } : {}}
-				transition={{ delay: 3.2 }}
-			>
-				A journey through your Claude Code sessions
-			</motion.p>
-
 			{/* Animated cursor */}
 			<motion.div
 				className="mt-10 text-sunset-accent font-mono text-xl"
 				initial={{ opacity: 0 }}
 				animate={isActive ? { opacity: 1 } : {}}
-				transition={{ delay: 3.6 }}
+				transition={{ delay: 3.4 }}
 			>
 				<motion.span
 					animate={{ opacity: [1, 0, 1] }}
@@ -148,6 +164,16 @@ export function IntroStory({ data, isActive }: StorySlideProps) {
 				>
 					_
 				</motion.span>
+			</motion.div>
+
+			{/* CTA to continue */}
+			<motion.div
+				className="mt-6 text-dark/60 text-sm"
+				initial={{ opacity: 0 }}
+				animate={isActive ? { opacity: 1 } : {}}
+				transition={{ delay: 3.6 }}
+			>
+				Tap anywhere to continue
 			</motion.div>
 		</SlideLayout>
 	)
