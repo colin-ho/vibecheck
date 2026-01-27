@@ -4,6 +4,12 @@ import { HeroStat } from '../../components/HeroStat'
 import { ArcPair } from '../../components/viz/ArcPair'
 import { SlideLayout } from '../../components/SlideLayout'
 
+// Format large numbers with M (millions) or B (billions)
+const formatTokenCount = (n: number): string => {
+	if (n >= 1000000000) return `${(n / 1000000000).toFixed(1)}B`
+	return `${(n / 1000000).toFixed(1)}M`
+}
+
 export function TokensStory({ data, isActive }: StorySlideProps) {
 	const { stats, percentiles } = data
 	const totalTokens = stats.totalTokens ?? { input: 0, output: 0, cached: 0 }
@@ -74,7 +80,7 @@ export function TokensStory({ data, isActive }: StorySlideProps) {
 					transition={{ delay: 2.2 }}
 				>
 					<span className="text-sunset-accent font-semibold">
-						{(totalTokens.cached / 1000000).toFixed(1)}M
+						{formatTokenCount(totalTokens.cached)}
 					</span>
 					<span className="text-dark/80 ml-2">from cache</span>
 				</motion.div>
