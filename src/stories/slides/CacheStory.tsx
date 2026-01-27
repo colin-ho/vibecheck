@@ -7,11 +7,18 @@ import { SlideLayout } from '../../components/SlideLayout'
 export function CacheStory({ data, isActive }: StorySlideProps) {
 	const { stats, percentiles } = data
 
-	const cacheRate = (stats.totalTokens.cached / Math.max(stats.totalTokens.input, 1)) * 100
-	const cachedTokens = stats.totalTokens.cached
+	// Cache efficiency = cache reads / total input tokens (per Anthropic docs)
+	// total_input = cache_read + cache_creation + input
+	const { cached, cacheCreation, input } = stats.totalTokens
+	const totalInput = cached + (cacheCreation ?? 0) + input
+	const cacheRate = totalInput > 0 ? (cached / totalInput) * 100 : 0
+	const cachedTokens = cached
 
-	// Estimate savings (rough: cached tokens at ~$0.003 per 1K vs $0.015 per 1K = $0.012 saved per 1K)
-	const estimatedSavings = (cachedTokens / 1000) * 0.012
+	// Estimate savings based on current Anthropic pricing (Jan 2026)
+	// Opus 4.5: $5/MTok full, $0.50/MTok cache = $4.50/MTok savings
+	// Sonnet 4.5: $3/MTok full, $0.30/MTok cache = $2.70/MTok savings
+	// Using ~$4/MTok = $0.004 per 1K tokens (assuming mostly Opus usage)
+	const estimatedSavings = (cachedTokens / 1000) * 0.004
 
 	const getCacheComment = (rate: number): string => {
 		if (rate > 50) return 'At least something about you is efficient'
