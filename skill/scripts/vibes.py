@@ -757,6 +757,7 @@ def build_bundle(
     input_tokens = sum(v.get("inputTokens", 0) for v in model_usage_raw.values())
     output_tokens = sum(v.get("outputTokens", 0) for v in model_usage_raw.values())
     cached_tokens = sum(v.get("cacheReadInputTokens", 0) for v in model_usage_raw.values())
+    cache_creation_tokens = sum(v.get("cacheCreationInputTokens", 0) for v in model_usage_raw.values())
 
     # Normalize model names and aggregate
     model_usage: Dict[str, int] = {}
@@ -806,6 +807,7 @@ def build_bundle(
             input=input_tokens,
             output=output_tokens,
             cached=cached_tokens,
+            cacheCreation=cache_creation_tokens,
         ),
         totalToolCalls=sum(tool_usage.values()),
         toolUsage=tool_usage,

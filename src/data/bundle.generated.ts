@@ -105,7 +105,14 @@ export interface Stats {
 export interface TokenCounts {
   input: number;
   output: number;
+  /**
+   * Cache read tokens (served from cache)
+   */
   cached: number;
+  /**
+   * Cache creation tokens (written to cache)
+   */
+  cacheCreation?: number;
 }
 export interface DailyActivity {
   /**

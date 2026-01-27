@@ -147,7 +147,13 @@
         },
         "cached": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Cache read tokens (served from cache)"
+        },
+        "cacheCreation": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Cache creation tokens (written to cache)"
         }
       }
     },
