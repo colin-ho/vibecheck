@@ -36,6 +36,7 @@ export interface Percentiles {
 export interface UsageData extends AnonymousBundle {
 	percentiles: Percentiles
 	persona: PersonaDefinition
+	bundleId?: string // Short ID for sharing (when loaded via ?id=)
 }
 
 // Persona definition - all personas roast
