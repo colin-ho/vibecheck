@@ -83,15 +83,33 @@ When modifying the bundle structure:
 ### Testing with Mock Data
 Visit `http://localhost:5173/` with no URL params to see mock data. Sample routes available at `/sample_1` through `/sample_4`.
 
-### Testing the Script
-```bash
-# Run Python script directly
-python3 skill/scripts/vibes.py              # Full run with Claude analysis
-python3 skill/scripts/vibes.py --stats-only # Output raw JSON bundle without Claude
-python3 skill/scripts/vibes.py -v           # Verbose mode
+### Testing with production data
 
-# Run tests
-cd skill && python3 -m pytest tests/
+To test locally with real data stored on the production server, add a proxy to `vite.config.ts`:
+
+```ts
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': 'https://getyourvibechecked.vercel.app'
+    }
+  }
+})
+```
+
+Then visit `http://localhost:5173/vibes?id=<id>` where `<id>` is a bundle ID from production.
+
+### Python / UV
+
+This project uses [UV](https://docs.astral.sh/uv/) for Python dependency management.
+
+```bash
+uv sync --extra dev         # Install dependencies (including dev extras)
+uv run pytest               # Run tests
+uv run python skill/scripts/vibes.py              # Full run with Claude analysis
+uv run python skill/scripts/vibes.py --stats-only # Output raw JSON bundle without Claude
+uv run python skill/scripts/vibes.py -v           # Verbose mode
 ```
 
 ## Privacy Model
