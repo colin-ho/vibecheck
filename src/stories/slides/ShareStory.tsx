@@ -63,7 +63,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 				quality: 1,
 				pixelRatio: 2,
 				cacheBust: true,
-				backgroundColor: '#FFF8F0',
+				backgroundColor: '#3b110c', // dark color from theme
 			})
 
 			// Restore original styling
@@ -80,16 +80,24 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 		}
 	}
 
+	// Generate share URL - prefer short ID if available
+	const getShareUrl = () => {
+		if (data.bundleId) {
+			return `https://getyourvibechecked.vercel.app/vibes?id=${data.bundleId}`
+		}
+		return `https://getyourvibechecked.vercel.app/?d=${encodeDataForUrl(data)}`
+	}
+
 	const handleShareTwitter = () => {
 		const text = `I'm a ${persona.name}! ${persona.tagline}\n\n${formatNumber(totalTokens)} tokens \u2022 ${stats.totalSessions} sessions \u2022 ${stats.projectCount} projects\n\nGet your VibeChecked:`
-		const url = `https://getyourvibechecked.vercel.app/?d=${encodeDataForUrl(data)}`
+		const url = getShareUrl()
 		const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
 		window.open(twitterUrl, '_blank')
 	}
 
 	const handleCopyLink = async () => {
 		try {
-			const url = `https://getyourvibechecked.vercel.app/?d=${encodeDataForUrl(data)}`
+			const url = getShareUrl()
 			await navigator.clipboard.writeText(url)
 			setCopySuccess(true)
 			setTimeout(() => setCopySuccess(false), 2000)

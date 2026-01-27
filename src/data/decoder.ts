@@ -37,7 +37,9 @@ export async function decodeUrlData(): Promise<UsageData> {
 		console.log('Loading bundle from server:', bundleId)
 		const bundle = await fetchBundleById(bundleId)
 		if (bundle) {
-			return enrichBundle(bundle)
+			const enriched = await enrichBundle(bundle)
+			// Preserve the bundleId for sharing
+			return { ...enriched, bundleId }
 		}
 		console.error('Bundle not found or expired, using mock data')
 		return mockData
