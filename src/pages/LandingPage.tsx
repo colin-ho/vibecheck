@@ -404,6 +404,12 @@ export function LandingPage() {
 							</div>
 						</div>
 					</div>
+					<a
+						href="/vibes?id=WJbfkgRJ"
+						className="text-sm text-[#3b110c]/60 hover:text-[#3b110c] transition-colors"
+					>
+						See how cooked some of you really are →
+					</a>
 				</div>
 			</div>
 		</div>

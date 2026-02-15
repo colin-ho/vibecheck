@@ -290,8 +290,8 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 				animate={isActive ? { opacity: 1 } : {}}
 				transition={{ delay: 0.8 }}
 			>
-				<p>Made with Claude</p>
-				<p className="mt-0.5">getyourvibechecked.vercel.app</p>
+				<p>expose your friends too</p>
+				<p className="mt-1 font-mono text-dark/40">npx skills add colinho/vibechecked</p>
 			</motion.div>
 
 			{/* Hidden share card for export - using opacity instead of off-screen for better rendering */}
