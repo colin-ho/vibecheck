@@ -1,8 +1,0 @@
-{"type":"user","message":{"role":"user","content":"WHY IS THIS NOT WORKING??? FIX IT NOW!!!"}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-1","name":"Bash","input":{"command":"npm test"}}]}}
-{"type":"user","message":{"role":"user","content":"ok"}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-2","name":"Glob","input":{"pattern":"**/*.ts"}}]}}
-{"type":"user","message":{"role":"user","content":"Please help me create a new component for the dashboard. I would really appreciate your assistance with this task."}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-3","name":"Read","input":{"file_path":"/src/components/Dashboard.tsx"}}]}}
-{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"tool-4","name":"Edit","input":{"file_path":"/src/components/Dashboard.tsx","old_string":"a","new_string":"b"}}]}}
-{"type":"user","message":{"role":"user","content":"Thank you so much!"}}
