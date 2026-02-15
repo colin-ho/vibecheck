@@ -17,7 +17,7 @@
     "check:types": "node schema/check-generated.js"
   },
   "dependencies": {
-    "@upstash/redis": "^1.36.1",
+    "@supabase/supabase-js": "^2.49.1",
     "framer-motion": "^12.29.0",
     "html-to-image": "^1.11.13",
     "pako": "^2.1.0",

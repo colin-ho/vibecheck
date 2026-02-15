@@ -25,7 +25,7 @@ npm run lint         # ESLint check
 
 3. **Frontend** (`src/`): Decode URL → enrich with percentiles + persona → render 15 animated story slides
 
-4. **API** (`api/`): Vercel serverless functions compute percentiles using Upstash Redis (or in-memory fallback)
+4. **API** (`api/`): Vercel serverless functions compute percentiles using Supabase (or in-memory fallback)
 
 ### Key Directories
 
@@ -75,7 +75,7 @@ When modifying the bundle structure:
 - Tailwind CSS 4 with sunset theme (dawn #FFF8F0 to twilight #FF8A5B, accents: lavender #bdb7fc, sunset #dd5013, red #da1c1c)
 - Framer Motion for animations
 - html-to-image for PNG/JPEG export
-- Vercel serverless with optional Upstash Redis
+- Vercel serverless with optional Supabase
 
 ## Development Notes
 

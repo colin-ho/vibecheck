@@ -1,13 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { Redis } from '@upstash/redis';
+import { getSupabase } from './_supabase.js';
 
-// Initialize Redis if environment variables are set
-// Supports both Vercel KV (KV_REST_API_*) and Upstash (UPSTASH_REDIS_REST_*) naming
-const redisUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const redis = redisUrl && redisToken
-  ? new Redis({ url: redisUrl, token: redisToken })
-  : null;
+const supabase = getSupabase();
 
 // In-memory fallback for local development
 const inMemoryBundles: Array<{
@@ -87,7 +81,62 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const totalHourSessions = bundle.stats.hourCounts.reduce((a, b) => a + b, 0);
     const nightPercentage = nightSessions / Math.max(totalHourSessions, 1);
 
-    // Store anonymous stats
+    if (supabase) {
+      // Generate a unique ID for the bundle_metrics row
+      const id = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+
+      // Insert metrics row
+      const { error: insertError } = await supabase
+        .from('bundle_metrics')
+        .insert({
+          id,
+          total_sessions: bundle.stats.totalSessions,
+          total_tokens: totalTokens,
+          tool_count: toolCount,
+          longest_session: bundle.stats.longestSessionMinutes,
+          night_coding: nightPercentage,
+          cache_rate: cacheRate,
+          persona_id: bundle.personaId || null,
+        });
+
+      if (insertError) {
+        console.error('Supabase insert error:', insertError);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+
+      // Increment total wraps and compute percentiles in parallel
+      const [wrapsResult, percentilesResult] = await Promise.all([
+        supabase.rpc('increment_total_wraps'),
+        supabase.rpc('compute_percentiles', {
+          p_total_tokens: totalTokens,
+          p_tool_count: toolCount,
+          p_night_coding: nightPercentage,
+          p_longest_session: bundle.stats.longestSessionMinutes,
+          p_cache_rate: cacheRate,
+          p_total_sessions: bundle.stats.totalSessions,
+        }),
+      ]);
+
+      const totalWraps = wrapsResult.data ?? 0;
+      const p = percentilesResult.data?.[0];
+
+      const percentiles = {
+        tokenUsage: p?.token_usage ?? 50,
+        toolDiversity: p?.tool_diversity ?? 50,
+        nightCoding: p?.night_coding ?? 50,
+        sessionLength: p?.session_length ?? 50,
+        cacheEfficiency: p?.cache_efficiency ?? 50,
+        totalSessions: p?.total_sessions ?? 50,
+      };
+
+      return res.status(200).json({
+        success: true,
+        percentiles,
+        totalWraps,
+      });
+    }
+
+    // Fallback to in-memory storage
     const bundleData = {
       timestamp: Date.now(),
       stats: {
@@ -100,62 +149,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     };
 
-    let totalWraps: number;
-
-    if (redis) {
-      // Use Redis for persistent storage
-      const bundleKey = `bundle:${Date.now()}:${Math.random().toString(36).slice(2)}`;
-      await redis.set(bundleKey, JSON.stringify(bundleData), { ex: 60 * 60 * 24 * 365 }); // 1 year TTL
-      await redis.lpush('bundles:recent', bundleKey);
-      await redis.ltrim('bundles:recent', 0, 9999); // Keep last 10000
-
-      // Increment global counter
-      totalWraps = await redis.incr('stats:totalWraps');
-
-      // Track persona popularity
-      if (bundle.personaId) {
-        await redis.zincrby('stats:personas', 1, bundle.personaId);
-      }
-
-      // Store individual metrics in sorted sets for percentile computation
-      await redis.zadd('metrics:tokens', { score: totalTokens, member: bundleKey });
-      await redis.zadd('metrics:tools', { score: toolCount, member: bundleKey });
-      await redis.zadd('metrics:night', { score: nightPercentage, member: bundleKey });
-      await redis.zadd('metrics:sessions', { score: bundle.stats.longestSessionMinutes, member: bundleKey });
-      await redis.zadd('metrics:cache', { score: cacheRate, member: bundleKey });
-      await redis.zadd('metrics:totalSessions', { score: bundle.stats.totalSessions, member: bundleKey });
-
-      // Get percentiles using sorted set rank
-      const tokenRank = await redis.zrank('metrics:tokens', bundleKey) || 0;
-      const tokenTotal = await redis.zcard('metrics:tokens');
-      const toolRank = await redis.zrank('metrics:tools', bundleKey) || 0;
-      const toolTotal = await redis.zcard('metrics:tools');
-      const nightRank = await redis.zrank('metrics:night', bundleKey) || 0;
-      const nightTotal = await redis.zcard('metrics:night');
-      const sessionRank = await redis.zrank('metrics:sessions', bundleKey) || 0;
-      const sessionTotal = await redis.zcard('metrics:sessions');
-      const cacheRank = await redis.zrank('metrics:cache', bundleKey) || 0;
-      const cacheTotal = await redis.zcard('metrics:cache');
-      const totalSessionsRank = await redis.zrank('metrics:totalSessions', bundleKey) || 0;
-      const totalSessionsTotal = await redis.zcard('metrics:totalSessions');
-
-      const percentiles = {
-        tokenUsage: Math.round(100 - (tokenRank / Math.max(tokenTotal, 1)) * 100),
-        toolDiversity: Math.round(100 - (toolRank / Math.max(toolTotal, 1)) * 100),
-        nightCoding: Math.round(100 - (nightRank / Math.max(nightTotal, 1)) * 100),
-        sessionLength: Math.round(100 - (sessionRank / Math.max(sessionTotal, 1)) * 100),
-        cacheEfficiency: Math.round(100 - (cacheRank / Math.max(cacheTotal, 1)) * 100),
-        totalSessions: Math.round(100 - (totalSessionsRank / Math.max(totalSessionsTotal, 1)) * 100),
-      };
-
-      return res.status(200).json({
-        success: true,
-        percentiles,
-        totalWraps,
-      });
-    }
-
-    // Fallback to in-memory storage
     inMemoryBundles.push(bundleData);
 
     // Keep only last 10000 entries

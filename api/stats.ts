@@ -1,13 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { Redis } from '@upstash/redis';
+import { getSupabase } from './_supabase.js';
 
-// Initialize Redis if environment variables are set
-// Supports both Vercel KV (KV_REST_API_*) and Upstash (UPSTASH_REDIS_REST_*) naming
-const redisUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const redisToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const redis = redisUrl && redisToken
-  ? new Redis({ url: redisUrl, token: redisToken })
-  : null;
+const supabase = getSupabase();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -24,39 +18,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    if (redis) {
-      // Get real stats from Redis
-      const totalWraps = await redis.get<number>('stats:totalWraps') || 0;
+    if (supabase) {
+      const [wrapsResult, personaResult, sessionsResult] = await Promise.all([
+        supabase.from('global_stats').select('total_wraps').eq('id', 1).single(),
+        supabase.rpc('get_top_persona'),
+        supabase
+          .from('bundle_metrics')
+          .select('total_sessions')
+          .order('created_at', { ascending: false })
+          .limit(100),
+      ]);
 
-      // Get top persona from leaderboard
-      const topPersonas = await redis.zrange<string[]>('stats:personas', 0, 0, { rev: true });
-      const topPersona = topPersonas?.[0] || 'midnight-architect';
+      const totalWraps = wrapsResult.data?.total_wraps || 0;
+      const topPersona = personaResult.data || 'midnight-architect';
 
-      // Get average sessions from recent bundles
-      const recentKeys = await redis.lrange<string>('bundles:recent', 0, 99);
-      let totalSessions = 0;
-      let count = 0;
-
-      for (const key of recentKeys || []) {
-        const bundle = await redis.get<string>(key);
-        if (bundle) {
-          const data = typeof bundle === 'string' ? JSON.parse(bundle) : bundle;
-          totalSessions += data.stats?.totalSessions || 0;
-          count++;
-        }
+      let avgSessions = 0;
+      if (sessionsResult.data && sessionsResult.data.length > 0) {
+        const sum = sessionsResult.data.reduce(
+          (acc: number, row: { total_sessions: number }) => acc + row.total_sessions,
+          0
+        );
+        avgSessions = Math.round(sum / sessionsResult.data.length);
       }
-
-      const avgSessions = count > 0 ? Math.round(totalSessions / count) : 0;
 
       return res.status(200).json({
         totalWraps,
-        totalTokensProcessed: totalWraps * 500000, // Estimated average
+        totalTokensProcessed: totalWraps * 500000,
         topPersona,
         avgSessions,
       });
     }
 
-    // Return placeholder stats for demo when no Redis
+    // Return placeholder stats for demo when no Supabase
     return res.status(200).json({
       totalWraps: 1234,
       totalTokensProcessed: 5678901234,
