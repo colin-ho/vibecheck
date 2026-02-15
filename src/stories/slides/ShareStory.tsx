@@ -11,6 +11,7 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 	const [showPreview, setShowPreview] = useState(false)
 	const [showConfetti, setShowConfetti] = useState(false)
 	const [copySuccess, setCopySuccess] = useState(false)
+	const [installCopied, setInstallCopied] = useState(false)
 	const shareCardRef = useRef<HTMLDivElement>(null)
 
 	const totalTokens = stats.totalTokens.input + stats.totalTokens.output
@@ -291,7 +292,16 @@ export function ShareStory({ data, isActive }: StorySlideProps) {
 				transition={{ delay: 0.8 }}
 			>
 				<p>expose your friends too</p>
-				<p className="mt-1 font-mono text-dark/40">npx skills add colinho/vibechecked</p>
+				<p
+					className="mt-1 font-mono text-dark/40 cursor-pointer hover:text-dark/60 transition-colors"
+					onClick={async () => {
+						await navigator.clipboard.writeText('npx skills add colinho/vibechecked')
+						setInstallCopied(true)
+						setTimeout(() => setInstallCopied(false), 2000)
+					}}
+				>
+					{installCopied ? 'copied!' : 'npx skills add colinho/vibechecked'}
+				</p>
 			</motion.div>
 
 			{/* Hidden share card for export - using opacity instead of off-screen for better rendering */}
