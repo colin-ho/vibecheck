@@ -19,7 +19,7 @@ npm run lint         # ESLint check
 
 ### Data Flow
 
-1. **Script** (`skill/`): User runs install.sh → Python script extracts stats from `~/.claude/stats-cache.json` and session JSONL files → calls Claude for persona analysis → compiled into `AnonymousBundle`
+1. **Skill** (`skills/vibechecked/`): User installs via `npx skills add colinho/vibechecked`, invokes `/vibechecked` in Claude Code → Python script extracts stats → 3 parallel Claude analyses → deterministic merge into `AnonymousBundle`
 
 2. **Encoding**: Bundle → pako.deflate → base64url → URL param `?d=<encoded>` (or short ID via `?id=<id>`)
 
@@ -32,7 +32,7 @@ npm run lint         # ESLint check
 - `src/stories/slides/` - 15 individual animated story slides, each implements `StorySlideProps`
 - `src/personas/definitions.ts` - 16+ persona definitions with metadata and `determinePersona()` algorithm
 - `src/data/` - Types, URL encoding/decoding, bundle enrichment, mock data
-- `skill/scripts/vibes.py` - Python script for local stats extraction (requires Python 3.8+)
+- `skills/vibechecked/` - Claude Code skill with SKILL.md, extract_stats.py, merge_and_upload.py
 - `api/` - Vercel serverless endpoints (`submit.ts` for percentiles, `store.ts` for bundle storage)
 
 ### Slide Component Pattern
@@ -54,21 +54,20 @@ All story slides:
 
 ### Shared Schema
 
-The `AnonymousBundle` type is shared between Python and TypeScript via JSON Schema:
+The `AnonymousBundle` type is defined via JSON Schema:
 
 ```
 schema/bundle.schema.json     # Single source of truth
         ↓
    npm run generate:types
         ↓
-├── src/data/bundle.generated.ts   # TypeScript types
-└── skill/scripts/bundle_types.py  # Python Pydantic models
+└── src/data/bundle.generated.ts   # TypeScript types
 ```
 
 When modifying the bundle structure:
 1. Edit `schema/bundle.schema.json`
 2. Run `npm run generate:types`
-3. Update `vibes.py` to match the new schema
+3. Update `skills/vibechecked/scripts/extract_stats.py` and `merge_and_upload.py` if needed
 
 ## Tech Stack
 
@@ -100,16 +99,14 @@ export default defineConfig({
 
 Then visit `http://localhost:5173/vibes?id=<id>` where `<id>` is a bundle ID from production.
 
-### Python / UV
+### Skill Scripts
 
-This project uses [UV](https://docs.astral.sh/uv/) for Python dependency management.
+The extraction scripts in `skills/vibechecked/scripts/` use Python stdlib only (no external dependencies).
 
 ```bash
-uv sync --extra dev         # Install dependencies (including dev extras)
-uv run pytest               # Run tests
-uv run python skill/scripts/vibes.py              # Full run with Claude analysis
-uv run python skill/scripts/vibes.py --stats-only # Output raw JSON bundle without Claude
-uv run python skill/scripts/vibes.py -v           # Verbose mode
+python3 skills/vibechecked/scripts/extract_stats.py                              # Extract stats JSON
+python3 skills/vibechecked/scripts/extract_stats.py --prompts-dir /tmp/vibes     # Custom prompts dir
+python3 skills/vibechecked/scripts/merge_and_upload.py --dry-run                 # Preview merged bundle
 ```
 
 ## Privacy Model

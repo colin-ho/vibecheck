@@ -22,32 +22,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pydantic
+      - name: Test extract_stats.py --help
+        run: python3 skills/vibechecked/scripts/extract_stats.py --help
 
-      - name: Run vibes.py tests
-        run: |
-          cd skill
-          python -m pytest tests/test_vibes.py -v
-
-  test-install-script:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Run install.sh tests
-        run: |
-          chmod +x skill/tests/test_install.sh
-          skill/tests/test_install.sh
+      - name: Test merge_and_upload.py --help
+        run: python3 skills/vibechecked/scripts/merge_and_upload.py --help

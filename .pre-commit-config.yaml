@@ -7,7 +7,7 @@ repos:
         entry: node schema/check-generated.js
         language: system
         pass_filenames: false
-        files: ^(schema/bundle\.schema\.json|src/data/bundle\.generated\.ts|skill/scripts/bundle_types\.py)$
+        files: ^(schema/bundle\.schema\.json|src/data/bundle\.generated\.ts)$
 
   # Python - Ruff linting and formatting
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -15,22 +15,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-        files: ^skill/
-        exclude: bundle_types\.py$
+        files: ^skills/
       - id: ruff-format
-        files: ^skill/
-        exclude: bundle_types\.py$
-
-  # Python - Tests via uv
-  - repo: local
-    hooks:
-      - id: pytest
-        name: pytest
-        entry: uv run pytest
-        language: system
-        pass_filenames: false
-        files: ^skill/
-        types: [python]
+        files: ^skills/
 
   # Frontend - ESLint
   - repo: local

@@ -30,13 +30,13 @@ vibechecked/
 │   ├── submit.ts                 # Receive bundles, compute percentiles
 │   └── stats.ts                  # Global aggregate stats
 │
-├── skill/                        # Stats extraction scripts
+├── skills/vibechecked/            # Claude Code skill
+│   ├── SKILL.md                  # Skill entry point (/vibechecked)
 │   ├── scripts/
-│   │   ├── vibes.py              # Main script: extract stats, call Claude, upload
-│   │   └── bundle_types.py       # Pydantic models (generated from schema)
-│   ├── tests/                    # Python tests
-│   ├── install.sh                # One-line installer
-│   └── README.md
+│   │   ├── extract_stats.py      # Stats extraction (stdlib Python)
+│   │   └── merge_and_upload.py   # Merge analysis results + upload
+│   └── references/
+│       └── analysis-prompts.md   # Analysis instructions for 3 parallel tasks
 │
 ├── src/
 │   ├── App.tsx                   # Main app component
@@ -121,16 +121,24 @@ http://localhost:5173/?d=<base64url-encoded-gzipped-json>
 
 ## Usage
 
+Install as a Claude Code skill:
+
 ```bash
-curl -fsSL https://getyourvibechecked.vercel.app/install.sh | bash
+npx skills add colinho/vibechecked
 ```
 
-This downloads and runs the script, which:
-1. Extracts your Claude Code usage stats locally
-2. Calls Claude to analyze and determine your persona
-3. Uploads anonymous stats and returns a personalized URL
+Then invoke in Claude Code:
 
-**Requirements:** Claude Code CLI, Python 3.8+, existing usage stats
+```
+/vibechecked
+```
+
+This will:
+1. Extract your Claude Code usage stats locally
+2. Run 3 parallel analyses to determine your persona, style, and memorable prompts
+3. Upload anonymous stats and present a personalized URL
+
+**Requirements:** Claude Code, Python 3.8+, existing usage stats
 
 ## Story Screens
 

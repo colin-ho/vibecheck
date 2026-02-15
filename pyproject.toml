@@ -3,20 +3,12 @@ name = "vibechecked-skill"
 version = "1.0.0"
 description = "VibeChecked skill for Claude Code"
 requires-python = ">=3.8"
-dependencies = [
-    "pydantic>=2.10.6",
-]
-
-[project.optional-dependencies]
-dev = [
-    "datamodel-code-generator>=0.25.0",
-    "pytest>=7.0.0",
-]
+dependencies = []
 
 [tool.ruff]
 target-version = "py38"
 line-length = 120
-src = ["skill"]
+src = ["skills"]
 
 [tool.ruff.lint]
 select = [
@@ -32,16 +24,6 @@ ignore = [
     "E501",   # line too long (handled by formatter)
 ]
 
-[tool.ruff.lint.pyupgrade]
-# Pydantic evaluates type annotations at runtime, so we need to keep
-# Python 3.8 compatible typing syntax (Optional, List, Dict, etc.)
-keep-runtime-typing = true
-
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-
-[tool.pytest.ini_options]
-testpaths = ["skill/tests"]
-python_files = ["test_*.py"]
-addopts = "-v"
