@@ -6,7 +6,7 @@
  */
 
 /**
- * Anonymous bundle sent to server - no PII. Shared between Python (vibes.py) and TypeScript (types.ts).
+ * Anonymous bundle sent to server - no PII.
  */
 export interface AnonymousBundle {
   stats: Stats;
