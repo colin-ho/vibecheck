@@ -1,10 +1,10 @@
-# VibeChecked
+# [VibeChecked](https://getyourvibechecked.vercel.app)
 
-Your Claude Code usage stats, turned into an animated story.
+Your Claude Code usage stats, turned into an animated story. **[See an example](https://getyourvibechecked.vercel.app/vibes?id=WJbfkgRJ)**
 
-**[getyourvibechecked.vercel.app](https://getyourvibechecked.vercel.app)** · **[See an example](https://getyourvibechecked.vercel.app/vibes?id=WJbfkgRJ)**
-
-![VibeChecked demo](assets/demo.gif)
+<p align="center">
+  <img src="assets/demo.gif" alt="VibeChecked demo" />
+</p>
 
 ## Get yours
 
