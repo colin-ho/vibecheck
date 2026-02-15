@@ -360,7 +360,7 @@ export function LandingPage() {
 							onClick={handleCopy}
 						>
 							<div className="flex items-start gap-3">
-								<code className="font-mono flex-1 text-[clamp(10px,1.5vw,13px)] break-all text-right text-[#3b110c]/90 pr-2">
+								<code className="font-mono flex-1 text-[clamp(10px,1.5vw,13px)] break-words text-right text-[#3b110c]/90 pr-2">
 									{installCommand}
 								</code>
 								<button
