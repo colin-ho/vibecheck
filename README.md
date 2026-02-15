@@ -8,10 +8,15 @@ Your Claude Code usage stats, turned into an animated story.
 
 ## Get yours
 
-Run these commands in [Claude Code](https://claude.ai/code):
+Install the skill:
+
+```bash
+npx skills add colinho/vibechecked
+```
+
+Then run in [Claude Code](https://claude.ai/code):
 
 ```
-npx skills add colinho/vibechecked
 /vibechecked
 ```
 
