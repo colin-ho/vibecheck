@@ -23,6 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 __pycache__/
-
-# Generated at build time
-public/install.sh
